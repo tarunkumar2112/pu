@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const BRAND_BLUE = "#1F2B44";
 const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
@@ -310,6 +311,12 @@ export default function AdminPage() {
               <option value="ACTIVE">Active only</option>
               <option value="DEACTIVATED">Deactivated only</option>
             </select>
+            <Link
+              href="/admin/opticon"
+              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+            >
+              Opticon Admin
+            </Link>
             <button
               onClick={() => fetchProducts(page, filter, locationId || undefined)}
               disabled={loading || authStatus !== "ok"}

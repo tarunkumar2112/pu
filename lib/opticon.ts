@@ -164,3 +164,62 @@ export async function testEbs50Connection(): Promise<Ebs50ConnectionResult> {
     };
   }
 }
+
+/**
+ * Fetch products from EBS50 product table.
+ * GET /api/Products – returns all rows; response reveals table structure (columns).
+ */
+export async function fetchEbs50Products(): Promise<{
+  success: boolean;
+  products: Record<string, unknown>[];
+  columns?: string[];
+  error?: string;
+}> {
+  const baseUrl = getEbs50BaseUrl();
+  const apiKey = getEbs50ApiKey();
+
+  if (!baseUrl) {
+    return { success: false, products: [], error: "EBS50_BASE_URL is not set" };
+  }
+  if (!apiKey) {
+    return { success: false, products: [], error: "EBS50_API_KEY is not set" };
+  }
+
+  try {
+    const url = `${baseUrl}/api/Products`;
+    const res = await ebs50Fetch(url, { "x-api-key": apiKey });
+
+    if (res.status === 401) {
+      return { success: false, products: [], error: "API key invalid or expired" };
+    }
+    if (!res.ok) {
+      return { success: false, products: [], error: `EBS50 returned ${res.status}` };
+    }
+
+    const data = await res.json();
+    let products: Record<string, unknown>[] = [];
+
+    if (Array.isArray(data)) {
+      products = data;
+    } else if (data?.Rows && Array.isArray(data.Rows)) {
+      products = data.Rows;
+    } else if (data?.data && Array.isArray(data.data)) {
+      products = data.data;
+    } else if (typeof data === "object" && data !== null) {
+      products = [data];
+    }
+
+    const columns =
+      products.length > 0 && typeof products[0] === "object" && products[0] !== null
+        ? Object.keys(products[0] as Record<string, unknown>)
+        : undefined;
+
+    return { success: true, products, columns };
+  } catch (err) {
+    return {
+      success: false,
+      products: [],
+      error: err instanceof Error ? err.message : "Failed to fetch products",
+    };
+  }
+}
