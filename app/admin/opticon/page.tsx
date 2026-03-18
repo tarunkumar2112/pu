@@ -16,6 +16,20 @@ export default function OpticonAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<"checking" | "ok" | "fail">("checking");
   const [selectedProduct, setSelectedProduct] = useState<OpticonProduct | null>(null);
+  const [pushLoading, setPushLoading] = useState(false);
+  const [pushResult, setPushResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [testProduct, setTestProduct] = useState(`{
+  "NotUsed": "",
+  "ProductId": "001",
+  "Barcode": "3083680012256",
+  "Description": "BONDUELLE CARROTS ",
+  "Group": "93",
+  "StandardPrice": "0,95",
+  "SellPrice": "0,89",
+  "Discount": "",
+  "Content": "180",
+  "Unit": "GR"
+}`);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -60,6 +74,31 @@ export default function OpticonAdminPage() {
     if (v === undefined || v === null) return "-";
     if (typeof v === "object") return JSON.stringify(v);
     return String(v);
+  };
+
+  const handlePushProduct = async () => {
+    setPushLoading(true);
+    setPushResult(null);
+    try {
+      const parsed = JSON.parse(testProduct) as Record<string, unknown>;
+      const res = await fetch("/api/opticon/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed),
+      });
+      const data = await res.json();
+      setPushResult(
+        data.success ? { ok: true, msg: "Product pushed successfully" } : { ok: false, msg: data.error ?? "Failed" }
+      );
+      if (data.success) fetchProducts();
+    } catch (err) {
+      setPushResult({
+        ok: false,
+        msg: err instanceof Error ? err.message : "Invalid JSON or request failed",
+      });
+    } finally {
+      setPushLoading(false);
+    }
   };
 
   return (
@@ -133,6 +172,33 @@ export default function OpticonAdminPage() {
             Connect to EBS50 first. Ensure the app runs on the same network as the EBS50 and check .env.local (EBS50_BASE_URL, EBS50_API_KEY).
           </div>
         )}
+
+        <div className="mb-8 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-zinc-900">Manual product upload (test)</h2>
+          <p className="mt-1 text-sm text-zinc-500">Paste JSON and POST to EBS50 ChangeProducts</p>
+          <textarea
+            value={testProduct}
+            onChange={(e) => setTestProduct(e.target.value)}
+            className="mt-4 w-full rounded-lg border border-zinc-300 p-3 font-mono text-sm"
+            rows={14}
+            spellCheck={false}
+          />
+          <div className="mt-4 flex items-center gap-4">
+            <button
+              onClick={handlePushProduct}
+              disabled={pushLoading || connectionStatus !== "ok"}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              style={{ backgroundColor: BRAND_BLUE }}
+            >
+              {pushLoading ? "Pushing..." : "POST product"}
+            </button>
+            {pushResult && (
+              <span className={`text-sm font-medium ${pushResult.ok ? "text-emerald-600" : "text-red-600"}`}>
+                {pushResult.msg}
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
           <div className="border-b border-zinc-200 px-6 py-4">

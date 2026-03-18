@@ -223,3 +223,94 @@ export async function fetchEbs50Products(): Promise<{
     };
   }
 }
+
+/**
+ * POST to EBS50 (for ChangeProducts, etc.)
+ */
+async function ebs50Post(url: string, body: unknown, headers: Record<string, string> = {}): Promise<Response> {
+  const defaultHeaders: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    ...headers,
+  };
+  const bodyStr = JSON.stringify(body);
+  if (!isInsecure()) {
+    return fetch(url, {
+      method: "POST",
+      headers: defaultHeaders,
+      body: bodyStr,
+      signal: AbortSignal.timeout(15000),
+    });
+  }
+  const agent = new https.Agent({ rejectUnauthorized: false });
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      url,
+      {
+        method: "POST",
+        headers: {
+          ...defaultHeaders,
+          "Content-Length": Buffer.byteLength(bodyStr),
+        },
+        agent,
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (c) => chunks.push(c));
+        res.on("end", () =>
+          resolve(
+            new Response(Buffer.concat(chunks).toString(), {
+              status: res.statusCode ?? 500,
+              headers: new Headers(res.headers as Record<string, string>),
+            })
+          )
+        );
+      }
+    );
+    req.on("error", reject);
+    req.setTimeout(15000, () => {
+      req.destroy();
+      reject(new Error("timeout"));
+    });
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+/**
+ * Push product(s) to EBS50 via ChangeProducts.
+ * POST /api/v2.0/Products/ChangeProducts – accepts JSON array of product objects.
+ */
+export async function pushProductToEbs50(product: Record<string, unknown>): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  const baseUrl = getEbs50BaseUrl();
+  const apiKey = getEbs50ApiKey();
+
+  if (!baseUrl) return { success: false, error: "EBS50_BASE_URL is not set" };
+  if (!apiKey) return { success: false, error: "EBS50_API_KEY is not set" };
+
+  try {
+    const url = `${baseUrl}/api/v2.0/Products/ChangeProducts`;
+    const body = [product];
+    const res = await ebs50Post(url, body, { "x-api-key": apiKey });
+
+    if (res.status === 401) return { success: false, error: "API key invalid or expired" };
+    if (!res.ok) {
+      const text = await res.text();
+      return { success: false, error: `EBS50 returned ${res.status}: ${text.slice(0, 200)}` };
+    }
+
+    const data = (await res.json()) as { Result?: string; Param1?: string };
+    if (data.Result && data.Result !== "OK" && !data.Result.startsWith("OK")) {
+      return { success: false, error: data.Result ?? data.Param1 ?? "Unknown error" };
+    }
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to push product",
+    };
+  }
+}
