@@ -27,7 +27,7 @@ export default function Home() {
           className="rounded-lg px-6 py-3 text-base font-medium text-white transition hover:opacity-90"
           style={{ backgroundColor: BRAND_BLUE }}
         >
-          Open Admin Dashboard
+          Open Dashboard
         </Link>
       </main>
     </div>

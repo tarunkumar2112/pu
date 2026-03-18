@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import Link from "next/link";
 
 const BRAND_BLUE = "#1F2B44";
-const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
 
 type OpticonProduct = Record<string, unknown>;
 
@@ -101,66 +98,44 @@ export default function OpticonAdminPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-zinc-50">
-      <header
-        className="border-b border-zinc-200 bg-white px-6 py-4"
-        style={{ borderBottomColor: "rgba(31,43,68,0.1)" }}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/admin" className="flex items-center gap-4">
-              <Image
-                src={LOGO_URL}
-                alt="Perfect Union"
-                width={140}
-                height={40}
-                className="h-10 w-auto object-contain"
-                unoptimized
-              />
-            </Link>
-            <div>
-              <h1 className="text-lg font-semibold text-zinc-900">Opticon Admin</h1>
-              <p className="text-sm text-zinc-500">EBS50 product table</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm ${
-                connectionStatus === "ok"
-                  ? "bg-emerald-100 text-emerald-800"
-                  : connectionStatus === "fail"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-zinc-200 text-zinc-600"
-              }`}
-              title="EBS50 connection"
-            >
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  connectionStatus === "ok" ? "bg-emerald-500" : connectionStatus === "fail" ? "bg-red-500" : "animate-pulse bg-zinc-400"
-                }`}
-              />
-              {connectionStatus === "ok" ? "Connected" : connectionStatus === "fail" ? "Disconnected" : "Checking..."}
-            </span>
-            <Link
-              href="/admin"
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-            >
-              ← Treez Admin
-            </Link>
-            <button
-              onClick={() => fetchProducts()}
-              disabled={loading || connectionStatus !== "ok"}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
-              style={{ backgroundColor: BRAND_BLUE }}
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </button>
-          </div>
-        </div>
-      </header>
+  const StatusBadge = () => (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${
+        connectionStatus === "ok"
+          ? "bg-emerald-100 text-emerald-800"
+          : connectionStatus === "fail"
+            ? "bg-red-100 text-red-800"
+            : "bg-zinc-200 text-zinc-600"
+      }`}
+      title="EBS50 connection"
+    >
+      <span
+        className={`h-2 w-2 rounded-full ${
+          connectionStatus === "ok" ? "bg-emerald-500" : connectionStatus === "fail" ? "bg-red-500" : "animate-pulse bg-zinc-400"
+        }`}
+      />
+      {connectionStatus === "ok" ? "Connected" : connectionStatus === "fail" ? "Disconnected" : "Checking..."}
+    </span>
+  );
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-zinc-900">Opticon Products</h1>
+        <div className="flex items-center gap-4">
+          <StatusBadge />
+          <button
+            onClick={() => fetchProducts()}
+            disabled={loading || connectionStatus !== "ok"}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: BRAND_BLUE }}
+          >
+            {loading ? "Loading..." : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      <div>
         {error && (
           <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
             {error}
@@ -264,8 +239,7 @@ export default function OpticonAdminPage() {
             </>
           )}
         </div>
-
-      </main>
+      </div>
 
       {selectedProduct && (
         <div

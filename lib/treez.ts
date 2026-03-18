@@ -20,7 +20,7 @@ export interface TreezTokenResponse {
 
 export interface TreezProduct {
   productId?: number;
-  product_id?: number;
+  product_id?: string | number;
   sku?: string;
   name?: string;
   productName?: string;
@@ -29,12 +29,63 @@ export interface TreezProduct {
   price?: number;
   retailPrice?: number;
   category?: string;
+  category_type?: string;
   categoryName?: string;
   brand?: string;
   brandName?: string;
   isActive?: boolean;
   updatedDate?: string;
+  product_status?: string;
+  sellable_quantity?: number;
+  product_configurable_fields?: Record<string, unknown>;
+  pricing?: Record<string, unknown>;
+  product_barcodes?: Array<{ sku?: string; type?: string }>;
+  e_commerce?: Record<string, unknown>;
   [key: string]: unknown;
+}
+
+export interface ProductDisplay {
+  name: string;
+  status: string;
+  sku: string;
+  category: string;
+  brand: string;
+  size: string;
+  price: string;
+  tier: string;
+  subtype: string;
+  qty: string;
+  minVisible: string;
+}
+
+export function getProductDisplay(p: TreezProduct): ProductDisplay {
+  const get = (v: unknown): string =>
+    v === undefined || v === null ? "-" : String(v);
+  const num = (v: unknown): string =>
+    typeof v === "number" && !Number.isNaN(v) ? String(v) : "-";
+  const cfg = p.product_configurable_fields as Record<string, unknown> | undefined;
+  const pricing = p.pricing as {
+    price_sell?: number;
+    tier_name?: string;
+    tier_pricing_detail?: Array<{ price_per_value?: number }>;
+  } | undefined;
+  const tierDetail = pricing?.tier_pricing_detail?.[0];
+  const priceVal = pricing?.price_sell ?? tierDetail?.price_per_value ?? p.price ?? p.retailPrice;
+  const skuFromBc = (p.product_barcodes as Array<{ sku?: string }> | undefined)?.[0]?.sku;
+  const statusVal = p.product_status ?? (p.isActive === true ? "ACTIVE" : p.isActive === false ? "DEACTIVATED" : undefined);
+  return {
+    name: get(cfg?.name ?? p.name ?? p.productName ?? (p.e_commerce as { menu_title?: string })?.menu_title),
+    status: get(statusVal) === "ACTIVE" ? "Active" : get(statusVal) === "DEACTIVATED" ? "Deactivated" : get(statusVal),
+    sku: get(skuFromBc ?? cfg?.external_id ?? p.sku),
+    category: get(p.category_type ?? p.category ?? p.categoryName ?? cfg?.category),
+    brand: get(cfg?.brand ?? p.brand ?? p.brandName),
+    size: get(cfg?.size ?? p.size ?? p.size_unit ?? p.productSize),
+    price: typeof priceVal === "number" ? `$${priceVal}` : num(priceVal),
+    tier: get(pricing?.tier_name ?? p.category_type ?? p.tier),
+    subtype: get(cfg?.subtype ?? p.product_subtype ?? p.subtype),
+    qty: num(p.sellable_quantity ?? p.quantity ?? p.qty),
+    minVisible: num((p.e_commerce as { minimum_visible_inventory_level?: number })?.minimum_visible_inventory_level ?? p.min_visible_quantity ?? p.minVisible ?? p.min_visible),
+  };
 }
 
 export interface TreezProductResponse {
