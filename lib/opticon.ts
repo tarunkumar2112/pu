@@ -278,8 +278,9 @@ async function ebs50Post(url: string, body: unknown, headers: Record<string, str
 }
 
 /**
- * Push product(s) to EBS50 via ChangeProducts.
- * POST /api/v2.0/Products/ChangeProducts – accepts JSON array of product objects.
+ * Push product(s) to EBS50.
+ * Tries v1.0 POST /api/Products first (same format as GET returns).
+ * Falls back to v2.0 POST /api/v2.0/Products/ChangeProducts if v1 returns 404.
  */
 export async function pushProductToEbs50(product: Record<string, unknown>): Promise<{
   success: boolean;
@@ -291,10 +292,19 @@ export async function pushProductToEbs50(product: Record<string, unknown>): Prom
   if (!baseUrl) return { success: false, error: "EBS50_BASE_URL is not set" };
   if (!apiKey) return { success: false, error: "EBS50_API_KEY is not set" };
 
+  const body = [product];
+  const headers = { "x-api-key": apiKey };
+
   try {
-    const url = `${baseUrl}/api/v2.0/Products/ChangeProducts`;
-    const body = [product];
-    const res = await ebs50Post(url, body, { "x-api-key": apiKey });
+    // v1.0: POST /api/Products – same format as GET returns
+    let url = `${baseUrl}/api/Products`;
+    let res = await ebs50Post(url, body, headers);
+
+    if (res.status === 404) {
+      // v2.0: POST /api/v2.0/Products/ChangeProducts
+      url = `${baseUrl}/api/v2.0/Products/ChangeProducts`;
+      res = await ebs50Post(url, body, headers);
+    }
 
     if (res.status === 401) return { success: false, error: "API key invalid or expired" };
     if (!res.ok) {
@@ -302,9 +312,15 @@ export async function pushProductToEbs50(product: Record<string, unknown>): Prom
       return { success: false, error: `EBS50 returned ${res.status}: ${text.slice(0, 200)}` };
     }
 
-    const data = (await res.json()) as { Result?: string; Param1?: string };
-    if (data.Result && data.Result !== "OK" && !data.Result.startsWith("OK")) {
-      return { success: false, error: data.Result ?? data.Param1 ?? "Unknown error" };
+    const text = await res.text();
+    if (!text) return { success: true };
+    try {
+      const data = JSON.parse(text) as { Result?: string; Param1?: string };
+      if (data?.Result && data.Result !== "OK" && !String(data.Result).startsWith("OK")) {
+        return { success: false, error: data.Result ?? data.Param1 ?? "Unknown error" };
+      }
+    } catch {
+      // v1.0 may return empty or non-JSON; 200 = success
     }
     return { success: true };
   } catch (err) {
