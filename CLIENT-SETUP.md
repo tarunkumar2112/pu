@@ -3,8 +3,28 @@
 ## Prerequisites
 
 1. **Node.js** – Install from https://nodejs.org/ (LTS version)
-2. **Project folder** – Copy the entire project to the client's PC
-3. **Same network** – PC must be on the same network as the EBS50 (ebs50.local)
+2. **Project folder** – Copy the entire project to the client's machine
+3. **Same network** – Machine must be on the same network as the EBS50 (ebs50.local)
+
+---
+
+## Windows
+
+**Run:** Double-click `start-app.bat`
+
+---
+
+## macOS / Linux
+
+**First time:** Make the script executable (in Terminal):
+```bash
+chmod +x start-app.sh
+```
+
+**Run:** Double-click `start-app.sh` or in Terminal:
+```bash
+./start-app.sh
+```
 
 ## One-time setup
 
