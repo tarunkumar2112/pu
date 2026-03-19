@@ -88,6 +88,17 @@ export function getProductDisplay(p: TreezProduct): ProductDisplay {
   };
 }
 
+/** Check if product has a barcode (product_barcodes, manufacturer_barcode, or barcode) */
+export function productHasBarcode(p: TreezProduct): boolean {
+  const barcodes = p.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+  const first = barcodes?.[0];
+  const fromBarcodes = first?.sku ?? (first as { barcode?: string })?.barcode;
+  const cfg = p.product_configurable_fields as Record<string, unknown> | undefined;
+  const manufacturerBc = cfg?.manufacturer_barcode as string | undefined;
+  const val = fromBarcodes ?? manufacturerBc ?? p.barcode ?? "";
+  return typeof val === "string" && val.trim() !== "";
+}
+
 export interface TreezProductResponse {
   resultCode?: string;
   resultReason?: string;

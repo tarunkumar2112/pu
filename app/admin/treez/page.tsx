@@ -15,6 +15,7 @@ export default function TreezProductsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [filter, setFilter] = useState<FilterType>("SELLABLE");
+  const [barcodeOnly, setBarcodeOnly] = useState(false);
   const [locationId, setLocationId] = useState<string | undefined>(undefined);
   const [locations, setLocations] = useState<TreezLocation[]>([]);
   const [treezStatus, setTreezStatus] = useState<"checking" | "ok" | "fail">("checking");
@@ -31,6 +32,7 @@ export default function TreezProductsPage() {
         filter,
       });
       if (locationId) params.set("location", locationId);
+      if (barcodeOnly) params.set("barcode_only", "true");
       const res = await fetch(`/api/products?${params}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Failed to fetch products");
@@ -43,7 +45,7 @@ export default function TreezProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, locationId]);
+  }, [page, filter, locationId, barcodeOnly]);
 
   const fetchLocations = useCallback(async () => {
     try {
@@ -138,10 +140,21 @@ export default function TreezProductsPage() {
     );
   };
 
+  const getBarcodeDisplay = (p: TreezProduct): string => {
+    const barcodes = p.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+    const first = barcodes?.[0];
+    const fromBarcodes = first?.sku ?? (first as { barcode?: string })?.barcode;
+    const cfg = p.product_configurable_fields as Record<string, unknown> | undefined;
+    const manufacturerBc = cfg?.manufacturer_barcode as string | undefined;
+    const val = fromBarcodes ?? manufacturerBc ?? p.barcode ?? "";
+    return val || "-";
+  };
+
   const columns = [
     "Name",
     "Status",
     "SKU",
+    "Barcode",
     "Category",
     "Brand",
     "Size",
@@ -231,6 +244,23 @@ export default function TreezProductsPage() {
         ))}
       </div>
 
+      <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
+        <button
+          type="button"
+          onClick={() => {
+            setBarcodeOnly((b) => !b);
+            setPage(1);
+          }}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            barcodeOnly ? "text-white" : "bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-100"
+          }`}
+          style={barcodeOnly ? { backgroundColor: BRAND_BLUE } : undefined}
+          title="Show only products that have a barcode (filters across all products)"
+        >
+          {barcodeOnly ? `Barcode only (${totalCount} products)` : "Barcode only products"}
+        </button>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
         {loading ? (
           <div className="flex justify-center py-24">
@@ -241,7 +271,9 @@ export default function TreezProductsPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
-            No products found. Try a different filter or location.
+            {barcodeOnly
+              ? "No products with barcode found. Turn off &quot;Barcode only&quot; to see all products."
+              : "No products found. Try a different filter or location."}
           </div>
         ) : (
           <>
@@ -288,6 +320,9 @@ export default function TreezProductsPage() {
                         <td className="max-w-[100px] truncate px-3 py-2 text-zinc-600" title={d.sku}>
                           {d.sku}
                         </td>
+                        <td className="max-w-[120px] truncate px-3 py-2 font-mono text-zinc-600" title={getBarcodeDisplay(p)}>
+                          {getBarcodeDisplay(p)}
+                        </td>
                         <td className="max-w-[120px] truncate px-3 py-2 text-zinc-600" title={d.category}>
                           {d.category}
                         </td>
@@ -312,10 +347,12 @@ export default function TreezProductsPage() {
                 </tbody>
               </table>
             </div>
-            {totalPages > 1 && (
+            {totalPages >= 1 && (
               <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3">
                 <p className="text-sm text-zinc-500">
-                  {totalCount.toLocaleString()} total · Page {page} of {totalPages}
+                  {barcodeOnly
+                    ? `${totalCount.toLocaleString()} products with barcode · Page ${page} of ${totalPages}`
+                    : `${totalCount.toLocaleString()} total · Page ${page} of ${totalPages}`}
                 </p>
                 <div className="flex gap-2">
                   <button
