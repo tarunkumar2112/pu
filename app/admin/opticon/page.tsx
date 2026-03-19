@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 const BRAND_BLUE = "#1F2B44";
 
 type OpticonProduct = Record<string, unknown>;
+type EslItem = { Mac?: string; [key: string]: unknown };
 
 export default function OpticonAdminPage() {
   const [products, setProducts] = useState<OpticonProduct[]>([]);
@@ -15,6 +16,13 @@ export default function OpticonAdminPage() {
   const [selectedProduct, setSelectedProduct] = useState<OpticonProduct | null>(null);
   const [pushLoading, setPushLoading] = useState(false);
   const [pushResult, setPushResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [esls, setEsls] = useState<EslItem[]>([]);
+  const [eslLoading, setEslLoading] = useState(false);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [linkProduct, setLinkProduct] = useState<OpticonProduct | null>(null);
+  const [selectedMac, setSelectedMac] = useState("");
+  const [linkLoading, setLinkLoading] = useState(false);
+  const [linkResult, setLinkResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [testProduct, setTestProduct] = useState(`{
   "NotUsed": "",
   "ProductId": "001",
@@ -71,6 +79,64 @@ export default function OpticonAdminPage() {
     if (v === undefined || v === null) return "-";
     if (typeof v === "object") return JSON.stringify(v);
     return String(v);
+  };
+
+  const fetchEsls = useCallback(async () => {
+    setEslLoading(true);
+    try {
+      const res = await fetch("/api/opticon/esl");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.esls)) {
+        setEsls(data.esls);
+      } else {
+        setEsls([]);
+      }
+    } catch {
+      setEsls([]);
+    } finally {
+      setEslLoading(false);
+    }
+  }, []);
+
+  const openLinkModal = (product?: OpticonProduct) => {
+    const p = product ?? selectedProduct;
+    if (!p) return;
+    setLinkProduct(p);
+    setLinkModalOpen(true);
+    setSelectedMac("");
+    setLinkResult(null);
+    fetchEsls();
+  };
+
+  const handleLinkEsl = async () => {
+    if (!linkProduct || !selectedMac) return;
+    const productIdOrBarcode =
+      (linkProduct.ProductId as string) ??
+      (linkProduct.Barcode as string) ??
+      (linkProduct.Description as string) ??
+      "";
+    if (!productIdOrBarcode) {
+      setLinkResult({ ok: false, msg: "Product has no ID, Barcode, or Description" });
+      return;
+    }
+    setLinkLoading(true);
+    setLinkResult(null);
+    try {
+      const res = await fetch("/api/opticon/link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mac: selectedMac, productIdOrBarcode }),
+      });
+      const data = await res.json();
+      setLinkResult(
+        data.success ? { ok: true, msg: "ESL linked successfully" } : { ok: false, msg: data.error ?? "Link failed" }
+      );
+      if (data.success) { setLinkModalOpen(false); setLinkProduct(null); }
+    } catch (err) {
+      setLinkResult({ ok: false, msg: err instanceof Error ? err.message : "Link failed" });
+    } finally {
+      setLinkLoading(false);
+    }
   };
 
   const handlePushProduct = async () => {
@@ -213,6 +279,7 @@ export default function OpticonAdminPage() {
                           {col}
                         </th>
                       ))}
+                      <th className="w-24 px-3 py-3 text-right font-medium text-zinc-900">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -231,6 +298,17 @@ export default function OpticonAdminPage() {
                             {getCellValue(p, col)}
                           </td>
                         ))}
+                        <td className="px-3 py-2 text-right" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => openLinkModal(p)}
+                            disabled={connectionStatus !== "ok"}
+                            className="rounded-lg px-3 py-1.5 text-xs font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+                            style={{ backgroundColor: BRAND_BLUE }}
+                            title="Link to ESL"
+                          >
+                            Link ESL
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -244,7 +322,7 @@ export default function OpticonAdminPage() {
       {selectedProduct && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setSelectedProduct(null)}
+          onClick={() => { setSelectedProduct(null); setLinkModalOpen(false); setLinkProduct(null); }}
         >
           <div
             className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
@@ -252,12 +330,22 @@ export default function OpticonAdminPage() {
           >
             <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
               <h3 className="text-lg font-semibold text-zinc-900">Product meta</h3>
-              <button
-                onClick={() => setSelectedProduct(null)}
-                className="rounded p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => openLinkModal()}
+                  disabled={connectionStatus !== "ok"}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+                  style={{ backgroundColor: BRAND_BLUE }}
+                >
+                  Link to ESL
+                </button>
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="rounded p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="mt-4 space-y-4">
               <dl className="grid gap-2 sm:grid-cols-2">
@@ -276,6 +364,77 @@ export default function OpticonAdminPage() {
                   {JSON.stringify(selectedProduct, null, 2)}
                 </pre>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {linkModalOpen && linkProduct && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
+          onClick={() => { setLinkModalOpen(false); setLinkProduct(null); }}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
+              <h3 className="text-lg font-semibold text-zinc-900">Link to ESL</h3>
+              <button
+                onClick={() => { setLinkModalOpen(false); setLinkProduct(null); }}
+                className="rounded p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-3 text-sm text-zinc-600">
+              Product: <span className="font-medium text-zinc-900">
+                {(linkProduct.Description as string) ?? (linkProduct.ProductId as string) ?? (linkProduct.Barcode as string) ?? "—"}
+              </span>
+            </p>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-zinc-700">Select ESL (by MAC)</label>
+              {eslLoading ? (
+                <div className="mt-2 flex items-center gap-2 text-sm text-zinc-500">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300" style={{ borderTopColor: BRAND_BLUE }} />
+                  Loading ESLs...
+                </div>
+              ) : (
+                <select
+                  value={selectedMac}
+                  onChange={(e) => setSelectedMac(e.target.value)}
+                  className="mt-2 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="">— Select ESL —</option>
+                  {esls.map((esl) => {
+                    const mac = esl.Mac ?? (esl as { mac?: string }).mac ?? "";
+                    return mac ? (
+                      <option key={mac} value={mac}>{mac}</option>
+                    ) : null;
+                  })}
+                </select>
+              )}
+            </div>
+            {linkResult && (
+              <p className={`mt-3 text-sm font-medium ${linkResult.ok ? "text-emerald-600" : "text-red-600"}`}>
+                {linkResult.msg}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => { setLinkModalOpen(false); setLinkProduct(null); }}
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLinkEsl}
+                disabled={!selectedMac || linkLoading || eslLoading}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+                style={{ backgroundColor: BRAND_BLUE }}
+              >
+                {linkLoading ? "Linking..." : "Link"}
+              </button>
             </div>
           </div>
         </div>

@@ -233,7 +233,7 @@ async function ebs50Post(url: string, body: unknown, headers: Record<string, str
     "Content-Type": "application/json",
     ...headers,
   };
-  const bodyStr = JSON.stringify(body);
+  const bodyStr = body === undefined ? "" : JSON.stringify(body);
   if (!isInsecure()) {
     return fetch(url, {
       method: "POST",
@@ -327,6 +327,76 @@ export async function pushProductToEbs50(product: Record<string, unknown>): Prom
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to push product",
+    };
+  }
+}
+
+/**
+ * Fetch ESLs from EBS50.
+ * GET /api/ESL
+ */
+export async function fetchEbs50Esls(): Promise<{
+  success: boolean;
+  esls?: Array<{ Mac?: string; [key: string]: unknown }>;
+  error?: string;
+}> {
+  const baseUrl = getEbs50BaseUrl();
+  const apiKey = getEbs50ApiKey();
+
+  if (!baseUrl) return { success: false, error: "EBS50_BASE_URL is not set" };
+  if (!apiKey) return { success: false, error: "EBS50_API_KEY is not set" };
+
+  const url = `${baseUrl}/api/ESL`;
+  const headers = { "x-api-key": apiKey };
+
+  try {
+    const res = await ebs50Fetch(url, headers);
+    if (res.status === 401) return { success: false, error: "API key invalid or expired" };
+    if (!res.ok) {
+      const text = await res.text();
+      return { success: false, error: `EBS50 returned ${res.status}: ${text.slice(0, 200)}` };
+    }
+    const data = (await res.json()) as Array<{ Mac?: string; [key: string]: unknown }> | { Mac?: string; [key: string]: unknown };
+    const esls = Array.isArray(data) ? data : data ? [data] : [];
+    return { success: true, esls };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to fetch ESLs",
+    };
+  }
+}
+
+/**
+ * Link ESL (by MAC) to product (by ID, Barcode, or Description).
+ * POST /api/ESL/{mac}/LINK/{id}
+ */
+export async function linkEslToProduct(mac: string, productIdOrBarcode: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  const baseUrl = getEbs50BaseUrl();
+  const apiKey = getEbs50ApiKey();
+
+  if (!baseUrl) return { success: false, error: "EBS50_BASE_URL is not set" };
+  if (!apiKey) return { success: false, error: "EBS50_API_KEY is not set" };
+
+  const encoded = encodeURIComponent(productIdOrBarcode);
+  const url = `${baseUrl}/api/ESL/${encodeURIComponent(mac)}/LINK/${encoded}`;
+  const headers = { "x-api-key": apiKey };
+
+  try {
+    const res = await ebs50Post(url, {}, headers);
+    if (res.status === 401) return { success: false, error: "API key invalid or expired" };
+    if (!res.ok) {
+      const text = await res.text();
+      return { success: false, error: `EBS50 returned ${res.status}: ${text.slice(0, 200)}` };
+    }
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to link ESL",
     };
   }
 }

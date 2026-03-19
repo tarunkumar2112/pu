@@ -88,6 +88,28 @@ export function getProductDisplay(p: TreezProduct): ProductDisplay {
   };
 }
 
+/**
+ * Get nested value from object by dot path (e.g. "product_configurable_fields.name").
+ * Supports array indices: "product_barcodes[0].sku"
+ */
+export function getNestedValue(obj: unknown, path: string): unknown {
+  if (obj === undefined || obj === null) return undefined;
+  const parts = path.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current === undefined || current === null) return undefined;
+    const num = parseInt(part, 10);
+    if (!Number.isNaN(num) && Array.isArray(current)) {
+      current = current[num];
+    } else if (typeof current === "object" && part in current) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return undefined;
+    }
+  }
+  return current;
+}
+
 /** Check if product has a barcode (product_barcodes, manufacturer_barcode, or barcode) */
 export function productHasBarcode(p: TreezProduct): boolean {
   const barcodes = p.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
