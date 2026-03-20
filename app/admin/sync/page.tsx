@@ -74,6 +74,7 @@ export default function SyncPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [filter, setFilter] = useState<FilterType>("SELLABLE");
   const [barcodeOnly, setBarcodeOnly] = useState(false);
+  const [eslTaggedOnly, setEslTaggedOnly] = useState(false);
   const [locationId, setLocationId] = useState<string | undefined>(undefined);
   const [locations, setLocations] = useState<TreezLocation[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -106,6 +107,7 @@ export default function SyncPage() {
       const params = new URLSearchParams({ page: String(page), filter });
       if (locationId) params.set("location", locationId);
       if (barcodeOnly) params.set("barcode_only", "true");
+      if (eslTaggedOnly) params.set("esl_tagged_only", "true");
       const res = await fetch(`/api/products?${params}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Failed to fetch products");
@@ -118,7 +120,7 @@ export default function SyncPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, locationId, barcodeOnly]);
+  }, [page, filter, locationId, barcodeOnly, eslTaggedOnly]);
 
   const fetchLocations = useCallback(async () => {
     try {
@@ -428,7 +430,7 @@ export default function SyncPage() {
         ))}
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
+      <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
         <button
           type="button"
           onClick={() => { setBarcodeOnly((b) => !b); setPage(1); }}
@@ -438,7 +440,18 @@ export default function SyncPage() {
           style={barcodeOnly ? { backgroundColor: BRAND_BLUE } : undefined}
           title="Show only products with barcode"
         >
-          {barcodeOnly ? `Barcode only (${totalCount} products)` : "Barcode only"}
+          {barcodeOnly ? `Barcode only (${totalCount})` : "Barcode only"}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setEslTaggedOnly((e) => !e); setPage(1); }}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            eslTaggedOnly ? "text-white" : "bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-100"
+          }`}
+          style={eslTaggedOnly ? { backgroundColor: BRAND_BLUE } : undefined}
+          title="Show only products with ESL in internal_tags"
+        >
+          {eslTaggedOnly ? `ESL tagged (${totalCount})` : "ESL tagged only"}
         </button>
       </div>
 
@@ -490,8 +503,12 @@ export default function SyncPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
-            {barcodeOnly
-              ? "No products with barcode. Turn off Barcode only to see all."
+            {barcodeOnly || eslTaggedOnly
+              ? barcodeOnly && eslTaggedOnly
+                ? "No products with barcode and ESL tag."
+                : barcodeOnly
+                  ? "No products with barcode. Turn off Barcode only to see all."
+                  : "No products with ESL tag. Turn off ESL tagged only to see all."
               : "No products. Try a different filter or location."}
           </div>
         ) : (
@@ -553,7 +570,9 @@ export default function SyncPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3">
                 <p className="text-sm text-zinc-500">
-                  {totalCount.toLocaleString()} total · Page {page} of {totalPages}
+                  {barcodeOnly || eslTaggedOnly
+                    ? `${totalCount.toLocaleString()} products${barcodeOnly ? " with barcode" : ""}${barcodeOnly && eslTaggedOnly ? " and" : ""}${eslTaggedOnly ? " ESL tagged" : ""} · Page ${page} of ${totalPages}`
+                    : `${totalCount.toLocaleString()} total · Page ${page} of ${totalPages}`}
                 </p>
                 <div className="flex gap-2">
                   <button

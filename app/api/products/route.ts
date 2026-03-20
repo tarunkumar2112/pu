@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchTreezProducts, fetchTreezProductsPage, productHasBarcode } from "@/lib/treez";
+import { fetchTreezProducts, fetchTreezProductsPage, productHasBarcode, productHasEslTag } from "@/lib/treez";
 
 const PAGE_SIZE = 100;
 const TREEZ_PAGE_SIZE = 1000;
@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const filter = searchParams.get("filter") ?? "SELLABLE";
     const locationId = searchParams.get("location") ?? undefined;
     const barcodeOnly = searchParams.get("barcode_only") === "true";
+    const eslTaggedOnly = searchParams.get("esl_tagged_only") === "true";
 
     const filterConfig: Record<string, { active: "ALL" | "TRUE" | "FALSE"; above_threshold: boolean }> = {
       SELLABLE: { active: "ALL", above_threshold: true },
@@ -23,16 +24,18 @@ export async function GET(request: NextRequest) {
     let products: Awaited<ReturnType<typeof fetchTreezProductsPage>>["products"];
     let totalCount: number;
 
-    if (barcodeOnly) {
+    if (barcodeOnly || eslTaggedOnly) {
       const allProducts = await fetchTreezProducts({
         active,
         above_threshold,
         sellable_quantity_in_location: locationId,
       });
-      const withBarcode = allProducts.filter(productHasBarcode);
-      totalCount = withBarcode.length;
+      let filtered = allProducts;
+      if (barcodeOnly) filtered = filtered.filter(productHasBarcode);
+      if (eslTaggedOnly) filtered = filtered.filter(productHasEslTag);
+      totalCount = filtered.length;
       const start = (page - 1) * PAGE_SIZE;
-      products = withBarcode.slice(start, start + PAGE_SIZE);
+      products = filtered.slice(start, start + PAGE_SIZE);
     } else {
       const treezPage = Math.ceil((page * PAGE_SIZE) / TREEZ_PAGE_SIZE);
       const offsetInTreezPage = ((page - 1) * PAGE_SIZE) % TREEZ_PAGE_SIZE;
