@@ -48,17 +48,34 @@ export async function GET(request: NextRequest) {
       const productId = productIds[i];
       console.log(`[API] Fetching product ${i + 1}/${productIds.length}: ${productId}`);
       
-      try {
-        const product = await fetchTreezProductById(productId);
-        if (product) {
-          allProducts.push(product);
-          console.log(`[API] ✓ Found product: ${product.name ?? product.productName ?? 'Unknown'}`);
-        } else {
-          console.warn(`[API] ⚠ Product not found: ${productId}`);
-        }
-      } catch (error) {
-        console.error(`[API] ✗ Error fetching product ${productId}:`, error);
-      }
+           try {
+             const product = await fetchTreezProductById(productId);
+             if (product) {
+               allProducts.push(product);
+               const productName = product.name ?? product.productName ?? 'Unknown';
+               console.log(`[API] ✓ Found product: ${productName}`);
+               
+               // Log detailed product structure for debugging
+               console.log(`[API] Product ${i + 1} Full Structure:`, JSON.stringify({
+                 product_id: product.product_id,
+                 name: product.name,
+                 productName: product.productName,
+                 price: product.price,
+                 retailPrice: product.retailPrice,
+                 barcode: product.barcode,
+                 category: product.category,
+                 category_type: product.category_type,
+                 categoryName: product.categoryName,
+                 pricing: product.pricing,
+                 product_barcodes: product.product_barcodes,
+                 product_configurable_fields: product.product_configurable_fields,
+               }, null, 2));
+             } else {
+               console.warn(`[API] ⚠ Product not found: ${productId}`);
+             }
+           } catch (error) {
+             console.error(`[API] ✗ Error fetching product ${productId}:`, error);
+           }
     }
 
     console.log(`\n[API] ✓ Successfully fetched ${allProducts.length} of ${productIds.length} products\n`);
