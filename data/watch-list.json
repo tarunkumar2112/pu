@@ -1,1 +1,5858 @@
-[]
+[
+  {
+    "id": "530 GROWER|BEVERAGE|SODA|100 MG|13.5",
+    "brand": "530 GROWER",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "100 MG",
+    "price": 13.5
+  },
+  {
+    "id": "530 GROWER|BEVERAGE|TEA|100 MG|12.5",
+    "brand": "530 GROWER",
+    "productType": "BEVERAGE",
+    "subtype": "TEA",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "530 GROWER|CARTRIDGE|510 THREAD|1 G|25",
+    "brand": "530 GROWER",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "530 GROWER|CARTRIDGE|ALL-IN-ONE|1 G|32.5",
+    "brand": "530 GROWER",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 32.5
+  },
+  {
+    "id": "530 GROWER|FLOWER|PRE-PACK|7 G|50",
+    "brand": "530 GROWER",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 50
+  },
+  {
+    "id": "530 GROWER|FLOWER|PRE-PACK|3.5 G|40",
+    "brand": "530 GROWER",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 40
+  },
+  {
+    "id": "530 GROWER|FLOWER|PRE-PACK|1 G|15",
+    "brand": "530 GROWER",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "530 GROWER|PREROLL|FLOWER|1 G|9",
+    "brand": "530 GROWER",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 9
+  },
+  {
+    "id": "710 LABS|EXTRACT|LIVE ROSIN|1 G|62",
+    "brand": "710 LABS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 62
+  },
+  {
+    "id": "710 LABS|FLOWER|PRE-PACK|3.5 G|60",
+    "brand": "710 LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 60
+  },
+  {
+    "id": "710 LABS|FLOWER|PRE-PACK|3.5 G|15",
+    "brand": "710 LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 15
+  },
+  {
+    "id": "710 LABS|MERCH|BATTERY|ONE SIZE|20",
+    "brand": "710 LABS",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 20
+  },
+  {
+    "id": "710 LABS|MERCH|BATTERY|ONE SIZE|10",
+    "brand": "710 LABS",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 10
+  },
+  {
+    "id": "ABSOLUTEXTRACTS|CARTRIDGE|510 THREAD|1 G|40",
+    "brand": "ABSOLUTEXTRACTS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "ABSOLUTEXTRACTS|CARTRIDGE|510 THREAD|1 G|36",
+    "brand": "ABSOLUTEXTRACTS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "ABSOLUTEXTRACTS|EXTRACT|BADDER|1 G|22.5",
+    "brand": "ABSOLUTEXTRACTS",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "ABSOLUTEXTRACTS|PILL|CAPSULE|250 MG|35",
+    "brand": "ABSOLUTEXTRACTS",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "250 MG",
+    "price": 35
+  },
+  {
+    "id": "ALIEN LABS|CARTRIDGE|510 THREAD|1 G|50",
+    "brand": "ALIEN LABS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "ALIEN LABS|CARTRIDGE|510 THREAD|1 G|24",
+    "brand": "ALIEN LABS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 24
+  },
+  {
+    "id": "ALIEN LABS|FLOWER|PRE-PACK|14 G|125",
+    "brand": "ALIEN LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 125
+  },
+  {
+    "id": "ALIEN LABS|FLOWER|PRE-PACK|10 G|120",
+    "brand": "ALIEN LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "10 G",
+    "price": 120
+  },
+  {
+    "id": "ALIEN LABS|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "ALIEN LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "ALIEN LABS|PREROLL|FLOWER|1 G|15",
+    "brand": "ALIEN LABS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "ALLSWELL|EDIBLE|GUMMY|100 MG|8.5",
+    "brand": "ALLSWELL",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 8.5
+  },
+  {
+    "id": "ALLSWELL|FLOWER|PRE-PACK|3.5 G|12",
+    "brand": "ALLSWELL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 12
+  },
+  {
+    "id": "ALMORA|BEVERAGE|JUICE|100 MG|12",
+    "brand": "ALMORA",
+    "productType": "BEVERAGE",
+    "subtype": "JUICE",
+    "size": "100 MG",
+    "price": 12
+  },
+  {
+    "id": "ALMORA|BEVERAGE|OTHER|100 MG|12",
+    "brand": "ALMORA",
+    "productType": "BEVERAGE",
+    "subtype": "OTHER",
+    "size": "100 MG",
+    "price": 12
+  },
+  {
+    "id": "ALMORA|CARTRIDGE|510 THREAD|1 G|24.99",
+    "brand": "ALMORA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 24.99
+  },
+  {
+    "id": "ALMORA|CARTRIDGE|ALL-IN-ONE|1 G|42",
+    "brand": "ALMORA",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "ALMORA|CARTRIDGE|ALL-IN-ONE|1 G|34",
+    "brand": "ALMORA",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 34
+  },
+  {
+    "id": "ALMORA|CARTRIDGE|ALL-IN-ONE|1 G|29",
+    "brand": "ALMORA",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 29
+  },
+  {
+    "id": "ALMORA|EXTRACT|BADDER|1.2 G|20",
+    "brand": "ALMORA",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1.2 G",
+    "price": 20
+  },
+  {
+    "id": "ALMORA|EXTRACT|SAUCE|1.2 G|20",
+    "brand": "ALMORA",
+    "productType": "EXTRACT",
+    "subtype": "SAUCE",
+    "size": "1.2 G",
+    "price": 20
+  },
+  {
+    "id": "ALMORA|EXTRACT|SUGAR|1.2 G|20",
+    "brand": "ALMORA",
+    "productType": "EXTRACT",
+    "subtype": "SUGAR",
+    "size": "1.2 G",
+    "price": 20
+  },
+  {
+    "id": "ALMORA|FLOWER|PRE-GROUND|28 G|45",
+    "brand": "ALMORA",
+    "productType": "FLOWER",
+    "subtype": "PRE-GROUND",
+    "size": "28 G",
+    "price": 45
+  },
+  {
+    "id": "ALMORA|FLOWER|PRE-PACK|28 G|45",
+    "brand": "ALMORA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 45
+  },
+  {
+    "id": "ALMORA|FLOWER|PRE-PACK|7 G|33",
+    "brand": "ALMORA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 33
+  },
+  {
+    "id": "ALMORA|FLOWER|PRE-PACK|14 G|29",
+    "brand": "ALMORA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 29
+  },
+  {
+    "id": "ALMORA|FLOWER|PRE-PACK|3.5 G|22.5",
+    "brand": "ALMORA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 22.5
+  },
+  {
+    "id": "ALMORA|PREROLL|FLOWER|7 G|35.99",
+    "brand": "ALMORA",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "7 G",
+    "price": 35.99
+  },
+  {
+    "id": "ALMORA|PREROLL|INFUSED|2.5 G|37.5",
+    "brand": "ALMORA",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 37.5
+  },
+  {
+    "id": "ARCATA FIRE|CARTRIDGE|510 THREAD|1 G|49",
+    "brand": "ARCATA FIRE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 49
+  },
+  {
+    "id": "ARCATA FIRE|CARTRIDGE|510 THREAD|1 G|44",
+    "brand": "ARCATA FIRE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 44
+  },
+  {
+    "id": "ARCATA FIRE|CARTRIDGE|510 THREAD|1 G|32",
+    "brand": "ARCATA FIRE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 32
+  },
+  {
+    "id": "ARCATA FIRE|EXTRACT|LIVE RESIN|1 G|30",
+    "brand": "ARCATA FIRE",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "ARCATA FIRE|EXTRACT|LIVE ROSIN|1 G|50",
+    "brand": "ARCATA FIRE",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "ARTISAN|FLOWER|PRE-PACK|3.5 G|45",
+    "brand": "ARTISAN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "ARTISAN|MERCH|LIGHTER|ONE SIZE|14",
+    "brand": "ARTISAN",
+    "productType": "MERCH",
+    "subtype": "LIGHTER",
+    "size": "ONE SIZE",
+    "price": 14
+  },
+  {
+    "id": "ARTISAN|PREROLL|INFUSED|2 G|17.5",
+    "brand": "ARTISAN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2 G",
+    "price": 17.5
+  },
+  {
+    "id": "AUTUMN BRANDS|FLOWER|PRE-PACK|28 G|118",
+    "brand": "AUTUMN BRANDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 118
+  },
+  {
+    "id": "AUTUMN BRANDS|FLOWER|PRE-PACK|14 G|60",
+    "brand": "AUTUMN BRANDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "AUTUMN BRANDS|FLOWER|PRE-PACK|7 G|35",
+    "brand": "AUTUMN BRANDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 35
+  },
+  {
+    "id": "AUTUMN BRANDS|FLOWER|PRE-PACK|3.5 G|23.5",
+    "brand": "AUTUMN BRANDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 23.5
+  },
+  {
+    "id": "AUTUMN BRANDS|PREROLL|FLOWER|1 G|6.75",
+    "brand": "AUTUMN BRANDS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 6.75
+  },
+  {
+    "id": "AUTUMN BRANDS|TOPICAL|OTHER|400 MG|45",
+    "brand": "AUTUMN BRANDS",
+    "productType": "TOPICAL",
+    "subtype": "OTHER",
+    "size": "400 MG",
+    "price": 45
+  },
+  {
+    "id": "BANGERS|PREROLL|INFUSED|1.2 G|11",
+    "brand": "BANGERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.2 G",
+    "price": 11
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|BAKED GOOD|100 MG|17",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "BAKED GOOD",
+    "size": "100 MG",
+    "price": 17
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|BAKED GOOD|100 MG|15",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "BAKED GOOD",
+    "size": "100 MG",
+    "price": 15
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|BUTTER|1000 MG|48",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "BUTTER",
+    "size": "1000 MG",
+    "price": 48
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|COOKIE|100 MG|19.75",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "COOKIE",
+    "size": "100 MG",
+    "price": 19.75
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|COOKIE|100 MG|17",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "COOKIE",
+    "size": "100 MG",
+    "price": 17
+  },
+  {
+    "id": "BIG PETE'S TREATS|EDIBLE|OTHER|1000 MG|48",
+    "brand": "BIG PETE'S TREATS",
+    "productType": "EDIBLE",
+    "subtype": "OTHER",
+    "size": "1000 MG",
+    "price": 48
+  },
+  {
+    "id": "BIG TREE|CARTRIDGE|510 THREAD|1 G|13.5",
+    "brand": "BIG TREE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 13.5
+  },
+  {
+    "id": "BIG TREE|CARTRIDGE|ALL-IN-ONE|1 G|20",
+    "brand": "BIG TREE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "BIG TREE|EDIBLE|GUMMY|100 MG|8",
+    "brand": "BIG TREE",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 8
+  },
+  {
+    "id": "BIG TREE|EXTRACT|DIAMONDS|1 G|12.5",
+    "brand": "BIG TREE",
+    "productType": "EXTRACT",
+    "subtype": "DIAMONDS",
+    "size": "1 G",
+    "price": 12.5
+  },
+  {
+    "id": "BIG TREE|FLOWER|PRE-PACK|28 G|70",
+    "brand": "BIG TREE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 70
+  },
+  {
+    "id": "BIG TREE|FLOWER|PRE-PACK|14 G|36",
+    "brand": "BIG TREE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 36
+  },
+  {
+    "id": "BIG TREE|FLOWER|PRE-PACK|14 G|12.5",
+    "brand": "BIG TREE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 12.5
+  },
+  {
+    "id": "BIG TREE|FLOWER|PRE-PACK|3.5 G|10",
+    "brand": "BIG TREE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 10
+  },
+  {
+    "id": "BIG TREE|PREROLL|FLOWER|10 G|20",
+    "brand": "BIG TREE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "10 G",
+    "price": 20
+  },
+  {
+    "id": "BIG TREE|PREROLL|FLOWER|5 G|10",
+    "brand": "BIG TREE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "5 G",
+    "price": 10
+  },
+  {
+    "id": "BIG TREE|PREROLL|FLOWER|1 G|3.75",
+    "brand": "BIG TREE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 3.75
+  },
+  {
+    "id": "BIRDIES|PREROLL|FLOWER|7 G|35",
+    "brand": "BIRDIES",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "7 G",
+    "price": 35
+  },
+  {
+    "id": "BIRDIES|PREROLL|FLOWER|2.1 G|12.5",
+    "brand": "BIRDIES",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.1 G",
+    "price": 12.5
+  },
+  {
+    "id": "BIRDIES|PREROLL|INFUSED|4.2 G|27.5",
+    "brand": "BIRDIES",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "4.2 G",
+    "price": 27.5
+  },
+  {
+    "id": "BIRDIES|PREROLL|INFUSED|2.5 G|17.5",
+    "brand": "BIRDIES",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 17.5
+  },
+  {
+    "id": "BLACK MARKET|FLOWER|PRE-PACK|3.5 G|27.5",
+    "brand": "BLACK MARKET",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 27.5
+  },
+  {
+    "id": "BLAZY|CARTRIDGE|510 THREAD|1 G|17.5",
+    "brand": "BLAZY",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 17.5
+  },
+  {
+    "id": "BLAZY|CARTRIDGE|ALL-IN-ONE|1 G|24",
+    "brand": "BLAZY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 24
+  },
+  {
+    "id": "BLAZY|EDIBLE|CHOCOLATE|100 MG|12.5",
+    "brand": "BLAZY",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "BLAZY|EDIBLE|GUMMY|100 MG|11.5",
+    "brand": "BLAZY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 11.5
+  },
+  {
+    "id": "BLAZY|FLOWER|PRE-PACK|28 G|126",
+    "brand": "BLAZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 126
+  },
+  {
+    "id": "BLAZY|FLOWER|PRE-PACK|14 G|64",
+    "brand": "BLAZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 64
+  },
+  {
+    "id": "BLAZY|FLOWER|PRE-PACK|7 G|34",
+    "brand": "BLAZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 34
+  },
+  {
+    "id": "BLAZY|FLOWER|PRE-PACK|3.5 G|18",
+    "brand": "BLAZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 18
+  },
+  {
+    "id": "BLAZY|FLOWER|PRE-PACK|3.5 G|10",
+    "brand": "BLAZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 10
+  },
+  {
+    "id": "BLAZY|MERCH|APPAREL|LARGE|100",
+    "brand": "BLAZY",
+    "productType": "MERCH",
+    "subtype": "APPAREL",
+    "size": "LARGE",
+    "price": 100
+  },
+  {
+    "id": "BLAZY|PREROLL|FLOWER|1 G|8.5",
+    "brand": "BLAZY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 8.5
+  },
+  {
+    "id": "BLEM|CARTRIDGE|510 THREAD|1 G|47.5",
+    "brand": "BLEM",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 47.5
+  },
+  {
+    "id": "BLEM|FLOWER|PRE-PACK|10 G|122.99",
+    "brand": "BLEM",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "10 G",
+    "price": 122.99
+  },
+  {
+    "id": "BLEM|FLOWER|PRE-PACK|3.5 G|62",
+    "brand": "BLEM",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 62
+  },
+  {
+    "id": "BLEM|PREROLL|FLOWER|0.75 G|10.25",
+    "brand": "BLEM",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "0.75 G",
+    "price": 10.25
+  },
+  {
+    "id": "BUDDIES|CARTRIDGE|510 THREAD|1 G|40",
+    "brand": "BUDDIES",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "BUDDIES|CARTRIDGE|510 THREAD|1 G|32.5",
+    "brand": "BUDDIES",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 32.5
+  },
+  {
+    "id": "BUDDIES|CARTRIDGE|510 THREAD|1 G|22.5",
+    "brand": "BUDDIES",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "BUDDIES|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "BUDDIES",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "BUDDIES|EXTRACT|CRUMBLE|1 G|22.5",
+    "brand": "BUDDIES",
+    "productType": "EXTRACT",
+    "subtype": "CRUMBLE",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "BUDDIES|PILL|CAPSULE|1000 MG|40",
+    "brand": "BUDDIES",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "1000 MG",
+    "price": 40
+  },
+  {
+    "id": "BUDDIES|PILL|OTHER|1000 MG|45",
+    "brand": "BUDDIES",
+    "productType": "PILL",
+    "subtype": "OTHER",
+    "size": "1000 MG",
+    "price": 45
+  },
+  {
+    "id": "BUDDIES|TOPICAL|BALM|250 MG|40",
+    "brand": "BUDDIES",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "250 MG",
+    "price": 40
+  },
+  {
+    "id": "BUDDIES|TOPICAL|CREAM|1000 MG|40",
+    "brand": "BUDDIES",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "1000 MG",
+    "price": 40
+  },
+  {
+    "id": "BUDDIES|TOPICAL|ROLL-ON|1000 MG|60",
+    "brand": "BUDDIES",
+    "productType": "TOPICAL",
+    "subtype": "ROLL-ON",
+    "size": "1000 MG",
+    "price": 60
+  },
+  {
+    "id": "BUDDY|EDIBLE|GUMMY|100 MG|16.25",
+    "brand": "BUDDY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 16.25
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|35 MG|62",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "35 MG",
+    "price": 62
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|220 MG|47",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "220 MG",
+    "price": 47
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|234 MG|38",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "234 MG",
+    "price": 38
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|8 MG|34",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "8 MG",
+    "price": 34
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|100 MG|32",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "100 MG",
+    "price": 32
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|530 MG|29",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "530 MG",
+    "price": 29
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|14 MG|27",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "14 MG",
+    "price": 27
+  },
+  {
+    "id": "CAD|TINCTURE|DROPPER|14 MG|18",
+    "brand": "CAD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "14 MG",
+    "price": 18
+  },
+  {
+    "id": "CAD|TOPICAL|BALM|22 MG|45",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "22 MG",
+    "price": 45
+  },
+  {
+    "id": "CAD|TOPICAL|BALM|31 MG|18",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "31 MG",
+    "price": 18
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|530 MG|110",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "530 MG",
+    "price": 110
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|1000 MG|78",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "1000 MG",
+    "price": 78
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|500 MG|71",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "500 MG",
+    "price": 71
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|275 MG|62",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "275 MG",
+    "price": 62
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|250 MG|50",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "250 MG",
+    "price": 50
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|100 MG|45",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "100 MG",
+    "price": 45
+  },
+  {
+    "id": "CAD|TOPICAL|CREAM|120 MG|38",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "CREAM",
+    "size": "120 MG",
+    "price": 38
+  },
+  {
+    "id": "CAD|TOPICAL|OTHER|250 MG|78",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "OTHER",
+    "size": "250 MG",
+    "price": 78
+  },
+  {
+    "id": "CAD|TOPICAL|OTHER|150 MG|38",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "OTHER",
+    "size": "150 MG",
+    "price": 38
+  },
+  {
+    "id": "CAD|TOPICAL|PATCH|75 MG|32",
+    "brand": "CAD",
+    "productType": "TOPICAL",
+    "subtype": "PATCH",
+    "size": "75 MG",
+    "price": 32
+  },
+  {
+    "id": "CAKE|CARTRIDGE|510 THREAD|1 G|20",
+    "brand": "CAKE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "CAKE|CARTRIDGE|ALL-IN-ONE|1 G|37.5",
+    "brand": "CAKE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 37.5
+  },
+  {
+    "id": "CAKE|CARTRIDGE|ALL-IN-ONE|1.25 G|25",
+    "brand": "CAKE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1.25 G",
+    "price": 25
+  },
+  {
+    "id": "CAKE|CARTRIDGE|ALL-IN-ONE|1 G|18.75",
+    "brand": "CAKE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 18.75
+  },
+  {
+    "id": "CAKE|CARTRIDGE|READY TO USE|1 G|21",
+    "brand": "CAKE",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 21
+  },
+  {
+    "id": "CAKE|MERCH|BATTERY|ONE SIZE|35",
+    "brand": "CAKE",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 35
+  },
+  {
+    "id": "CAKE|MERCH|BATTERY|ONE SIZE|30",
+    "brand": "CAKE",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 30
+  },
+  {
+    "id": "CAKE|MERCH|BATTERY|ONE SIZE|25",
+    "brand": "CAKE",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 25
+  },
+  {
+    "id": "CAM|CARTRIDGE|ALL-IN-ONE|1 G|48",
+    "brand": "CAM",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "CAM|CARTRIDGE|ALL-IN-ONE|1 G|10",
+    "brand": "CAM",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "CAM|FLOWER|PRE-PACK|14 G|165",
+    "brand": "CAM",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 165
+  },
+  {
+    "id": "CAM|FLOWER|PRE-PACK|7 G|86",
+    "brand": "CAM",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 86
+  },
+  {
+    "id": "CAM|PREROLL|FLOWER|3.5 G|50",
+    "brand": "CAM",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 50
+  },
+  {
+    "id": "CAM|PREROLL|FLOWER|1 G|13",
+    "brand": "CAM",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 13
+  },
+  {
+    "id": "CAMINO|EDIBLE|GUMMY|100 MG|20",
+    "brand": "CAMINO",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "CANN|BEVERAGE|SODA|40 MG|32",
+    "brand": "CANN",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "40 MG",
+    "price": 32
+  },
+  {
+    "id": "CANN|BEVERAGE|SODA|10 MG|8.75",
+    "brand": "CANN",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "10 MG",
+    "price": 8.75
+  },
+  {
+    "id": "CANNABIOTIX|CARTRIDGE|510 THREAD|0.5 G|25",
+    "brand": "CANNABIOTIX",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "0.5 G",
+    "price": 25
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|LIVE ROSIN|1 G|60",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 60
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|LIVE ROSIN|1 G|48",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|LIVE ROSIN|1 G|10",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|ROSIN|1 G|60",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 60
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|ROSIN|1 G|48",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "CANNABIOTIX|EXTRACT|SUGAR|1 G|25",
+    "brand": "CANNABIOTIX",
+    "productType": "EXTRACT",
+    "subtype": "SUGAR",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "CANNABIOTIX|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "CANNABIOTIX",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "CANNABIOTIX|PREROLL|FLOWER|2 G|25",
+    "brand": "CANNABIOTIX",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2 G",
+    "price": 25
+  },
+  {
+    "id": "CANNABIOTIX|PREROLL|FLOWER|0.75 G|10",
+    "brand": "CANNABIOTIX",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "0.75 G",
+    "price": 10
+  },
+  {
+    "id": "CAP CITY|CARTRIDGE|510 THREAD|1 G|19",
+    "brand": "CAP CITY",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 19
+  },
+  {
+    "id": "CAP CITY|CARTRIDGE|ALL-IN-ONE|1 G|25",
+    "brand": "CAP CITY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "CAP CITY|FLOWER|PRE-PACK|28 G|120",
+    "brand": "CAP CITY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 120
+  },
+  {
+    "id": "CAP CITY|FLOWER|PRE-PACK|14 G|60",
+    "brand": "CAP CITY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "CAP CITY|FLOWER|PRE-PACK|7 G|32",
+    "brand": "CAP CITY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 32
+  },
+  {
+    "id": "CAP CITY|FLOWER|PRE-PACK|3.5 G|18",
+    "brand": "CAP CITY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 18
+  },
+  {
+    "id": "CAP CITY|PREROLL|FLOWER|1 G|6.75",
+    "brand": "CAP CITY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 6.75
+  },
+  {
+    "id": "CARE BY DESIGN|TINCTURE|DROPPER|100 MG|65",
+    "brand": "CARE BY DESIGN",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "100 MG",
+    "price": 65
+  },
+  {
+    "id": "CARE BY DESIGN|TINCTURE|DROPPER|100 MG|48",
+    "brand": "CARE BY DESIGN",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "100 MG",
+    "price": 48
+  },
+  {
+    "id": "CASA FLOR|FLOWER|PRE-PACK|14 G|40",
+    "brand": "CASA FLOR",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 40
+  },
+  {
+    "id": "CASA FLOR|TINCTURE|SYRUP|1000 MG|30",
+    "brand": "CASA FLOR",
+    "productType": "TINCTURE",
+    "subtype": "SYRUP",
+    "size": "1000 MG",
+    "price": 30
+  },
+  {
+    "id": "CLAYBOURNE CO.|CARTRIDGE|ALL-IN-ONE|1 G|37.5",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 37.5
+  },
+  {
+    "id": "CLAYBOURNE CO.|FLOWER|PRE-GROUND|3.5 G|45",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-GROUND",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "CLAYBOURNE CO.|FLOWER|PRE-PACK|14 G|110",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 110
+  },
+  {
+    "id": "CLAYBOURNE CO.|FLOWER|PRE-PACK|7 G|65",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 65
+  },
+  {
+    "id": "CLAYBOURNE CO.|FLOWER|PRE-PACK|3.5 G|60",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 60
+  },
+  {
+    "id": "CLAYBOURNE CO.|FLOWER|PRE-PACK|3.5 G|45",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "CLAYBOURNE CO.|PREROLL|INFUSED|2.5 G|37.5",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 37.5
+  },
+  {
+    "id": "CLAYBOURNE CO.|PREROLL|INFUSED|3 G|35",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 35
+  },
+  {
+    "id": "CLAYBOURNE CO.|PREROLL|INFUSED|1.5 G|25",
+    "brand": "CLAYBOURNE CO.",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 25
+  },
+  {
+    "id": "CLONE GUY|PLANT|CLONE|EACH|25",
+    "brand": "CLONE GUY",
+    "productType": "PLANT",
+    "subtype": "CLONE",
+    "size": "EACH",
+    "price": 25
+  },
+  {
+    "id": "CLSICS|CARTRIDGE|ALL-IN-ONE|1 G|48",
+    "brand": "CLSICS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "CLSICS|CARTRIDGE|ALL-IN-ONE|1 G|35",
+    "brand": "CLSICS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "CLSICS|CARTRIDGE|READY TO USE|1 G|35",
+    "brand": "CLSICS",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "CLSICS|EXTRACT|LIVE ROSIN|1 G|29.5",
+    "brand": "CLSICS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 29.5
+  },
+  {
+    "id": "CLSICS|PREROLL|INFUSED|3 G|44",
+    "brand": "CLSICS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 44
+  },
+  {
+    "id": "CLSICS|PREROLL|INFUSED|1.3 G|17.5",
+    "brand": "CLSICS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.3 G",
+    "price": 17.5
+  },
+  {
+    "id": "CLSICS|TINCTURE|DROPPER|1000 MG|52",
+    "brand": "CLSICS",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "1000 MG",
+    "price": 52
+  },
+  {
+    "id": "COASTAL SUN|FLOWER|PRE-PACK|28 G|86",
+    "brand": "COASTAL SUN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 86
+  },
+  {
+    "id": "COASTAL SUN|FLOWER|PRE-PACK|14 G|56",
+    "brand": "COASTAL SUN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 56
+  },
+  {
+    "id": "COASTAL SUN|FLOWER|PRE-PACK|7 G|29",
+    "brand": "COASTAL SUN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 29
+  },
+  {
+    "id": "COASTAL SUN|FLOWER|PRE-PACK|3.5 G|18.75",
+    "brand": "COASTAL SUN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 18.75
+  },
+  {
+    "id": "COASTAL SUN|PREROLL|FLOWER|3.5 G|18.75",
+    "brand": "COASTAL SUN",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 18.75
+  },
+  {
+    "id": "COASTAL SUN|PREROLL|FLOWER|1.5 G|13",
+    "brand": "COASTAL SUN",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.5 G",
+    "price": 13
+  },
+  {
+    "id": "COASTAL SUN|PREROLL|INFUSED|1.5 G|13",
+    "brand": "COASTAL SUN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 13
+  },
+  {
+    "id": "COLDFIRE|CARTRIDGE|510 THREAD|1 G|55",
+    "brand": "COLDFIRE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "CONNECTED|CARTRIDGE|510 THREAD|1 G|50",
+    "brand": "CONNECTED",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "CONNECTED|CARTRIDGE|510 THREAD|1 G|24",
+    "brand": "CONNECTED",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 24
+  },
+  {
+    "id": "CONNECTED|CARTRIDGE|ALL-IN-ONE|1 G|48",
+    "brand": "CONNECTED",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "CONNECTED|FLOWER|PRE-PACK|14 G|125",
+    "brand": "CONNECTED",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 125
+  },
+  {
+    "id": "CONNECTED|FLOWER|PRE-PACK|10 G|120",
+    "brand": "CONNECTED",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "10 G",
+    "price": 120
+  },
+  {
+    "id": "CONNECTED|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "CONNECTED",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "CONNECTED|PREROLL|FLOWER|2.5 G|37.5",
+    "brand": "CONNECTED",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.5 G",
+    "price": 37.5
+  },
+  {
+    "id": "CONNECTED|PREROLL|FLOWER|1 G|15",
+    "brand": "CONNECTED",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "COTC|PREROLL|INFUSED|1 G|22.5",
+    "brand": "COTC",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "CREAM OF THE CROP|FLOWER|PRE-PACK|3.5 G|50",
+    "brand": "CREAM OF THE CROP",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 50
+  },
+  {
+    "id": "CREAM OF THE CROP|PREROLL|FLOWER|1 G|16",
+    "brand": "CREAM OF THE CROP",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 16
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|510 THREAD|1 G|33",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 33
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|510 THREAD|1 G|28",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 28
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|ALL-IN-ONE|1 G|42",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|ALL-IN-ONE|1 G|36",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|READY TO USE|1 G|42",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "CRYSTAL CLEAR|CARTRIDGE|READY TO USE|1 G|36",
+    "brand": "CRYSTAL CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "CURE INJOY|CARTRIDGE|ALL-IN-ONE|1 G|30",
+    "brand": "CURE INJOY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "CURE INJOY|CARTRIDGE|ALL-IN-ONE|1 G|22.5",
+    "brand": "CURE INJOY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "CURE INJOY|CARTRIDGE|READY TO USE|1 G|22.5",
+    "brand": "CURE INJOY",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "DABWOODS|CARTRIDGE|ALL-IN-ONE|1 G|50",
+    "brand": "DABWOODS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "DABWOODS|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "DABWOODS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "DABWOODS|CARTRIDGE|POD|1 G|35",
+    "brand": "DABWOODS",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "DABWOODS|MERCH|BATTERY|ONE SIZE|25",
+    "brand": "DABWOODS",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 25
+  },
+  {
+    "id": "DOJA|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "DOJA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "DOJA|PREROLL|FLOWER|1.5 G|10",
+    "brand": "DOJA",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.5 G",
+    "price": 10
+  },
+  {
+    "id": "DR. NORM'S|EDIBLE|BAKED GOOD|100 MG|20",
+    "brand": "DR. NORM'S",
+    "productType": "EDIBLE",
+    "subtype": "BAKED GOOD",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "DR. NORM'S|EDIBLE|GUMMY|100 MG|12.5",
+    "brand": "DR. NORM'S",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "DUFFY'S|FLOWER|PRE-PACK|14 G|108",
+    "brand": "DUFFY'S",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 108
+  },
+  {
+    "id": "DUFFY'S|FLOWER|PRE-PACK|3.5 G|30",
+    "brand": "DUFFY'S",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 30
+  },
+  {
+    "id": "EIGHTY EAST|FLOWER|PRE-PACK|7 G|45",
+    "brand": "EIGHTY EAST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 45
+  },
+  {
+    "id": "EIGHTY EAST|FLOWER|PRE-PACK|3.5 G|27.5",
+    "brand": "EIGHTY EAST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 27.5
+  },
+  {
+    "id": "EIGHTY EAST|FLOWER|PRE-PACK|7 G|10",
+    "brand": "EIGHTY EAST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 10
+  },
+  {
+    "id": "EL BLUNTO|PREROLL|FLOWER|1.65 G|21.5",
+    "brand": "EL BLUNTO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.65 G",
+    "price": 21.5
+  },
+  {
+    "id": "EL BLUNTO|PREROLL|FLOWER|1.65 G|19",
+    "brand": "EL BLUNTO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.65 G",
+    "price": 19
+  },
+  {
+    "id": "EL BLUNTO|PREROLL|FLOWER|1.5 G|16.5",
+    "brand": "EL BLUNTO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.5 G",
+    "price": 16.5
+  },
+  {
+    "id": "EMERALD BAY EXTRACTS|EXTRACT|FULL SPECTRUM OIL|1 G|28.5",
+    "brand": "EMERALD BAY EXTRACTS",
+    "productType": "EXTRACT",
+    "subtype": "FULL SPECTRUM OIL",
+    "size": "1 G",
+    "price": 28.5
+  },
+  {
+    "id": "EMERALD BAY EXTRACTS|EXTRACT|RSO|1 G|28.5",
+    "brand": "EMERALD BAY EXTRACTS",
+    "productType": "EXTRACT",
+    "subtype": "RSO",
+    "size": "1 G",
+    "price": 28.5
+  },
+  {
+    "id": "EMERALD BAY EXTRACTS|PILL|TABLET|78 MG|48",
+    "brand": "EMERALD BAY EXTRACTS",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "78 MG",
+    "price": 48
+  },
+  {
+    "id": "EMERALD BAY EXTRACTS|PILL|TABLET|1000 MG|48",
+    "brand": "EMERALD BAY EXTRACTS",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "1000 MG",
+    "price": 48
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|CHOCOLATE|100 MG|25",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 25
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|CHOCOLATE|100 MG|20",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|GUMMY|100 MG|12",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 12
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|GUMMY|100 MG|11.25",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 11.25
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|GUMMY|100 MG|7",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 7
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|HARD CANDY|100 MG|14.5",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "HARD CANDY",
+    "size": "100 MG",
+    "price": 14.5
+  },
+  {
+    "id": "EMERALD SKY|EDIBLE|HARD CANDY|100 MG|12",
+    "brand": "EMERALD SKY",
+    "productType": "EDIBLE",
+    "subtype": "HARD CANDY",
+    "size": "100 MG",
+    "price": 12
+  },
+  {
+    "id": "EXPLICIT|PREROLL|INFUSED|1 G|6.25",
+    "brand": "EXPLICIT",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 6.25
+  },
+  {
+    "id": "FARMER AND THE FELON|FLOWER|PRE-PACK|7 G|42",
+    "brand": "FARMER AND THE FELON",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 42
+  },
+  {
+    "id": "FARMER AND THE FELON|FLOWER|PRE-PACK|3.5 G|28.5",
+    "brand": "FARMER AND THE FELON",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 28.5
+  },
+  {
+    "id": "FIG FARMS|FLOWER|PRE-PACK|7 G|60",
+    "brand": "FIG FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 60
+  },
+  {
+    "id": "FIG FARMS|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "FIG FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "FIG FARMS|PREROLL|FLOWER|1 G|16",
+    "brand": "FIG FARMS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 16
+  },
+  {
+    "id": "FLAVORADE|CARTRIDGE|510 THREAD|1 G|42",
+    "brand": "FLAVORADE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "FLEETWOOD|FLOWER|PRE-PACK|14 G|37.5",
+    "brand": "FLEETWOOD",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 37.5
+  },
+  {
+    "id": "FOCUS V|MERCH|ACCESSORY|ONE SIZE|345",
+    "brand": "FOCUS V",
+    "productType": "MERCH",
+    "subtype": "ACCESSORY",
+    "size": "ONE SIZE",
+    "price": 345
+  },
+  {
+    "id": "FOCUS V|MERCH|DAB RIG|ONE SIZE|265",
+    "brand": "FOCUS V",
+    "productType": "MERCH",
+    "subtype": "DAB RIG",
+    "size": "ONE SIZE",
+    "price": 265
+  },
+  {
+    "id": "FOCUS V|MERCH|DAB RIG|ONE SIZE|215",
+    "brand": "FOCUS V",
+    "productType": "MERCH",
+    "subtype": "DAB RIG",
+    "size": "ONE SIZE",
+    "price": 215
+  },
+  {
+    "id": "FRIENDLY BRAND|CARTRIDGE|510 THREAD|1 G|50",
+    "brand": "FRIENDLY BRAND",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "FRIENDLY BRAND|EXTRACT|CURED RESIN|1 G|31.5",
+    "brand": "FRIENDLY BRAND",
+    "productType": "EXTRACT",
+    "subtype": "CURED RESIN",
+    "size": "1 G",
+    "price": 31.5
+  },
+  {
+    "id": "FRIENDLY BRAND|TINCTURE|DROPPER|1000 MG|42.5",
+    "brand": "FRIENDLY BRAND",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "1000 MG",
+    "price": 42.5
+  },
+  {
+    "id": "FRIENDLY BRAND|TINCTURE|OTHER|1000 MG|42.5",
+    "brand": "FRIENDLY BRAND",
+    "productType": "TINCTURE",
+    "subtype": "OTHER",
+    "size": "1000 MG",
+    "price": 42.5
+  },
+  {
+    "id": "FROOT|EDIBLE|CHEW|100 MG|12.5",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "FROOT|EDIBLE|CHEW|100 MG|8.75",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 8.75
+  },
+  {
+    "id": "FROOT|EDIBLE|GUMMY|100 MG|14.99",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 14.99
+  },
+  {
+    "id": "FROOT|EDIBLE|GUMMY|100 MG|12.5",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "FROOT|EDIBLE|GUMMY|200 MG|12.5",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "200 MG",
+    "price": 12.5
+  },
+  {
+    "id": "FROOT|EDIBLE|GUMMY|100 MG|8.75",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 8.75
+  },
+  {
+    "id": "FROOT|EDIBLE|OTHER|100 MG|8.75",
+    "brand": "FROOT",
+    "productType": "EDIBLE",
+    "subtype": "OTHER",
+    "size": "100 MG",
+    "price": 8.75
+  },
+  {
+    "id": "FUZZIES|PREROLL|INFUSED|2.5 G|34",
+    "brand": "FUZZIES",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 34
+  },
+  {
+    "id": "GELATO|CARTRIDGE|510 THREAD|1 G|25",
+    "brand": "GELATO",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "GELATO|CARTRIDGE|510 THREAD|1 G|22.5",
+    "brand": "GELATO",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "GELATO|CARTRIDGE|ALL-IN-ONE|1 G|30",
+    "brand": "GELATO",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "GELATO|CARTRIDGE|ALL-IN-ONE|1 G|22.5",
+    "brand": "GELATO",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "GELATO|CARTRIDGE|READY TO USE|1 G|22.5",
+    "brand": "GELATO",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "GELATO|EDIBLE|BAKED GOOD|100 MG|17.5",
+    "brand": "GELATO",
+    "productType": "EDIBLE",
+    "subtype": "BAKED GOOD",
+    "size": "100 MG",
+    "price": 17.5
+  },
+  {
+    "id": "GELATO|FLOWER|PRE-PACK|3.5 G|37.5",
+    "brand": "GELATO",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 37.5
+  },
+  {
+    "id": "GELATO|PREROLL|FLOWER|1.2 G|12.5",
+    "brand": "GELATO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.2 G",
+    "price": 12.5
+  },
+  {
+    "id": "GELATO|PREROLL|FLOWER|1 G|4.25",
+    "brand": "GELATO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 4.25
+  },
+  {
+    "id": "GELATO|PREROLL|INFUSED|3 G|31",
+    "brand": "GELATO",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 31
+  },
+  {
+    "id": "GELATO|PREROLL|INFUSED|1.2 G|12.5",
+    "brand": "GELATO",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.2 G",
+    "price": 12.5
+  },
+  {
+    "id": "GLASS HOUSE FARMS|FLOWER|PRE-PACK|28 G|126",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 126
+  },
+  {
+    "id": "GLASS HOUSE FARMS|FLOWER|PRE-PACK|14 G|78",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 78
+  },
+  {
+    "id": "GLASS HOUSE FARMS|FLOWER|PRE-PACK|7 G|38",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 38
+  },
+  {
+    "id": "GLASS HOUSE FARMS|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "GLASS HOUSE FARMS|PREROLL|FLOWER|1 G|10",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "GLASS HOUSE FARMS|PREROLL|INFUSED|2.5 G|40",
+    "brand": "GLASS HOUSE FARMS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 40
+  },
+  {
+    "id": "GOLDDROP|CARTRIDGE|ALL-IN-ONE|1.5 G|50",
+    "brand": "GOLDDROP",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1.5 G",
+    "price": 50
+  },
+  {
+    "id": "GOOD TIDE|EDIBLE|GUMMY|100 MG|25",
+    "brand": "GOOD TIDE",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 25
+  },
+  {
+    "id": "GOOD TIDE|EDIBLE|GUMMY|100 MG|20",
+    "brand": "GOOD TIDE",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "GRASSHOPPERS|PREROLL|INFUSED|1 G|6",
+    "brand": "GRASSHOPPERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 6
+  },
+  {
+    "id": "GRASSHOPPERS|PREROLL|INFUSED|1 G|5.25",
+    "brand": "GRASSHOPPERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 5.25
+  },
+  {
+    "id": "GREEN DAWG|FLOWER|PRE-PACK|7 G|65",
+    "brand": "GREEN DAWG",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 65
+  },
+  {
+    "id": "GREEN DAWG|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "GREEN DAWG",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "GREEN DAWG|FLOWER|PRE-PACK|3.5 G|15",
+    "brand": "GREEN DAWG",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 15
+  },
+  {
+    "id": "GREEN DAWG|PREROLL|FLOWER|3 G|30",
+    "brand": "GREEN DAWG",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 30
+  },
+  {
+    "id": "GRIZZLY PEAK|FLOWER|PRE-PACK|3.5 G|5",
+    "brand": "GRIZZLY PEAK",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 5
+  },
+  {
+    "id": "GRIZZLY PEAK|PREROLL|FLOWER|1 G|10",
+    "brand": "GRIZZLY PEAK",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "GRIZZLY PEAK|PREROLL|FLOWER|1 G|7.5",
+    "brand": "GRIZZLY PEAK",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 7.5
+  },
+  {
+    "id": "GROUNDED|FLOWER|PRE-GROUND|14 G|12.5",
+    "brand": "GROUNDED",
+    "productType": "FLOWER",
+    "subtype": "PRE-GROUND",
+    "size": "14 G",
+    "price": 12.5
+  },
+  {
+    "id": "GROUNDED|FLOWER|PRE-PACK|14 G|12.5",
+    "brand": "GROUNDED",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 12.5
+  },
+  {
+    "id": "HALARA|CARTRIDGE|510 THREAD|1 G|55",
+    "brand": "HALARA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "HALF PIPE|CARTRIDGE|510 THREAD|1 G|25",
+    "brand": "HALF PIPE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "HALF PIPE|CARTRIDGE|510 THREAD|1 G|20",
+    "brand": "HALF PIPE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "HALF PIPE|CARTRIDGE|ALL-IN-ONE|1 G|28",
+    "brand": "HALF PIPE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 28
+  },
+  {
+    "id": "HALF PIPE|EXTRACT|RSO|1 G|22",
+    "brand": "HALF PIPE",
+    "productType": "EXTRACT",
+    "subtype": "RSO",
+    "size": "1 G",
+    "price": 22
+  },
+  {
+    "id": "HALF PIPE|FLOWER|PRE-PACK|28 G|120",
+    "brand": "HALF PIPE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 120
+  },
+  {
+    "id": "HALF PIPE|FLOWER|PRE-PACK|14 G|60",
+    "brand": "HALF PIPE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "HALF PIPE|FLOWER|PRE-PACK|7 G|40",
+    "brand": "HALF PIPE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 40
+  },
+  {
+    "id": "HALF PIPE|FLOWER|PRE-PACK|14 G|20",
+    "brand": "HALF PIPE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 20
+  },
+  {
+    "id": "HALF PIPE|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "HALF PIPE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "HALF PIPE|PREROLL|FLOWER|1 G|7",
+    "brand": "HALF PIPE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 7
+  },
+  {
+    "id": "HALF PIPE|PREROLL|INFUSED|1 G|14",
+    "brand": "HALF PIPE",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 14
+  },
+  {
+    "id": "HAMSA|EDIBLE|GUMMY|100 MG|17.5",
+    "brand": "HAMSA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 17.5
+  },
+  {
+    "id": "HAPPIE|FLOWER|PRE-PACK|14 G|60",
+    "brand": "HAPPIE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "HAPPIE|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "HAPPIE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "HAPPIE|PREROLL|FLOWER|1 G|5.5",
+    "brand": "HAPPIE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 5.5
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|510 THREAD|2 G|90",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "2 G",
+    "price": 90
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|510 THREAD|1 G|73.49",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 73.49
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|510 THREAD|1 G|70",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 70
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|510 THREAD|1 G|65",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 65
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|510 THREAD|1 G|62",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 62
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|ALL-IN-ONE|1 G|82",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 82
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|ALL-IN-ONE|1 G|65",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 65
+  },
+  {
+    "id": "HEAVY HITTERS|CARTRIDGE|ALL-IN-ONE|1 G|62",
+    "brand": "HEAVY HITTERS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 62
+  },
+  {
+    "id": "HEAVY HITTERS|EDIBLE|GUMMY|100 MG|25",
+    "brand": "HEAVY HITTERS",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 25
+  },
+  {
+    "id": "HEAVY HITTERS|EDIBLE|GUMMY|100 MG|22.5",
+    "brand": "HEAVY HITTERS",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 22.5
+  },
+  {
+    "id": "HEAVY HITTERS|EDIBLE|GUMMY|100 MG|22",
+    "brand": "HEAVY HITTERS",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 22
+  },
+  {
+    "id": "HEAVY HITTERS|EDIBLE|GUMMY|100 MG|18",
+    "brand": "HEAVY HITTERS",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 18
+  },
+  {
+    "id": "HEAVY HITTERS|MERCH|BATTERY|ONE SIZE|40",
+    "brand": "HEAVY HITTERS",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 40
+  },
+  {
+    "id": "HEAVY HITTERS|PILL|TABLET|1000 MG|90",
+    "brand": "HEAVY HITTERS",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "1000 MG",
+    "price": 90
+  },
+  {
+    "id": "HEAVY HITTERS|PILL|TABLET|1000 MG|65",
+    "brand": "HEAVY HITTERS",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "1000 MG",
+    "price": 65
+  },
+  {
+    "id": "HEAVY HITTERS|PILL|TABLET|100 MG|22.5",
+    "brand": "HEAVY HITTERS",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "100 MG",
+    "price": 22.5
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|2.5 G|50",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 50
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|2.5 G|46",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 46
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|2.5 G|38.99",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 38.99
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|1 G|31",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 31
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|1 G|23",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 23
+  },
+  {
+    "id": "HEAVY HITTERS|PREROLL|INFUSED|1 G|22.5",
+    "brand": "HEAVY HITTERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 22.5
+  },
+  {
+    "id": "HEIRBLOOM|CARTRIDGE|ALL-IN-ONE|0.5 G|25",
+    "brand": "HEIRBLOOM",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 25
+  },
+  {
+    "id": "HEIRBLOOM|FLOWER|PRE-PACK|3.5 G|48",
+    "brand": "HEIRBLOOM",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 48
+  },
+  {
+    "id": "HEIRBLOOM|PREROLL|FLOWER|0.75 G|12",
+    "brand": "HEIRBLOOM",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "0.75 G",
+    "price": 12
+  },
+  {
+    "id": "HI BRAND|EXTRACT|LIVE RESIN|1 G|16",
+    "brand": "HI BRAND",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 16
+  },
+  {
+    "id": "HI BRAND|FLOWER|INFUSED|7 G|45",
+    "brand": "HI BRAND",
+    "productType": "FLOWER",
+    "subtype": "INFUSED",
+    "size": "7 G",
+    "price": 45
+  },
+  {
+    "id": "HI BRAND|FLOWER|PRE-PACK|14 G|90",
+    "brand": "HI BRAND",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 90
+  },
+  {
+    "id": "HI BRAND|FLOWER|PRE-PACK|7 G|52",
+    "brand": "HI BRAND",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 52
+  },
+  {
+    "id": "HI BRAND|PREROLL|FLOWER|7 G|46",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "7 G",
+    "price": 46
+  },
+  {
+    "id": "HI BRAND|PREROLL|FLOWER|0.5 G|46",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "0.5 G",
+    "price": 46
+  },
+  {
+    "id": "HI BRAND|PREROLL|FLOWER|3 G|21",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 21
+  },
+  {
+    "id": "HI BRAND|PREROLL|FLOWER|2.5 G|21",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.5 G",
+    "price": 21
+  },
+  {
+    "id": "HI BRAND|PREROLL|INFUSED|1 G|17",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 17
+  },
+  {
+    "id": "HI BRAND|PREROLL|INFUSED|1 G|8.5",
+    "brand": "HI BRAND",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 8.5
+  },
+  {
+    "id": "HIGHRISE|CARTRIDGE|510 THREAD|1 G|19",
+    "brand": "HIGHRISE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 19
+  },
+  {
+    "id": "HIGHRISE|CARTRIDGE|ALL-IN-ONE|1 G|24",
+    "brand": "HIGHRISE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 24
+  },
+  {
+    "id": "HIMALAYA|CARTRIDGE|510 THREAD|1 G|48",
+    "brand": "HIMALAYA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 48
+  },
+  {
+    "id": "HIMALAYA|CARTRIDGE|510 THREAD|1 G|32",
+    "brand": "HIMALAYA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 32
+  },
+  {
+    "id": "HIMALAYA|CARTRIDGE|510 THREAD|1 G|25",
+    "brand": "HIMALAYA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "HIMALAYA|CARTRIDGE|ALL-IN-ONE|1 G|36",
+    "brand": "HIMALAYA",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "HIMALAYA|EXTRACT|LIVE RESIN|1 G|20",
+    "brand": "HIMALAYA",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "HIMALAYA|MERCH|BATTERY|ONE SIZE|14",
+    "brand": "HIMALAYA",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 14
+  },
+  {
+    "id": "HIMALAYA|MERCH|OTHER|ONE SIZE|14",
+    "brand": "HIMALAYA",
+    "productType": "MERCH",
+    "subtype": "OTHER",
+    "size": "ONE SIZE",
+    "price": 14
+  },
+  {
+    "id": "HIMALAYA|PREROLL|INFUSED|1 G|10",
+    "brand": "HIMALAYA",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "HOME GROWN|CARTRIDGE|510 THREAD|1 G|31.5",
+    "brand": "HOME GROWN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 31.5
+  },
+  {
+    "id": "HOME GROWN|CARTRIDGE|ALL-IN-ONE|1 G|31.5",
+    "brand": "HOME GROWN",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 31.5
+  },
+  {
+    "id": "HOME GROWN|EXTRACT|CURED RESIN|1 G|30",
+    "brand": "HOME GROWN",
+    "productType": "EXTRACT",
+    "subtype": "CURED RESIN",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "HOME GROWN|EXTRACT|CURED RESIN|1000 MG|30",
+    "brand": "HOME GROWN",
+    "productType": "EXTRACT",
+    "subtype": "CURED RESIN",
+    "size": "1000 MG",
+    "price": 30
+  },
+  {
+    "id": "HOME GROWN|EXTRACT|RSO|1 G|30",
+    "brand": "HOME GROWN",
+    "productType": "EXTRACT",
+    "subtype": "RSO",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "HOWIE ROLL|FLOWER|PRE-PACK|14 G|47",
+    "brand": "HOWIE ROLL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 47
+  },
+  {
+    "id": "HOWIE ROLL|FLOWER|PRE-PACK|3.5 G|12.5",
+    "brand": "HOWIE ROLL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 12.5
+  },
+  {
+    "id": "JEETER|CARTRIDGE|510 THREAD|1 G|26",
+    "brand": "JEETER",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 26
+  },
+  {
+    "id": "JEETER|CARTRIDGE|ALL-IN-ONE|1 G|35",
+    "brand": "JEETER",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "JEETER|CARTRIDGE|ALL-IN-ONE|1 G|32",
+    "brand": "JEETER",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 32
+  },
+  {
+    "id": "JEETER|PREROLL|FLOWER|2.5 G|38",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.5 G",
+    "price": 38
+  },
+  {
+    "id": "JEETER|PREROLL|FLOWER|2 G|36",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2 G",
+    "price": 36
+  },
+  {
+    "id": "JEETER|PREROLL|FLOWER|1 G|19",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 19
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|1.5 G|45",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 45
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|2.5 G|38",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 38
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|1.3 G|36",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.3 G",
+    "price": 36
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|2 G|36",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2 G",
+    "price": 36
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|1 G|19",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 19
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|0.5 G|7.5",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "0.5 G",
+    "price": 7.5
+  },
+  {
+    "id": "JEETER|PREROLL|INFUSED|1 G|0.01",
+    "brand": "JEETER",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 0.01
+  },
+  {
+    "id": "JETTY|CARTRIDGE|510 THREAD|1 G|56",
+    "brand": "JETTY",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 56
+  },
+  {
+    "id": "JETTY|CARTRIDGE|ALL-IN-ONE|1 G|68",
+    "brand": "JETTY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 68
+  },
+  {
+    "id": "JETTY|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "JETTY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "JETTY|CARTRIDGE|ALL-IN-ONE|1 G|40",
+    "brand": "JETTY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "JETTY|PREROLL|INFUSED|1 G|15",
+    "brand": "JETTY",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "JETTY|PREROLL|INFUSED|1 G|11.25",
+    "brand": "JETTY",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 11.25
+  },
+  {
+    "id": "KAIZEN|CARTRIDGE|510 THREAD|1.25 G|60",
+    "brand": "KAIZEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1.25 G",
+    "price": 60
+  },
+  {
+    "id": "KAIZEN|CARTRIDGE|510 THREAD|1 G|45",
+    "brand": "KAIZEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "KAIZEN|EXTRACT|LIVE RESIN BADDER|1 G|20",
+    "brand": "KAIZEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN BADDER",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "KAIZEN|EXTRACT|LIVE ROSIN|1 G|62",
+    "brand": "KAIZEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 62
+  },
+  {
+    "id": "KAIZEN|EXTRACT|LIVE ROSIN|1 G|35",
+    "brand": "KAIZEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "KANHA|EDIBLE|GUMMY|100 MG|22",
+    "brand": "KANHA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 22
+  },
+  {
+    "id": "KANHA|EDIBLE|GUMMY|50 MG|20",
+    "brand": "KANHA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "50 MG",
+    "price": 20
+  },
+  {
+    "id": "KANHA|EDIBLE|GUMMY|100 MG|20",
+    "brand": "KANHA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "KANHA|EDIBLE|GUMMY|100 MG|15",
+    "brand": "KANHA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 15
+  },
+  {
+    "id": "KEEF|BEVERAGE|SHOT|100 MG|12.5",
+    "brand": "KEEF",
+    "productType": "BEVERAGE",
+    "subtype": "SHOT",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "KEEF|BEVERAGE|SODA|100 MG|12.5",
+    "brand": "KEEF",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "KEEF|BEVERAGE|WATER|100 MG|9",
+    "brand": "KEEF",
+    "productType": "BEVERAGE",
+    "subtype": "WATER",
+    "size": "100 MG",
+    "price": 9
+  },
+  {
+    "id": "KINGPEN|CARTRIDGE|510 THREAD|1 G|52",
+    "brand": "KINGPEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 52
+  },
+  {
+    "id": "KINGPEN|EXTRACT|BADDER|1.5 G|25",
+    "brand": "KINGPEN",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1.5 G",
+    "price": 25
+  },
+  {
+    "id": "KINGPEN|PREROLL|INFUSED|4.2 G|50",
+    "brand": "KINGPEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "4.2 G",
+    "price": 50
+  },
+  {
+    "id": "KINGPEN|PREROLL|INFUSED|1.3 G|22",
+    "brand": "KINGPEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.3 G",
+    "price": 22
+  },
+  {
+    "id": "KINGROLL|PREROLL|FLOWER|3 G|38",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 38
+  },
+  {
+    "id": "KINGROLL|PREROLL|INFUSED|4.2 G|50",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "4.2 G",
+    "price": 50
+  },
+  {
+    "id": "KINGROLL|PREROLL|INFUSED|3 G|38",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 38
+  },
+  {
+    "id": "KINGROLL|PREROLL|INFUSED|1.3 G|22",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.3 G",
+    "price": 22
+  },
+  {
+    "id": "KINGROLL|PREROLL|INFUSED|0.5 G|8.75",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "0.5 G",
+    "price": 8.75
+  },
+  {
+    "id": "KINGROLL|PREROLL|INFUSED|0.6 G|8.5",
+    "brand": "KINGROLL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "0.6 G",
+    "price": 8.5
+  },
+  {
+    "id": "KIVA|EDIBLE|CHOCOLATE|100 MG|25.5",
+    "brand": "KIVA",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 25.5
+  },
+  {
+    "id": "KIVA|EDIBLE|CHOCOLATE|100 MG|23",
+    "brand": "KIVA",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 23
+  },
+  {
+    "id": "KIVA LOST FARM|EDIBLE|CHEW|100 MG|26",
+    "brand": "KIVA LOST FARM",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 26
+  },
+  {
+    "id": "KIVA LOST FARM|EDIBLE|CHEW|100 MG|21",
+    "brand": "KIVA LOST FARM",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 21
+  },
+  {
+    "id": "KIVA LOST FARM|EDIBLE|GUMMY|100 MG|21",
+    "brand": "KIVA LOST FARM",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 21
+  },
+  {
+    "id": "KIVA TERRA|EDIBLE|CHOCOLATE|100 MG|25.5",
+    "brand": "KIVA TERRA",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 25.5
+  },
+  {
+    "id": "KIVA TERRA|EDIBLE|CHOCOLATE|100 MG|23",
+    "brand": "KIVA TERRA",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 23
+  },
+  {
+    "id": "LEVEL|PILL|CAPSULE|100 MG|18.5",
+    "brand": "LEVEL",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "100 MG",
+    "price": 18.5
+  },
+  {
+    "id": "LEVEL|PILL|TABLET|250 MG|32.5",
+    "brand": "LEVEL",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "250 MG",
+    "price": 32.5
+  },
+  {
+    "id": "LEVEL|PILL|TABLET|100 MG|18.5",
+    "brand": "LEVEL",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "100 MG",
+    "price": 18.5
+  },
+  {
+    "id": "LEVEL|PILL|TABLET|100 MG|5",
+    "brand": "LEVEL",
+    "productType": "PILL",
+    "subtype": "TABLET",
+    "size": "100 MG",
+    "price": 5
+  },
+  {
+    "id": "LIFT TICKETS|CARTRIDGE|ALL-IN-ONE|1 G|36",
+    "brand": "LIFT TICKETS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "LIFT TICKETS|PREROLL|INFUSED|2.5 G|36",
+    "brand": "LIFT TICKETS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 36
+  },
+  {
+    "id": "LIME|PREROLL|FLOWER|3 G|25",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 25
+  },
+  {
+    "id": "LIME|PREROLL|FLOWER|2.15 G|24",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.15 G",
+    "price": 24
+  },
+  {
+    "id": "LIME|PREROLL|FLOWER|1.75 G|17.5",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.75 G",
+    "price": 17.5
+  },
+  {
+    "id": "LIME|PREROLL|FLOWER|0.6 G|6.99",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "0.6 G",
+    "price": 6.99
+  },
+  {
+    "id": "LIME|PREROLL|INFUSED|3 G|25",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 25
+  },
+  {
+    "id": "LIME|PREROLL|INFUSED|2.15 G|24",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.15 G",
+    "price": 24
+  },
+  {
+    "id": "LIME|PREROLL|INFUSED|1.75 G|17.5",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.75 G",
+    "price": 17.5
+  },
+  {
+    "id": "LIME|PREROLL|INFUSED|0.6 G|6.99",
+    "brand": "LIME",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "0.6 G",
+    "price": 6.99
+  },
+  {
+    "id": "LIME|TINCTURE|SYRUP|1000 MG|34",
+    "brand": "LIME",
+    "productType": "TINCTURE",
+    "subtype": "SYRUP",
+    "size": "1000 MG",
+    "price": 34
+  },
+  {
+    "id": "LIQUID FLOWER|TOPICAL|BALM|100 MG|75",
+    "brand": "LIQUID FLOWER",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "100 MG",
+    "price": 75
+  },
+  {
+    "id": "LIQUID FLOWER|TOPICAL|BALM|32 MG|75",
+    "brand": "LIQUID FLOWER",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "32 MG",
+    "price": 75
+  },
+  {
+    "id": "LIQUID FLOWER|TOPICAL|BALM|179 MG|50",
+    "brand": "LIQUID FLOWER",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "179 MG",
+    "price": 50
+  },
+  {
+    "id": "LMFAO|CARTRIDGE|510 THREAD|1 G|15",
+    "brand": "LMFAO",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "LMFAO|EXTRACT|LIVE RESIN|1 G|13.75",
+    "brand": "LMFAO",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 13.75
+  },
+  {
+    "id": "LMFAO|PREROLL|FLOWER|1 G|3.75",
+    "brand": "LMFAO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 3.75
+  },
+  {
+    "id": "LOLO|FLOWER|PRE-PACK|3.5 G|29",
+    "brand": "LOLO",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 29
+  },
+  {
+    "id": "LOLO|FLOWER|PRE-PACK|3.5 G|21",
+    "brand": "LOLO",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 21
+  },
+  {
+    "id": "LOLO|PREROLL|FLOWER|1 G|6.25",
+    "brand": "LOLO",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 6.25
+  },
+  {
+    "id": "LOLO|PREROLL|INFUSED|1 G|9.25",
+    "brand": "LOLO",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 9.25
+  },
+  {
+    "id": "LOUD & CLEAR|CARTRIDGE|510 THREAD|1 G|30",
+    "brand": "LOUD & CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "LOUD & CLEAR|EXTRACT|LIVE RESIN|2 G|44",
+    "brand": "LOUD & CLEAR",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "2 G",
+    "price": 44
+  },
+  {
+    "id": "LOUD AND CLEAR|CARTRIDGE|510 THREAD|1 G|30",
+    "brand": "LOUD AND CLEAR",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "LOUDPACK|FLOWER|PRE-PACK|3.5 G|0.01",
+    "brand": "LOUDPACK",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 0.01
+  },
+  {
+    "id": "LUCI HASH CO|CARTRIDGE|ALL-IN-ONE|1 G|50",
+    "brand": "LUCI HASH CO",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 50
+  },
+  {
+    "id": "LUMPY'S|FLOWER|PRE-PACK|14 G|120",
+    "brand": "LUMPY'S",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 120
+  },
+  {
+    "id": "LUMPY'S|FLOWER|PRE-PACK|7 G|65",
+    "brand": "LUMPY'S",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 65
+  },
+  {
+    "id": "LUMPY'S|FLOWER|PRE-PACK|3.5 G|43",
+    "brand": "LUMPY'S",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 43
+  },
+  {
+    "id": "LUMPY'S|PREROLL|FLOWER|1 G|11",
+    "brand": "LUMPY'S",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 11
+  },
+  {
+    "id": "LUVBUDS|MERCH|GRINDER|ONE SIZE|20",
+    "brand": "LUVBUDS",
+    "productType": "MERCH",
+    "subtype": "GRINDER",
+    "size": "ONE SIZE",
+    "price": 20
+  },
+  {
+    "id": "MAVEN|FLOWER|PRE-PACK|3.5 G|50",
+    "brand": "MAVEN",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 50
+  },
+  {
+    "id": "MAVEN|PREROLL|FLOWER|1 G|12.5",
+    "brand": "MAVEN",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 12.5
+  },
+  {
+    "id": "MAVEN|PREROLL|INFUSED|3 G|40",
+    "brand": "MAVEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 40
+  },
+  {
+    "id": "MAVEN|PREROLL|INFUSED|3 G|29",
+    "brand": "MAVEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 29
+  },
+  {
+    "id": "MOUNTAIN MAN MELTS|CARTRIDGE|ALL-IN-ONE|0.5 G|55",
+    "brand": "MOUNTAIN MAN MELTS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 55
+  },
+  {
+    "id": "MOUNTAIN MAN MELTS|EXTRACT|LIVE ROSIN|1 G|52",
+    "brand": "MOUNTAIN MAN MELTS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 52
+  },
+  {
+    "id": "MOUNTAIN MAN MELTS|EXTRACT|ROSIN|1 G|52",
+    "brand": "MOUNTAIN MAN MELTS",
+    "productType": "EXTRACT",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 52
+  },
+  {
+    "id": "MR. ZIPS|CARTRIDGE|510 THREAD|1 G|26",
+    "brand": "MR. ZIPS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 26
+  },
+  {
+    "id": "MR. ZIPS|FLOWER|PRE-PACK|28 G|97",
+    "brand": "MR. ZIPS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 97
+  },
+  {
+    "id": "MR. ZIPS|FLOWER|PRE-PACK|14 G|55",
+    "brand": "MR. ZIPS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 55
+  },
+  {
+    "id": "MR. ZIPS|FLOWER|PRE-PACK|7 G|31",
+    "brand": "MR. ZIPS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 31
+  },
+  {
+    "id": "MR. ZIPS|FLOWER|PRE-PACK|3.5 G|15",
+    "brand": "MR. ZIPS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 15
+  },
+  {
+    "id": "MR. ZIPS|PREROLL|FLOWER|7 G|37.5",
+    "brand": "MR. ZIPS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "7 G",
+    "price": 37.5
+  },
+  {
+    "id": "MR. ZIPS|PREROLL|FLOWER|1.5 G|7.5",
+    "brand": "MR. ZIPS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.5 G",
+    "price": 7.5
+  },
+  {
+    "id": "MR. ZIPS|PREROLL|INFUSED|1.5 G|11.25",
+    "brand": "MR. ZIPS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 11.25
+  },
+  {
+    "id": "NAMELESS GENETICS|FLOWER|PRE-PACK|7 G|68",
+    "brand": "NAMELESS GENETICS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 68
+  },
+  {
+    "id": "NAMELESS GENETICS|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "NAMELESS GENETICS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "NASHA|CARTRIDGE|ALL-IN-ONE|1 G|55",
+    "brand": "NASHA",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "NASHA|CARTRIDGE|ROSIN|1 G|55",
+    "brand": "NASHA",
+    "productType": "CARTRIDGE",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "NASHA|EXTRACT|HASH|1.2 G|26",
+    "brand": "NASHA",
+    "productType": "EXTRACT",
+    "subtype": "HASH",
+    "size": "1.2 G",
+    "price": 26
+  },
+  {
+    "id": "NASHA|EXTRACT|HASH|1.2 G|20",
+    "brand": "NASHA",
+    "productType": "EXTRACT",
+    "subtype": "HASH",
+    "size": "1.2 G",
+    "price": 20
+  },
+  {
+    "id": "NATURAL GAS|CARTRIDGE|ALL-IN-ONE|0.5 G|50",
+    "brand": "NATURAL GAS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 50
+  },
+  {
+    "id": "NORTHERN EMERALDS|FLOWER|PRE-PACK|3.5 G|60",
+    "brand": "NORTHERN EMERALDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 60
+  },
+  {
+    "id": "NORTHERN EMERALDS|FLOWER|PRE-PACK|5 G|10",
+    "brand": "NORTHERN EMERALDS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "5 G",
+    "price": 10
+  },
+  {
+    "id": "NORTHERN HARVEST|FLOWER|PRE-PACK|3.5 G|52",
+    "brand": "NORTHERN HARVEST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 52
+  },
+  {
+    "id": "NORTHERN HARVEST|PREROLL|FLOWER|3.5 G|50",
+    "brand": "NORTHERN HARVEST",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 50
+  },
+  {
+    "id": "NOT YOUR FATHER'S|BEVERAGE|SODA|100 MG|10.5",
+    "brand": "NOT YOUR FATHER'S",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "100 MG",
+    "price": 10.5
+  },
+  {
+    "id": "NOT YOUR FATHER'S|BEVERAGE|SODA|100 MG|9.25",
+    "brand": "NOT YOUR FATHER'S",
+    "productType": "BEVERAGE",
+    "subtype": "SODA",
+    "size": "100 MG",
+    "price": 9.25
+  },
+  {
+    "id": "PACIFIC STONE|FLOWER|PRE-PACK|14 G|60",
+    "brand": "PACIFIC STONE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "PACIFIC STONE|FLOWER|PRE-PACK|7 G|34",
+    "brand": "PACIFIC STONE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 34
+  },
+  {
+    "id": "PACIFIC STONE|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "PACIFIC STONE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "PACIFIC STONE|FLOWER|PRE-PACK|1 G|6",
+    "brand": "PACIFIC STONE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "1 G",
+    "price": 6
+  },
+  {
+    "id": "PACIFIC STONE|PREROLL|FLOWER|7 G|40",
+    "brand": "PACIFIC STONE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "7 G",
+    "price": 40
+  },
+  {
+    "id": "PACIFIC STONE|PREROLL|FLOWER|3 G|26",
+    "brand": "PACIFIC STONE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 26
+  },
+  {
+    "id": "PACIFIC STONE|PREROLL|FLOWER|1 G|12",
+    "brand": "PACIFIC STONE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 12
+  },
+  {
+    "id": "PACIFIC STONE|PREROLL|INFUSED|3.5 G|35",
+    "brand": "PACIFIC STONE",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3.5 G",
+    "price": 35
+  },
+  {
+    "id": "PACIFIC STONE|PREROLL|INFUSED|3.5 G|34",
+    "brand": "PACIFIC STONE",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3.5 G",
+    "price": 34
+  },
+  {
+    "id": "PALETAS|CARTRIDGE|ALL-IN-ONE|1 G|25",
+    "brand": "PALETAS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "PANACEA|FLOWER|PRE-PACK|28 G|113",
+    "brand": "PANACEA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 113
+  },
+  {
+    "id": "PANACEA|FLOWER|PRE-PACK|14 G|58",
+    "brand": "PANACEA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 58
+  },
+  {
+    "id": "PANACEA|FLOWER|PRE-PACK|7 G|35",
+    "brand": "PANACEA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 35
+  },
+  {
+    "id": "PAPA & BARKLEY|EDIBLE|GUMMY|100 MG|27.5",
+    "brand": "PAPA & BARKLEY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 27.5
+  },
+  {
+    "id": "PAPA & BARKLEY|EDIBLE|GUMMY|20 MG|27.5",
+    "brand": "PAPA & BARKLEY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "20 MG",
+    "price": 27.5
+  },
+  {
+    "id": "PAPA & BARKLEY|PILL|CAPSULE|1000 MG|105",
+    "brand": "PAPA & BARKLEY",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "1000 MG",
+    "price": 105
+  },
+  {
+    "id": "PAPA & BARKLEY|PILL|CAPSULE|100 MG|86",
+    "brand": "PAPA & BARKLEY",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "100 MG",
+    "price": 86
+  },
+  {
+    "id": "PAPA & BARKLEY|PILL|CAPSULE|100 MG|74",
+    "brand": "PAPA & BARKLEY",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "100 MG",
+    "price": 74
+  },
+  {
+    "id": "PAPA & BARKLEY|PILL|CAPSULE|1000 MG|74",
+    "brand": "PAPA & BARKLEY",
+    "productType": "PILL",
+    "subtype": "CAPSULE",
+    "size": "1000 MG",
+    "price": 74
+  },
+  {
+    "id": "PAPA & BARKLEY|TINCTURE|DROPPER|1000 MG|60",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "1000 MG",
+    "price": 60
+  },
+  {
+    "id": "PAPA & BARKLEY|TINCTURE|DROPPER|100 MG|50",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "100 MG",
+    "price": 50
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|BALM|150 MG|112",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "150 MG",
+    "price": 112
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|BALM|3 MG|75",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "3 MG",
+    "price": 75
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|BALM|50 MG|37.5",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "50 MG",
+    "price": 37.5
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|BALM|100 MG|25",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "BALM",
+    "size": "100 MG",
+    "price": 25
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|OIL|400 MG|50",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "OIL",
+    "size": "400 MG",
+    "price": 50
+  },
+  {
+    "id": "PAPA & BARKLEY|TOPICAL|PATCH|30 MG|15",
+    "brand": "PAPA & BARKLEY",
+    "productType": "TOPICAL",
+    "subtype": "PATCH",
+    "size": "30 MG",
+    "price": 15
+  },
+  {
+    "id": "PAPA'S HERB|CARTRIDGE|ALL-IN-ONE|1 G|35",
+    "brand": "PAPA'S HERB",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "PAPA'S HERB|CARTRIDGE|OTHER|1 G|35",
+    "brand": "PAPA'S HERB",
+    "productType": "CARTRIDGE",
+    "subtype": "OTHER",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "PAPA'S HERB|FLOWER|PRE-PACK|3.5 G|21",
+    "brand": "PAPA'S HERB",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 21
+  },
+  {
+    "id": "PAPA'S HERB|PREROLL|FLOWER|1 G|6.25",
+    "brand": "PAPA'S HERB",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 6.25
+  },
+  {
+    "id": "PAX|CARTRIDGE|ALL-IN-ONE|1 G|55",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "PAX|CARTRIDGE|ALL-IN-ONE|1 G|46",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 46
+  },
+  {
+    "id": "PAX|CARTRIDGE|ALL-IN-ONE|1 G|44",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 44
+  },
+  {
+    "id": "PAX|CARTRIDGE|POD|1 G|55",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 55
+  },
+  {
+    "id": "PAX|CARTRIDGE|POD|1 G|46",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 46
+  },
+  {
+    "id": "PAX|CARTRIDGE|POD|1 G|31",
+    "brand": "PAX",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 31
+  },
+  {
+    "id": "PAX|MERCH|BATTERY|ONE SIZE|25",
+    "brand": "PAX",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 25
+  },
+  {
+    "id": "PERFECT UNION|FLOWER|PRE-PACK|7 G|3",
+    "brand": "PERFECT UNION",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 3
+  },
+  {
+    "id": "PERFECT UNION|MERCH|APPAREL|LARGE|100",
+    "brand": "PERFECT UNION",
+    "productType": "MERCH",
+    "subtype": "APPAREL",
+    "size": "LARGE",
+    "price": 100
+  },
+  {
+    "id": "PERFECT UNION|MERCH|HAT|ONE SIZE|29",
+    "brand": "PERFECT UNION",
+    "productType": "MERCH",
+    "subtype": "HAT",
+    "size": "ONE SIZE",
+    "price": 29
+  },
+  {
+    "id": "PERFECT UNION|MERCH|LIGHTER|ONE SIZE|5",
+    "brand": "PERFECT UNION",
+    "productType": "MERCH",
+    "subtype": "LIGHTER",
+    "size": "ONE SIZE",
+    "price": 5
+  },
+  {
+    "id": "PERFECT UNION|MERCH|LIGHTER|ONE SIZE|4.5",
+    "brand": "PERFECT UNION",
+    "productType": "MERCH",
+    "subtype": "LIGHTER",
+    "size": "ONE SIZE",
+    "price": 4.5
+  },
+  {
+    "id": "PIPES|MERCH|PIPE|ONE SIZE|10",
+    "brand": "PIPES",
+    "productType": "MERCH",
+    "subtype": "PIPE",
+    "size": "ONE SIZE",
+    "price": 10
+  },
+  {
+    "id": "PLUGPLAY|CARTRIDGE|ALL-IN-ONE|1 G|42",
+    "brand": "PLUGPLAY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "PLUGPLAY|CARTRIDGE|POD|1 G|42",
+    "brand": "PLUGPLAY",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "PLUGPLAY|CARTRIDGE|POD|1 G|36",
+    "brand": "PLUGPLAY",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "PLUGPLAY|MERCH|BATTERY|ONE SIZE|30",
+    "brand": "PLUGPLAY",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 30
+  },
+  {
+    "id": "PREFERRED GARDENS|CARTRIDGE|ALL-IN-ONE|1 G|42",
+    "brand": "PREFERRED GARDENS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "PREFERRED GARDENS|FLOWER|PRE-PACK|14 G|120",
+    "brand": "PREFERRED GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 120
+  },
+  {
+    "id": "PREFERRED GARDENS|FLOWER|PRE-PACK|14 G|70",
+    "brand": "PREFERRED GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 70
+  },
+  {
+    "id": "PREFERRED GARDENS|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "PREFERRED GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "PREFERRED GARDENS|FLOWER|PRE-PACK|3.5 G|22",
+    "brand": "PREFERRED GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 22
+  },
+  {
+    "id": "PREFERRED GARDENS|PREROLL|FLOWER|1 G|10",
+    "brand": "PREFERRED GARDENS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 10
+  },
+  {
+    "id": "PRESIDENTIAL|FLOWER|PRE-PACK|2 G|37.5",
+    "brand": "PRESIDENTIAL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "2 G",
+    "price": 37.5
+  },
+  {
+    "id": "PRESIDENTIAL|PREROLL|FLOWER|1.5 G|34",
+    "brand": "PRESIDENTIAL",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1.5 G",
+    "price": 34
+  },
+  {
+    "id": "PRESIDENTIAL|PREROLL|INFUSED|2.1 G|34",
+    "brand": "PRESIDENTIAL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.1 G",
+    "price": 34
+  },
+  {
+    "id": "PRESIDENTIAL|PREROLL|INFUSED|1.5 G|26",
+    "brand": "PRESIDENTIAL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 26
+  },
+  {
+    "id": "PRESIDENTIAL|PREROLL|INFUSED|1 G|17.5",
+    "brand": "PRESIDENTIAL",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 17.5
+  },
+  {
+    "id": "PUFFCO|MERCH|ACCESSORY|ONE SIZE|110",
+    "brand": "PUFFCO",
+    "productType": "MERCH",
+    "subtype": "ACCESSORY",
+    "size": "ONE SIZE",
+    "price": 110
+  },
+  {
+    "id": "PUFFCO|MERCH|ACCESSORY|ONE SIZE|45",
+    "brand": "PUFFCO",
+    "productType": "MERCH",
+    "subtype": "ACCESSORY",
+    "size": "ONE SIZE",
+    "price": 45
+  },
+  {
+    "id": "PUNCH|EDIBLE|GUMMY|100 MG|20",
+    "brand": "PUNCH",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "PUNCH|EDIBLE|GUMMY|100 MG|10",
+    "brand": "PUNCH",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "PUNCH|EXTRACT|BADDER|1 G|35",
+    "brand": "PUNCH",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "PUNCH|EXTRACT|BADDER|1 G|20",
+    "brand": "PUNCH",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1 G",
+    "price": 20
+  },
+  {
+    "id": "PUNCH|PREROLL|INFUSED|2.5 G|30",
+    "brand": "PUNCH",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 30
+  },
+  {
+    "id": "PUNCH|PREROLL|INFUSED|1.6 G|30",
+    "brand": "PUNCH",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.6 G",
+    "price": 30
+  },
+  {
+    "id": "PURE BEAUTY|FLOWER|PRE-PACK|3.5 G|50",
+    "brand": "PURE BEAUTY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 50
+  },
+  {
+    "id": "PURE BEAUTY|PREROLL|FLOWER|3.5 G|40",
+    "brand": "PURE BEAUTY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 40
+  },
+  {
+    "id": "QUICKIES|PREROLL|FLOWER|1 G|3.75",
+    "brand": "QUICKIES",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 3.75
+  },
+  {
+    "id": "QUICKIES|PREROLL|INFUSED|1 G|6.25",
+    "brand": "QUICKIES",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 6.25
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|510 THREAD|1 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|510 THREAD|1 G|36",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 36
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|510 THREAD|0.5 G|27",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "0.5 G",
+    "price": 27
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|ALL-IN-ONE|1 G|47",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 47
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "RAW GARDEN|CARTRIDGE|LIVE RESIN|1 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "CARTRIDGE",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|EXTRACT|DIAMONDS|1 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "EXTRACT",
+    "subtype": "DIAMONDS",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|EXTRACT|DIAMONDS|1 G|30",
+    "brand": "RAW GARDEN",
+    "productType": "EXTRACT",
+    "subtype": "DIAMONDS",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "RAW GARDEN|EXTRACT|LIVE RESIN|1 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|EXTRACT|LIVE RESIN|1 G|26",
+    "brand": "RAW GARDEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 26
+  },
+  {
+    "id": "RAW GARDEN|EXTRACT|LIVE ROSIN|1 G|37.5",
+    "brand": "RAW GARDEN",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 37.5
+  },
+  {
+    "id": "RAW GARDEN|PREROLL|INFUSED|2.85 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.85 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|PREROLL|INFUSED|2.5 G|40",
+    "brand": "RAW GARDEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 40
+  },
+  {
+    "id": "RAW GARDEN|PREROLL|INFUSED|1 G|15",
+    "brand": "RAW GARDEN",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|5",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 5
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|3.5",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 3.5
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|3",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 3
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|2.5",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 2.5
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|2.25",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 2.25
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|1.75",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 1.75
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|1.5",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 1.5
+  },
+  {
+    "id": "ROLLING PAPERS|MERCH|ROLLING PAPERS|ONE SIZE|1.25",
+    "brand": "ROLLING PAPERS",
+    "productType": "MERCH",
+    "subtype": "ROLLING PAPERS",
+    "size": "ONE SIZE",
+    "price": 1.25
+  },
+  {
+    "id": "ROOTIMENTREES|PLANT|CLONE|EACH|30",
+    "brand": "ROOTIMENTREES",
+    "productType": "PLANT",
+    "subtype": "CLONE",
+    "size": "EACH",
+    "price": 30
+  },
+  {
+    "id": "ROSIN TECH LABS|CARTRIDGE|510 THREAD|1 G|60",
+    "brand": "ROSIN TECH LABS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 60
+  },
+  {
+    "id": "ROSIN TECH LABS|EDIBLE|GUMMY|100 MG|21.5",
+    "brand": "ROSIN TECH LABS",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 21.5
+  },
+  {
+    "id": "ROSIN TECH LABS|EXTRACT|LIVE ROSIN|1 G|45",
+    "brand": "ROSIN TECH LABS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "ROSIN TECH LABS|EXTRACT|ROSIN|1 G|72",
+    "brand": "ROSIN TECH LABS",
+    "productType": "EXTRACT",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 72
+  },
+  {
+    "id": "ROSIN TECH LABS|FLOWER|PRE-PACK|5 G|38",
+    "brand": "ROSIN TECH LABS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "5 G",
+    "price": 38
+  },
+  {
+    "id": "ROSIN TECH LABS|PREROLL|INFUSED|1.6 G|50",
+    "brand": "ROSIN TECH LABS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.6 G",
+    "price": 50
+  },
+  {
+    "id": "ROSIN TECH LABS|PREROLL|INFUSED|3 G|35",
+    "brand": "ROSIN TECH LABS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "3 G",
+    "price": 35
+  },
+  {
+    "id": "ROSIN TECH LABS|PREROLL|INFUSED|1 G|12.5",
+    "brand": "ROSIN TECH LABS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 12.5
+  },
+  {
+    "id": "ROYAL GOLD|MERCH|OTHER|ONE SIZE|60",
+    "brand": "ROYAL GOLD",
+    "productType": "MERCH",
+    "subtype": "OTHER",
+    "size": "ONE SIZE",
+    "price": 60
+  },
+  {
+    "id": "ROYAL GOLD|MERCH|OTHER|ONE SIZE|34",
+    "brand": "ROYAL GOLD",
+    "productType": "MERCH",
+    "subtype": "OTHER",
+    "size": "ONE SIZE",
+    "price": 34
+  },
+  {
+    "id": "ROYAL GOLD|MERCH|OTHER|ONE SIZE|15",
+    "brand": "ROYAL GOLD",
+    "productType": "MERCH",
+    "subtype": "OTHER",
+    "size": "ONE SIZE",
+    "price": 15
+  },
+  {
+    "id": "SAIDA|EDIBLE|GUMMY|100 MG|6.25",
+    "brand": "SAIDA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 6.25
+  },
+  {
+    "id": "SAIDA|EDIBLE|GUMMY|100 MG|5",
+    "brand": "SAIDA",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 5
+  },
+  {
+    "id": "SAIDA|TINCTURE|DROPPER|1000 MG|24",
+    "brand": "SAIDA",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "1000 MG",
+    "price": 24
+  },
+  {
+    "id": "SAUCE|CARTRIDGE|ALL-IN-ONE|1.25 G|30",
+    "brand": "SAUCE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1.25 G",
+    "price": 30
+  },
+  {
+    "id": "SAUCE|CARTRIDGE|ALL-IN-ONE|1 G|17.5",
+    "brand": "SAUCE",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 17.5
+  },
+  {
+    "id": "SAUCE|CARTRIDGE|LIVE RESIN|1.25 G|30",
+    "brand": "SAUCE",
+    "productType": "CARTRIDGE",
+    "subtype": "LIVE RESIN",
+    "size": "1.25 G",
+    "price": 30
+  },
+  {
+    "id": "SAUCE|CARTRIDGE|OTHER|1.25 G|30",
+    "brand": "SAUCE",
+    "productType": "CARTRIDGE",
+    "subtype": "OTHER",
+    "size": "1.25 G",
+    "price": 30
+  },
+  {
+    "id": "SAUCE|CARTRIDGE|READY TO USE|1.25 G|30",
+    "brand": "SAUCE",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "1.25 G",
+    "price": 30
+  },
+  {
+    "id": "SENSE|FLOWER|PRE-PACK|3.5 G|60",
+    "brand": "SENSE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 60
+  },
+  {
+    "id": "SEVEN LEAVES|FLOWER|PRE-PACK|14 G|75",
+    "brand": "SEVEN LEAVES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 75
+  },
+  {
+    "id": "SEVEN LEAVES|FLOWER|PRE-PACK|7 G|50",
+    "brand": "SEVEN LEAVES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 50
+  },
+  {
+    "id": "SEVEN LEAVES|FLOWER|PRE-PACK|3.5 G|31",
+    "brand": "SEVEN LEAVES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 31
+  },
+  {
+    "id": "SHAKE THAT|PREROLL|FLOWER|1 G|5",
+    "brand": "SHAKE THAT",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 5
+  },
+  {
+    "id": "SHASTA FLOWER CO.|CARTRIDGE|ALL-IN-ONE|0.5 G|55",
+    "brand": "SHASTA FLOWER CO.",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 55
+  },
+  {
+    "id": "SHASTA FLOWER CO.|FLOWER|PRE-PACK|3.5 G|45",
+    "brand": "SHASTA FLOWER CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "SHASTA FLOWER CO.|PREROLL|FLOWER|3.5 G|45",
+    "brand": "SHASTA FLOWER CO.",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "SHASTA HASH CO.|CARTRIDGE|ALL-IN-ONE|0.5 G|55",
+    "brand": "SHASTA HASH CO.",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 55
+  },
+  {
+    "id": "SHASTA HASH CO.|EXTRACT|LIVE ROSIN|1 G|15",
+    "brand": "SHASTA HASH CO.",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "SHASTA HASH CO.|EXTRACT|ROSIN|1 G|65",
+    "brand": "SHASTA HASH CO.",
+    "productType": "EXTRACT",
+    "subtype": "ROSIN",
+    "size": "1 G",
+    "price": 65
+  },
+  {
+    "id": "SKY GARDENS|FLOWER|PRE-PACK|14 G|60",
+    "brand": "SKY GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 60
+  },
+  {
+    "id": "SKY GARDENS|FLOWER|PRE-PACK|7 G|31",
+    "brand": "SKY GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 31
+  },
+  {
+    "id": "SKY GARDENS|FLOWER|PRE-PACK|3.5 G|16.5",
+    "brand": "SKY GARDENS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 16.5
+  },
+  {
+    "id": "SKY GARDENS|PREROLL|FLOWER|3.5 G|0.01",
+    "brand": "SKY GARDENS",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 0.01
+  },
+  {
+    "id": "SLUGGERS|CARTRIDGE|510 THREAD|1.2 G|35",
+    "brand": "SLUGGERS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1.2 G",
+    "price": 35
+  },
+  {
+    "id": "SLUGGERS|CARTRIDGE|ALL-IN-ONE|1.2 G|35",
+    "brand": "SLUGGERS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1.2 G",
+    "price": 35
+  },
+  {
+    "id": "SLUGGERS|CARTRIDGE|ALL-IN-ONE|1 G|35",
+    "brand": "SLUGGERS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "SLUGGERS|EXTRACT|LIVE ROSIN|1 G|40",
+    "brand": "SLUGGERS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "SLUGGERS|EXTRACT|LIVE ROSIN|1 G|32",
+    "brand": "SLUGGERS",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 32
+  },
+  {
+    "id": "SLUGGERS|FLOWER|PRE-PACK|5 G|32.5",
+    "brand": "SLUGGERS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "5 G",
+    "price": 32.5
+  },
+  {
+    "id": "SLUGGERS|PREROLL|INFUSED|2 G|48",
+    "brand": "SLUGGERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2 G",
+    "price": 48
+  },
+  {
+    "id": "SLUGGERS|PREROLL|INFUSED|1.5 G|17.5",
+    "brand": "SLUGGERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 17.5
+  },
+  {
+    "id": "SLUGGERS|PREROLL|INFUSED|0.7 G|7.5",
+    "brand": "SLUGGERS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "0.7 G",
+    "price": 7.5
+  },
+  {
+    "id": "SMOKE|PREROLL|FLOWER|20 G|32",
+    "brand": "SMOKE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "20 G",
+    "price": 32
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|CHEW|100 MG|22.5",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 22.5
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|CHEW|100 MG|20",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|CHEW|100 MG|17.5",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 17.5
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|GUMMY|100 MG|22.5",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 22.5
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|GUMMY|100 MG|20",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "SMOKIEZ|EDIBLE|GUMMY|100 MG|17.5",
+    "brand": "SMOKIEZ",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 17.5
+  },
+  {
+    "id": "SNOWTILL|FLOWER|PRE-PACK|3.5 G|60",
+    "brand": "SNOWTILL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 60
+  },
+  {
+    "id": "SNOWTILL|FLOWER|PRE-PACK|1 G|15",
+    "brand": "SNOWTILL",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "SOMA ROSA|FLOWER|PRE-PACK|28 G|99",
+    "brand": "SOMA ROSA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 99
+  },
+  {
+    "id": "SOMA ROSA|FLOWER|PRE-PACK|14 G|70",
+    "brand": "SOMA ROSA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 70
+  },
+  {
+    "id": "SPACE GEM|EDIBLE|CHEW|100 MG|19",
+    "brand": "SPACE GEM",
+    "productType": "EDIBLE",
+    "subtype": "CHEW",
+    "size": "100 MG",
+    "price": 19
+  },
+  {
+    "id": "SPACE GEM|EDIBLE|GUMMY|100 MG|20",
+    "brand": "SPACE GEM",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "SPARKIEZ|PREROLL|FLOWER|14 G|37.5",
+    "brand": "SPARKIEZ",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "14 G",
+    "price": 37.5
+  },
+  {
+    "id": "ST. IDES|BEVERAGE|JUICE|100 MG|7.5",
+    "brand": "ST. IDES",
+    "productType": "BEVERAGE",
+    "subtype": "JUICE",
+    "size": "100 MG",
+    "price": 7.5
+  },
+  {
+    "id": "ST. IDES|BEVERAGE|SHOT|100 MG|7.5",
+    "brand": "ST. IDES",
+    "productType": "BEVERAGE",
+    "subtype": "SHOT",
+    "size": "100 MG",
+    "price": 7.5
+  },
+  {
+    "id": "ST. IDES|BEVERAGE|TEA|100 MG|7.5",
+    "brand": "ST. IDES",
+    "productType": "BEVERAGE",
+    "subtype": "TEA",
+    "size": "100 MG",
+    "price": 7.5
+  },
+  {
+    "id": "ST. IDES|PREROLL|INFUSED|2.5 G|30",
+    "brand": "ST. IDES",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 30
+  },
+  {
+    "id": "ST. IDES|TINCTURE|DROPPER|1000 MG|30",
+    "brand": "ST. IDES",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "1000 MG",
+    "price": 30
+  },
+  {
+    "id": "ST. IDES|TINCTURE|OTHER|1000 MG|30",
+    "brand": "ST. IDES",
+    "productType": "TINCTURE",
+    "subtype": "OTHER",
+    "size": "1000 MG",
+    "price": 30
+  },
+  {
+    "id": "STATUS|FLOWER|PRE-PACK|3.5 G|45",
+    "brand": "STATUS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 45
+  },
+  {
+    "id": "STATUS|FLOWER|PRE-PACK|1 G|15",
+    "brand": "STATUS",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "STICKY|FLOWER|PRE-PACK|14 G|76",
+    "brand": "STICKY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 76
+  },
+  {
+    "id": "STICKY|FLOWER|PRE-PACK|14 G|40",
+    "brand": "STICKY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 40
+  },
+  {
+    "id": "STICKY|FLOWER|PRE-PACK|7 G|38",
+    "brand": "STICKY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 38
+  },
+  {
+    "id": "STICKY|FLOWER|PRE-PACK|14 G|24",
+    "brand": "STICKY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 24
+  },
+  {
+    "id": "STICKY|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "STICKY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "STICKY|PREROLL|FLOWER|3.5 G|11",
+    "brand": "STICKY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 11
+  },
+  {
+    "id": "STICKY|PREROLL|FLOWER|1 G|6",
+    "brand": "STICKY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 6
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|ALL-IN-ONE|1 G|34",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 34
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|ALL-IN-ONE|1 G|30",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|ALL-IN-ONE|0.5 G|15",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "0.5 G",
+    "price": 15
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|POD|1 G|30",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|POD|1 G|26",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 26
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|POD|0.5 G|15",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "0.5 G",
+    "price": 15
+  },
+  {
+    "id": "STIIIZY|CARTRIDGE|READY TO USE|0.5 G|15",
+    "brand": "STIIIZY",
+    "productType": "CARTRIDGE",
+    "subtype": "READY TO USE",
+    "size": "0.5 G",
+    "price": 15
+  },
+  {
+    "id": "STIIIZY|EDIBLE|GUMMY|25 MG|14",
+    "brand": "STIIIZY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "25 MG",
+    "price": 14
+  },
+  {
+    "id": "STIIIZY|EDIBLE|GUMMY|100 MG|14",
+    "brand": "STIIIZY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 14
+  },
+  {
+    "id": "STIIIZY|EDIBLE|GUMMY|100 MG|13",
+    "brand": "STIIIZY",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 13
+  },
+  {
+    "id": "STIIIZY|EXTRACT|DIAMONDS|1 G|25",
+    "brand": "STIIIZY",
+    "productType": "EXTRACT",
+    "subtype": "DIAMONDS",
+    "size": "1 G",
+    "price": 25
+  },
+  {
+    "id": "STIIIZY|EXTRACT|LIVE RESIN|1 G|16.5",
+    "brand": "STIIIZY",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 16.5
+  },
+  {
+    "id": "STIIIZY|EXTRACT|LIVE RESIN SAUCE|1 G|16.5",
+    "brand": "STIIIZY",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN SAUCE",
+    "size": "1 G",
+    "price": 16.5
+  },
+  {
+    "id": "STIIIZY|EXTRACT|SAUCE|1 G|16.5",
+    "brand": "STIIIZY",
+    "productType": "EXTRACT",
+    "subtype": "SAUCE",
+    "size": "1 G",
+    "price": 16.5
+  },
+  {
+    "id": "STIIIZY|FLOWER|INFUSED|7 G|42",
+    "brand": "STIIIZY",
+    "productType": "FLOWER",
+    "subtype": "INFUSED",
+    "size": "7 G",
+    "price": 42
+  },
+  {
+    "id": "STIIIZY|FLOWER|PRE-PACK|7 G|42",
+    "brand": "STIIIZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 42
+  },
+  {
+    "id": "STIIIZY|FLOWER|PRE-PACK|3.5 G|30",
+    "brand": "STIIIZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 30
+  },
+  {
+    "id": "STIIIZY|FLOWER|PRE-PACK SMALLS|7 G|42",
+    "brand": "STIIIZY",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK SMALLS",
+    "size": "7 G",
+    "price": 42
+  },
+  {
+    "id": "STIIIZY|MERCH|BATTERY|ONE SIZE|37.5",
+    "brand": "STIIIZY",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 37.5
+  },
+  {
+    "id": "STIIIZY|MERCH|BATTERY|ONE SIZE|25",
+    "brand": "STIIIZY",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 25
+  },
+  {
+    "id": "STIIIZY|PREROLL|FLOWER|2.5 G|30",
+    "brand": "STIIIZY",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2.5 G",
+    "price": 30
+  },
+  {
+    "id": "STIIIZY|PREROLL|INFUSED|2.5 G|32.5",
+    "brand": "STIIIZY",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 32.5
+  },
+  {
+    "id": "STIIIZY|PREROLL|INFUSED|2.5 G|30",
+    "brand": "STIIIZY",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 30
+  },
+  {
+    "id": "STIIIZY|PREROLL|INFUSED|1 G|15",
+    "brand": "STIIIZY",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "SUNSET CONNECT|PREROLL|FLOWER|1 G|5",
+    "brand": "SUNSET CONNECT",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 5
+  },
+  {
+    "id": "SUNSMOKE|CARTRIDGE|510 THREAD|1 G|21",
+    "brand": "SUNSMOKE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 21
+  },
+  {
+    "id": "SUNSMOKE|CARTRIDGE|510 THREAD|1 G|15",
+    "brand": "SUNSMOKE",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 15
+  },
+  {
+    "id": "SUNSMOKE|EXTRACT|LIVE RESIN BADDER|1 G|18.75",
+    "brand": "SUNSMOKE",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN BADDER",
+    "size": "1 G",
+    "price": 18.75
+  },
+  {
+    "id": "SUNSMOKE|EXTRACT|LIVE ROSIN|1 G|24",
+    "brand": "SUNSMOKE",
+    "productType": "EXTRACT",
+    "subtype": "LIVE ROSIN",
+    "size": "1 G",
+    "price": 24
+  },
+  {
+    "id": "SUNSMOKE|FLOWER|PRE-PACK|28 G|62",
+    "brand": "SUNSMOKE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 62
+  },
+  {
+    "id": "SUNSMOKE|FLOWER|PRE-PACK|28 G|50",
+    "brand": "SUNSMOKE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 50
+  },
+  {
+    "id": "SUNSMOKE|FLOWER|PRE-PACK|14 G|42",
+    "brand": "SUNSMOKE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 42
+  },
+  {
+    "id": "SUNSMOKE|FLOWER|PRE-PACK|14 G|32.5",
+    "brand": "SUNSMOKE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 32.5
+  },
+  {
+    "id": "SUNSMOKE|FLOWER|PRE-PACK|3.5 G|12",
+    "brand": "SUNSMOKE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 12
+  },
+  {
+    "id": "SUNSMOKE|PREROLL|INFUSED|2.5 G|31",
+    "brand": "SUNSMOKE",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 31
+  },
+  {
+    "id": "SURPLUS|CARTRIDGE|510 THREAD|1 G|31",
+    "brand": "SURPLUS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 31
+  },
+  {
+    "id": "TALKING TREES|PREROLL|FLOWER|2 G|12.5",
+    "brand": "TALKING TREES",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "2 G",
+    "price": 12.5
+  },
+  {
+    "id": "THE PAIRIST|FLOWER|PRE-PACK|3.5 G|31.5",
+    "brand": "THE PAIRIST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 31.5
+  },
+  {
+    "id": "THE PAIRIST|FLOWER|PRE-PACK|3.5 G|30",
+    "brand": "THE PAIRIST",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 30
+  },
+  {
+    "id": "THE PAIRIST|PREROLL|INFUSED|2.5 G|31",
+    "brand": "THE PAIRIST",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "2.5 G",
+    "price": 31
+  },
+  {
+    "id": "THE PAIRIST|PREROLL|INFUSED|1.5 G|20",
+    "brand": "THE PAIRIST",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.5 G",
+    "price": 20
+  },
+  {
+    "id": "THE PAIRIST|PREROLL|INFUSED|1 G|12.5",
+    "brand": "THE PAIRIST",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1 G",
+    "price": 12.5
+  },
+  {
+    "id": "THE SHOP|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "THE SHOP",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "TIME MACHINE|FLOWER|PRE-PACK|7 G|34",
+    "brand": "TIME MACHINE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "7 G",
+    "price": 34
+  },
+  {
+    "id": "TIME MACHINE|FLOWER|PRE-PACK|3.5 G|19",
+    "brand": "TIME MACHINE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 19
+  },
+  {
+    "id": "TIME MACHINE|FLOWER|PRE-PACK|1 G|6",
+    "brand": "TIME MACHINE",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "1 G",
+    "price": 6
+  },
+  {
+    "id": "TIME MACHINE|PREROLL|FLOWER|14 G|65",
+    "brand": "TIME MACHINE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "14 G",
+    "price": 65
+  },
+  {
+    "id": "TIME MACHINE|PREROLL|FLOWER|3.5 G|24",
+    "brand": "TIME MACHINE",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3.5 G",
+    "price": 24
+  },
+  {
+    "id": "TIMELESS|CARTRIDGE|510 THREAD|1 G|35",
+    "brand": "TIMELESS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 35
+  },
+  {
+    "id": "TIMELESS|CARTRIDGE|510 THREAD|1 G|30",
+    "brand": "TIMELESS",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "TIMELESS|CARTRIDGE|ALL-IN-ONE|1 G|40",
+    "brand": "TIMELESS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 40
+  },
+  {
+    "id": "TIMELESS|CARTRIDGE|ALL-IN-ONE|1 G|0.01",
+    "brand": "TIMELESS",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 0.01
+  },
+  {
+    "id": "TIMELESS|MERCH|BATTERY|ONE SIZE|31",
+    "brand": "TIMELESS",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 31
+  },
+  {
+    "id": "TINY FIRES|FLOWER|PRE-PACK|28 G|65",
+    "brand": "TINY FIRES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "28 G",
+    "price": 65
+  },
+  {
+    "id": "TINY FIRES|FLOWER|PRE-PACK|14 G|34",
+    "brand": "TINY FIRES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 34
+  },
+  {
+    "id": "TURN|CARTRIDGE|ALL-IN-ONE|1 G|45",
+    "brand": "TURN",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 45
+  },
+  {
+    "id": "TURN|CARTRIDGE|ALL-IN-ONE|1 G|32.5",
+    "brand": "TURN",
+    "productType": "CARTRIDGE",
+    "subtype": "ALL-IN-ONE",
+    "size": "1 G",
+    "price": 32.5
+  },
+  {
+    "id": "TURN|CARTRIDGE|POD|1 G|42",
+    "brand": "TURN",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "TURN|CARTRIDGE|POD|0.5 G|42",
+    "brand": "TURN",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "0.5 G",
+    "price": 42
+  },
+  {
+    "id": "TURN|CARTRIDGE|POD|1 G|32.5",
+    "brand": "TURN",
+    "productType": "CARTRIDGE",
+    "subtype": "POD",
+    "size": "1 G",
+    "price": 32.5
+  },
+  {
+    "id": "TURN|MERCH|BATTERY|ONE SIZE|26.5",
+    "brand": "TURN",
+    "productType": "MERCH",
+    "subtype": "BATTERY",
+    "size": "ONE SIZE",
+    "price": 26.5
+  },
+  {
+    "id": "TURTLE PIE CO.|EXTRACT|LIVE RESIN|1 G|30",
+    "brand": "TURTLE PIE CO.",
+    "productType": "EXTRACT",
+    "subtype": "LIVE RESIN",
+    "size": "1 G",
+    "price": 30
+  },
+  {
+    "id": "TURTLE PIE CO.|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "TURTLE PIE CO.",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "TURTLE PIE CO.|PREROLL|FLOWER|3 G|30",
+    "brand": "TURTLE PIE CO.",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "3 G",
+    "price": 30
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|JUICE|100 MG|10",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "JUICE",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|JUICE|10 MG|4.5",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "JUICE",
+    "size": "10 MG",
+    "price": 4.5
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|OTHER|100 MG|10",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "OTHER",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|SHOT|100 MG|10",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "SHOT",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|SHOT|100 MG|9",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "SHOT",
+    "size": "100 MG",
+    "price": 9
+  },
+  {
+    "id": "UNCLE ARNIE'S|BEVERAGE|TEA|100 MG|10",
+    "brand": "UNCLE ARNIE'S",
+    "productType": "BEVERAGE",
+    "subtype": "TEA",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "UPNORTH|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "UPNORTH",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "UPNORTH|PREROLL|FLOWER|1 G|12.5",
+    "brand": "UPNORTH",
+    "productType": "PREROLL",
+    "subtype": "FLOWER",
+    "size": "1 G",
+    "price": 12.5
+  },
+  {
+    "id": "URSA|CARTRIDGE|510 THREAD|1 G|42",
+    "brand": "URSA",
+    "productType": "CARTRIDGE",
+    "subtype": "510 THREAD",
+    "size": "1 G",
+    "price": 42
+  },
+  {
+    "id": "URSA|EXTRACT|BADDER|1 G|32",
+    "brand": "URSA",
+    "productType": "EXTRACT",
+    "subtype": "BADDER",
+    "size": "1 G",
+    "price": 32
+  },
+  {
+    "id": "VET CBD|TINCTURE|DROPPER|50 MG|104",
+    "brand": "VET CBD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "50 MG",
+    "price": 104
+  },
+  {
+    "id": "VET CBD|TINCTURE|DROPPER|50 MG|88",
+    "brand": "VET CBD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "50 MG",
+    "price": 88
+  },
+  {
+    "id": "VET CBD|TINCTURE|DROPPER|25 MG|82",
+    "brand": "VET CBD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "25 MG",
+    "price": 82
+  },
+  {
+    "id": "VET CBD|TINCTURE|DROPPER|12 MG|52",
+    "brand": "VET CBD",
+    "productType": "TINCTURE",
+    "subtype": "DROPPER",
+    "size": "12 MG",
+    "price": 52
+  },
+  {
+    "id": "WEST COAST TREEZ|FLOWER|PRE-PACK|14 G|55",
+    "brand": "WEST COAST TREEZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 55
+  },
+  {
+    "id": "WEST COAST TREEZ|FLOWER|PRE-PACK|14 G|42",
+    "brand": "WEST COAST TREEZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 42
+  },
+  {
+    "id": "WEST COAST TREEZ|FLOWER|PRE-PACK|3.5 G|15",
+    "brand": "WEST COAST TREEZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 15
+  },
+  {
+    "id": "WEST COAST TREEZ|FLOWER|PRE-PACK|3.5 G|12",
+    "brand": "WEST COAST TREEZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 12
+  },
+  {
+    "id": "WYLD|EDIBLE|GUMMY|100 MG|21",
+    "brand": "WYLD",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 21
+  },
+  {
+    "id": "WYLD|EDIBLE|GUMMY|100 MG|20",
+    "brand": "WYLD",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 20
+  },
+  {
+    "id": "WYLD|EDIBLE|GUMMY|100 MG|17.5",
+    "brand": "WYLD",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 17.5
+  },
+  {
+    "id": "XOTIC FLAVORZ|FLOWER|PRE-PACK|14 G|45",
+    "brand": "XOTIC FLAVORZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 45
+  },
+  {
+    "id": "XOTIC FLAVORZ|FLOWER|PRE-PACK|3.5 G|20",
+    "brand": "XOTIC FLAVORZ",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 20
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|20 G|84",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "20 G",
+    "price": 84
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|10 G|45",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "10 G",
+    "price": 45
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|5 G|25",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "5 G",
+    "price": 25
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|14 G|20",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "14 G",
+    "price": 20
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|3.5 G|7.5",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 7.5
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK|2 G|7.5",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "2 G",
+    "price": 7.5
+  },
+  {
+    "id": "YADA YADA|FLOWER|PRE-PACK SMALLS|5 G|25",
+    "brand": "YADA YADA",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK SMALLS",
+    "size": "5 G",
+    "price": 25
+  },
+  {
+    "id": "ZABORES|FLOWER|PRE-PACK|3.5 G|55",
+    "brand": "ZABORES",
+    "productType": "FLOWER",
+    "subtype": "PRE-PACK",
+    "size": "3.5 G",
+    "price": 55
+  },
+  {
+    "id": "ZEN|EDIBLE|CHOCOLATE|100 MG|12.5",
+    "brand": "ZEN",
+    "productType": "EDIBLE",
+    "subtype": "CHOCOLATE",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "ZEN|EDIBLE|GUMMY|100 MG|12.5",
+    "brand": "ZEN",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 12.5
+  },
+  {
+    "id": "ZEN|EDIBLE|GUMMY|100 MG|10",
+    "brand": "ZEN",
+    "productType": "EDIBLE",
+    "subtype": "GUMMY",
+    "size": "100 MG",
+    "price": 10
+  },
+  {
+    "id": "ZOOTSKIS|PREROLL|INFUSED|1.3 G|22.5",
+    "brand": "ZOOTSKIS",
+    "productType": "PREROLL",
+    "subtype": "INFUSED",
+    "size": "1.3 G",
+    "price": 22.5
+  }
+]
