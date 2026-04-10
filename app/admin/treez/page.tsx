@@ -5,8 +5,6 @@ import { TreezProduct, TreezLocation, getProductDisplay } from "@/lib/treez";
 
 const BRAND_BLUE = "#1F2B44";
 
-type FilterType = "SELLABLE" | "ALL" | "ACTIVE" | "DEACTIVATED";
-
 export default function TreezProductsPage() {
   const [products, setProducts] = useState<TreezProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,9 +12,6 @@ export default function TreezProductsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [filter, setFilter] = useState<FilterType>("SELLABLE");
-  const [barcodeOnly, setBarcodeOnly] = useState(false);
-  const [eslTaggedOnly, setEslTaggedOnly] = useState(false);
   const [locationId, setLocationId] = useState<string | undefined>(undefined);
   const [locations, setLocations] = useState<TreezLocation[]>([]);
   const [treezStatus, setTreezStatus] = useState<"checking" | "ok" | "fail">("checking");
@@ -30,11 +25,9 @@ export default function TreezProductsPage() {
     try {
       const params = new URLSearchParams({
         page: String(page),
-        filter,
       });
       if (locationId) params.set("location", locationId);
-      if (barcodeOnly) params.set("barcode_only", "true");
-      if (eslTaggedOnly) params.set("esl_tagged_only", "true");
+      params.set("esl_tagged_only", "true");
       const res = await fetch(`/api/products?${params}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Failed to fetch products");
@@ -47,7 +40,7 @@ export default function TreezProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, locationId, barcodeOnly, eslTaggedOnly]);
+  }, [page, locationId]);
 
   const fetchLocations = useCallback(async () => {
     try {
@@ -108,13 +101,6 @@ export default function TreezProductsPage() {
       .finally(() => setDetailLoading(false));
   };
 
-  const filters: { value: FilterType; label: string }[] = [
-    { value: "SELLABLE", label: "Sellable" },
-    { value: "ALL", label: "All" },
-    { value: "ACTIVE", label: "Active" },
-    { value: "DEACTIVATED", label: "Deactivated" },
-  ];
-
   const StatusBadge = ({
     status,
     label,
@@ -170,7 +156,7 @@ export default function TreezProductsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-zinc-900">Treez Products</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Treez Products - ESL Tagged</h1>
         <div className="flex items-center gap-4">
           <StatusBadge status={treezStatus} label="Treez" />
           <StatusBadge status={opticonStatus} label="Opticon" />
@@ -228,55 +214,6 @@ export default function TreezProductsPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {filters.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => {
-              setFilter(f.value);
-              setPage(1);
-            }}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              filter === f.value ? "text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-            }`}
-            style={filter === f.value ? { backgroundColor: BRAND_BLUE } : undefined}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
-        <button
-          type="button"
-          onClick={() => {
-            setBarcodeOnly((b) => !b);
-            setPage(1);
-          }}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            barcodeOnly ? "text-white" : "bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-100"
-          }`}
-          style={barcodeOnly ? { backgroundColor: BRAND_BLUE } : undefined}
-          title="Show only products that have a barcode (filters across all products)"
-        >
-          {barcodeOnly ? `Barcode only (${totalCount} products)` : "Barcode only products"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setEslTaggedOnly((e) => !e);
-            setPage(1);
-          }}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            eslTaggedOnly ? "text-white" : "bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-100"
-          }`}
-          style={eslTaggedOnly ? { backgroundColor: BRAND_BLUE } : undefined}
-          title="Show only products with ESL in internal_tags"
-        >
-          {eslTaggedOnly ? `ESL tagged (${totalCount} products)` : "ESL tagged only"}
-        </button>
-      </div>
-
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
         {loading ? (
           <div className="flex justify-center py-24">
@@ -287,13 +224,7 @@ export default function TreezProductsPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
-            {barcodeOnly || eslTaggedOnly
-              ? barcodeOnly && eslTaggedOnly
-                ? "No products with barcode and ESL tag found."
-                : barcodeOnly
-                  ? "No products with barcode found. Turn off &quot;Barcode only&quot; to see all products."
-                  : "No products with ESL in internal_tags found. Turn off &quot;ESL tagged only&quot; to see all products."
-              : "No products found. Try a different filter or location."}
+            No products with ESL internal tag found.
           </div>
         ) : (
           <>
@@ -370,9 +301,7 @@ export default function TreezProductsPage() {
             {totalPages >= 1 && (
               <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3">
                 <p className="text-sm text-zinc-500">
-                  {barcodeOnly || eslTaggedOnly
-                    ? `${totalCount.toLocaleString()} products${barcodeOnly ? " with barcode" : ""}${barcodeOnly && eslTaggedOnly ? " and" : ""}${eslTaggedOnly ? " ESL tagged" : ""} · Page ${page} of ${totalPages}`
-                    : `${totalCount.toLocaleString()} total · Page ${page} of ${totalPages}`}
+                  {totalCount.toLocaleString()} ESL tagged products · Page {page} of {totalPages}
                 </p>
                 <div className="flex gap-2">
                   <button
