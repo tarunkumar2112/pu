@@ -84,20 +84,13 @@ export default function TreezProductsPage() {
       const barcode = getBarcodeDisplay(product);
       const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
       
-      // Generate a short numeric ID (use SKU or first 10 chars of barcode)
-      // Opticon ProductId has strict MaxLength limit
-      const sku = product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "";
-      let shortId = sku || barcode;
-      
-      // If still too long, use first 10 characters or hash of UUID
-      if (shortId.length > 15 || shortId === "-") {
-        // Use last 8 characters of UUID (more unique than first)
-        shortId = String(productId).slice(-12);
-      }
+      // Generate a very short ID (max 8 characters) for Opticon's strict limit
+      // Use last 8 chars of UUID (more unique than first chars)
+      const shortId = String(productId).slice(-8);
       
       const opticonProduct = {
         NotUsed: "",
-        ProductId: shortId, // Short ID (max 15 chars)
+        ProductId: shortId, // Very short ID (8 chars max)
         Barcode: barcode,
         Description: `${productName} [${productId}]`, // Include full Treez ID in description for sync
         Group: product.category ?? product.categoryName ?? "",
