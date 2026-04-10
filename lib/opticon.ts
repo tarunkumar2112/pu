@@ -295,35 +295,49 @@ export async function pushProductToEbs50(product: Record<string, unknown>): Prom
   const body = [product];
   const headers = { "x-api-key": apiKey };
 
+  console.log(`[Opticon] Pushing product to EBS50:`, product);
+
   try {
     // v1.0: POST /api/Products – same format as GET returns
     let url = `${baseUrl}/api/Products`;
+    console.log(`[Opticon] Trying v1.0: POST ${url}`);
     let res = await ebs50Post(url, body, headers);
+    console.log(`[Opticon] v1.0 Response: ${res.status} ${res.statusText}`);
 
     if (res.status === 404) {
       // v2.0: POST /api/v2.0/Products/ChangeProducts
       url = `${baseUrl}/api/v2.0/Products/ChangeProducts`;
+      console.log(`[Opticon] Trying v2.0: POST ${url}`);
       res = await ebs50Post(url, body, headers);
+      console.log(`[Opticon] v2.0 Response: ${res.status} ${res.statusText}`);
     }
 
     if (res.status === 401) return { success: false, error: "API key invalid or expired" };
     if (!res.ok) {
       const text = await res.text();
+      console.error(`[Opticon] Error response:`, text);
       return { success: false, error: `EBS50 returned ${res.status}: ${text.slice(0, 200)}` };
     }
 
     const text = await res.text();
+    console.log(`[Opticon] Success response:`, text);
+    
     if (!text) return { success: true };
     try {
       const data = JSON.parse(text) as { Result?: string; Param1?: string };
+      console.log(`[Opticon] Parsed response:`, data);
+      
       if (data?.Result && data.Result !== "OK" && !String(data.Result).startsWith("OK")) {
         return { success: false, error: data.Result ?? data.Param1 ?? "Unknown error" };
       }
     } catch {
       // v1.0 may return empty or non-JSON; 200 = success
     }
+    
+    console.log(`[Opticon] ✓ Product pushed successfully`);
     return { success: true };
   } catch (err) {
+    console.error(`[Opticon] Exception:`, err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to push product",
