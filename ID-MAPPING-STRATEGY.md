@@ -1,119 +1,132 @@
-# ID Mapping Strategy for Treez-Opticon Sync
+# External Mapping Strategy for Treez-Opticon Sync
 
-## Problem
-- Treez uses long UUIDs (36 characters): `4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a`
-- Opticon's `ProductId` field has strict MaxLength limit (~10 characters)
-- Need to preserve Treez ID for future sync and price updates
+## Problem Solved
+- ALL Opticon fields have MaxLength limits (even NotUsed, Discount)
+- Cannot store long UUIDs (36 chars) or long SKUs in Opticon
+- Need to preserve Treez UUID and SKU for future sync
 
-## Solution: Sequential Numbers + UUID in Description
+## Solution: External Mapping File
 
-### Simple Sequential ProductId
-Use **simple numbers** (1, 2, 3, etc.) as `ProductId` in Opticon:
-- Product 1 → ProductId = "1"
-- Product 2 → ProductId = "2"
-- Product 3 → ProductId = "3"
-- etc.
+Store the Treez ↔ Opticon mapping in **our application** instead of in Opticon fields!
 
-### Full UUID in Description
-Store the complete Treez UUID in the **Description** field with a special marker:
-```
-Description: "PRODUCT NAME [TREEZ_ID:4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a]"
-```
+### Mapping Storage
+File: `treez-opticon-mapping.json`
 
-## Example Mapping
-
-**Treez Products:**
 ```json
-[
-  {
-    "product_id": "1060459d-bec9-48cf-a779-9f7ae5761337",
-    "name": "LEMON JACK 7G",
-    "barcode": "4c78d8465085",
-    "price": 35.00
-  },
-  {
-    "product_id": "4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a",
-    "name": "DO-SI-LATO CURED RESIN 1G",
-    "barcode": "3083680012256",
-    "price": 45.00
-  }
-]
-```
-
-**Opticon Products:**
-```json
-[
-  {
-    "ProductId": "1",  // ← Simple sequential number
-    "Barcode": "4c78d8465085",
-    "Description": "LEMON JACK 7G [TREEZ_ID:1060459d-bec9-48cf-a779-9f7ae5761337]",  // ← Full UUID
-    "StandardPrice": "35.00",
-    "SellPrice": "35.00"
-  },
-  {
-    "ProductId": "2",  // ← Next sequential number
-    "Barcode": "3083680012256",
-    "Description": "DO-SI-LATO CURED RESIN 1G [TREEZ_ID:4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a]",
-    "StandardPrice": "45.00",
-    "SellPrice": "45.00"
-  }
-]
-```
-
-## Future Sync Strategy
-
-### For Price Updates:
-1. **Extract UUID from Description** - Use regex: `/\[TREEZ_ID:(.*?)\]/`
-2. **Get updated price from Treez** - Fetch by UUID
-3. **Find in Opticon** - Can use ProductId or barcode
-4. **Update Price** - Send updated StandardPrice/SellPrice
-
-### Sync Workflow:
-```javascript
-// 1. Get all Opticon products
-const opticonProducts = await fetchEbs50Products();
-
-// 2. For each product, extract Treez UUID
-for (const opticonProduct of opticonProducts) {
-  const match = opticonProduct.Description.match(/\[TREEZ_ID:(.*?)\]/);
-  if (match) {
-    const treezUUID = match[1];
-    
-    // 3. Get updated product from Treez
-    const treezProduct = await fetchTreezProductById(treezUUID);
-    
-    // 4. Compare and update price if changed
-    if (treezProduct.price !== parseFloat(opticonProduct.SellPrice)) {
-      await updateOpticonProduct(opticonProduct.ProductId, {
-        SellPrice: String(treezProduct.price)
-      });
+{
+  "mappings": [
+    {
+      "opticonProductId": "1",
+      "treezProductId": "1060459d-bec9-48cf-a779-9f7ae5761337",
+      "treezSku": "4c78d846",
+      "barcode": "4c78d8465085"
+    },
+    {
+      "opticonProductId": "2",
+      "treezProductId": "4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a",
+      "treezSku": "DO-SI-LATO-1G",
+      "barcode": "3083680012256"
     }
+  ]
+}
+```
+
+### Opticon Products (Clean - No Long Strings!)
+
+```json
+{
+  "NotUsed": "",
+  "ProductId": "1",           // Simple sequential number
+  "Barcode": "4c78d8465085",  // Product barcode
+  "Description": "LEMON JACK 7G",  // Clean product name
+  "Group": "FLOWER",
+  "StandardPrice": "35.00",
+  "SellPrice": "35.00",
+  "Discount": "",
+  "Content": "7",
+  "Unit": "G"
+}
+```
+
+## How It Works
+
+### On Upload:
+1. Upload product to Opticon with simple ProductId (1, 2, 3...)
+2. **Automatically save mapping** to `treez-opticon-mapping.json` via API
+3. Mapping links: Opticon ProductId ↔ Treez UUID + SKU + Barcode
+
+### On Sync (Future Price Updates):
+```javascript
+// 1. Read mapping file
+const mappings = await fetch('/api/sync/mapping').then(r => r.json());
+
+// 2. For each mapping, get updated Treez product
+for (const mapping of mappings.mappings) {
+  const treezProduct = await fetchTreezProductById(mapping.treezProductId);
+  const opticonProduct = await findOpticonProduct(mapping.opticonProductId);
+  
+  // 3. Compare and update price
+  if (treezProduct.price !== parseFloat(opticonProduct.SellPrice)) {
+    await updateOpticonPrice(mapping.opticonProductId, treezProduct.price);
+    console.log(`Updated ${mapping.treezSku}: ${treezProduct.price}`);
   }
 }
 ```
 
 ## Benefits
 
-✅ **Super short ProductId** (1, 2, 3) - fits any MaxLength limit  
-✅ **Human-readable** - Easy to understand  
-✅ **Preserves full Treez UUID** in Description for sync  
-✅ **Easy to extract** UUID with regex: `/\[TREEZ_ID:(.*?)\]/`  
-✅ **Enables future price updates** via UUID lookup  
-✅ **No collision issues** - Sequential numbers guaranteed unique  
+✅ **No MaxLength issues** - Nothing long stored in Opticon  
+✅ **Clean Opticon data** - Only essential product info  
+✅ **Full Treez data preserved** - UUID, SKU, Barcode all saved  
+✅ **Easy lookup** - Can search by any field  
+✅ **Automatic mapping** - Saved on upload, no manual work  
+✅ **Future-proof** - Can add more fields to mapping anytime  
+
+## API Endpoints
+
+### GET /api/sync/mapping
+Returns all mappings
+
+### POST /api/sync/mapping
+Save/update a mapping:
+```json
+{
+  "opticonProductId": "1",
+  "treezProductId": "uuid",
+  "treezSku": "sku",
+  "barcode": "barcode"
+}
+```
+
+## Mapping File Structure
+
+The mapping file is automatically maintained:
+- **On upload**: New entry added or existing updated
+- **On sync**: Read to find Treez IDs for price updates
+- **Manual edit**: Can edit JSON file directly if needed
+
+## Example Queries
+
+### Find Treez UUID by Opticon ID:
+```javascript
+const mapping = mappings.find(m => m.opticonProductId === "1");
+const treezUUID = mapping.treezProductId;
+```
+
+### Find Opticon ID by Treez UUID:
+```javascript
+const mapping = mappings.find(m => m.treezProductId === "1060459d-...");
+const opticonId = mapping.opticonProductId;
+```
+
+### Find by Barcode:
+```javascript
+const mapping = mappings.find(m => m.barcode === "4c78d8465085");
+```
 
 ## Console Logs
 
 ```
-[Upload] Product #1: ProductId="1", Treez UUID="1060459d-bec9-48cf-a779-9f7ae5761337", Barcode="..."
-[Upload] Product #2: ProductId="2", Treez UUID="4df8b3f6-ea86-4b3f-9e0c-066f828f6d9a", Barcode="..."
-```
-
-## UUID Extraction
-
-To get Treez UUID from Opticon product:
-```javascript
-const description = "LEMON JACK 7G [TREEZ_ID:1060459d-bec9-48cf-a779-9f7ae5761337]";
-const match = description.match(/\[TREEZ_ID:(.*?)\]/);
-const treezUUID = match ? match[1] : null;
-// Result: "1060459d-bec9-48cf-a779-9f7ae5761337"
+[Upload] Product #1: Name="LEMON JACK 7G", Treez UUID="1060459d-...", SKU="4c78d846", Barcode="..."
+[Mapping] Saved: Opticon #1 → Treez 1060459d-bec9-48cf-a779-9f7ae5761337
 ```

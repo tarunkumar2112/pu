@@ -87,24 +87,23 @@ export default function TreezProductsPage() {
       
       // Use simple sequential number as ProductId (1, 2, 3, etc.)
       const simpleId = String(index + 1);
-      
-      // Store Treez data in "unused" fields to avoid MaxLength issues:
-      // NotUsed field → Treez Product ID (UUID)
-      // Discount field → Treez SKU
+
+      // Clean Opticon product - NO long strings to avoid MaxLength
+      // Mapping saved separately in treez-opticon-mapping.json
       const opticonProduct = {
-        NotUsed: String(productId), // Store full Treez UUID here (custom field)
+        NotUsed: "",
         ProductId: simpleId, // Simple number: 1, 2, 3, etc.
         Barcode: barcode,
         Description: productName, // Clean product name only
         Group: product.category ?? product.categoryName ?? "",
         StandardPrice: String(price),
         SellPrice: String(price),
-        Discount: sku, // Store Treez SKU here (custom field)
+        Discount: "",
         Content: (product.product_configurable_fields as any)?.size ?? "",
         Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
 
-      console.log(`[Upload] Product #${simpleId}: Treez UUID="${productId}", SKU="${sku}", Barcode="${barcode}"`);
+      console.log(`[Upload] Product #${simpleId}: Name="${productName}", Treez UUID="${productId}", SKU="${sku}", Barcode="${barcode}"`);
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
@@ -115,6 +114,18 @@ export default function TreezProductsPage() {
       const data = await res.json();
 
       if (data.success) {
+        // Save mapping to file for future sync
+        await fetch("/api/sync/mapping", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            opticonProductId: simpleId,
+            treezProductId: productId,
+            treezSku: sku,
+            barcode: barcode,
+          }),
+        }).catch(err => console.warn("Failed to save mapping:", err));
+        
         setUploadStatus(prev => ({ ...prev, [productId]: "success" }));
         setTimeout(() => {
           setUploadStatus(prev => ({ ...prev, [productId]: "idle" }));
