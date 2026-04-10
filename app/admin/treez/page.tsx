@@ -16,6 +16,7 @@ export default function TreezProductsPage() {
   const [opticonStatus, setOpticonStatus] = useState<"checking" | "ok" | "fail" | "not_configured">("checking");
   const [selectedProduct, setSelectedProduct] = useState<TreezProduct | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -153,6 +154,17 @@ export default function TreezProductsPage() {
     "Internal Tags",
   ] as const;
 
+  const filteredProducts = products.filter(p => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const tags = getInternalTags(p).toLowerCase();
+    const name = getProductDisplay(p).name.toLowerCase();
+    const sku = getProductDisplay(p).sku.toLowerCase();
+    
+    return tags.includes(query) || name.includes(query) || sku.includes(query);
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -169,6 +181,31 @@ export default function TreezProductsPage() {
             {loading ? "Loading..." : "Refresh"}
           </button>
         </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by tags, name, or SKU (e.g., ESL)..."
+            className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <span className="text-sm text-zinc-600">
+            {filteredProducts.length} of {products.length} products
+          </span>
+        )}
       </div>
 
       {error && (
@@ -189,9 +226,9 @@ export default function TreezProductsPage() {
               style={{ borderTopColor: BRAND_BLUE }}
             />
           </div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
-            No products found.
+            {searchQuery ? `No products found matching "${searchQuery}"` : "No products found."}
           </div>
         ) : (
           <>
@@ -211,7 +248,7 @@ export default function TreezProductsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p, i) => {
+                  {filteredProducts.map((p, i) => {
                     const d = getProductDisplay(p);
                     return (
                       <tr
