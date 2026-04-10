@@ -5,6 +5,10 @@ import { TreezProduct, getProductDisplay } from "@/lib/treez";
 
 const BRAND_BLUE = "#1F2B44";
 
+type UploadStatus = {
+  [productId: string]: "idle" | "uploading" | "success" | "error";
+};
+
 export default function TreezProductsPage() {
   const [products, setProducts] = useState<TreezProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +23,8 @@ export default function TreezProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loadingProgress, setLoadingProgress] = useState<string>("");
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({});
+  const [uploadingAll, setUploadingAll] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -66,6 +72,58 @@ export default function TreezProductsPage() {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const uploadToOpticon = async (product: TreezProduct) => {
+    const productId = product.product_id ?? product.productId ?? "";
+    
+    setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
+    
+    try {
+      // Map Treez product to Opticon format
+      const opticonProduct = {
+        ID: productId,
+        Barcode: getBarcodeDisplay(product),
+        Description: product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "",
+        Price: product.price ?? (product.pricing as any)?.price_sell ?? 0,
+        SKU: product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "",
+        Category: product.category ?? product.categoryName ?? "",
+        Brand: (product.product_configurable_fields as any)?.brand ?? product.brand ?? "",
+      };
+
+      const res = await fetch("/api/opticon/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(opticonProduct),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setUploadStatus(prev => ({ ...prev, [productId]: "success" }));
+        setTimeout(() => {
+          setUploadStatus(prev => ({ ...prev, [productId]: "idle" }));
+        }, 3000);
+      } else {
+        setUploadStatus(prev => ({ ...prev, [productId]: "error" }));
+        console.error(`Upload failed for ${productId}:`, data.error);
+      }
+    } catch (error) {
+      setUploadStatus(prev => ({ ...prev, [productId]: "error" }));
+      console.error(`Upload error for ${productId}:`, error);
+    }
+  };
+
+  const uploadAllToOpticon = async () => {
+    setUploadingAll(true);
+    
+    for (const product of products) {
+      await uploadToOpticon(product);
+      // Small delay between uploads to avoid overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    setUploadingAll(false);
+  };
 
   const checkTreezStatus = useCallback(async () => {
     try {
@@ -189,6 +247,15 @@ export default function TreezProductsPage() {
         <div className="flex items-center gap-4">
           <StatusBadge status={treezStatus} label="Treez" />
           <StatusBadge status={opticonStatus} label="Opticon" />
+          <button
+            onClick={uploadAllToOpticon}
+            disabled={loading || uploadingAll || products.length === 0 || opticonStatus !== "ok"}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: "#10b981" }}
+            title={opticonStatus !== "ok" ? "Connect to Opticon first" : "Upload all products to Opticon"}
+          >
+            {uploadingAll ? "Uploading..." : `Upload All to Opticon (${products.length})`}
+          </button>
           <button
             onClick={() => fetchProducts()}
             disabled={loading || treezStatus !== "ok"}
