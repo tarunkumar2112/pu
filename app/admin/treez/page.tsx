@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { TreezProduct, TreezLocation, getProductDisplay } from "@/lib/treez";
+import { TreezProduct, getProductDisplay } from "@/lib/treez";
 
 const BRAND_BLUE = "#1F2B44";
 
@@ -12,8 +12,6 @@ export default function TreezProductsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [locationId, setLocationId] = useState<string | undefined>(undefined);
-  const [locations, setLocations] = useState<TreezLocation[]>([]);
   const [treezStatus, setTreezStatus] = useState<"checking" | "ok" | "fail">("checking");
   const [opticonStatus, setOpticonStatus] = useState<"checking" | "ok" | "fail" | "not_configured">("checking");
   const [selectedProduct, setSelectedProduct] = useState<TreezProduct | null>(null);
@@ -26,8 +24,6 @@ export default function TreezProductsPage() {
       const params = new URLSearchParams({
         page: String(page),
       });
-      if (locationId) params.set("location", locationId);
-      params.set("esl_tagged_only", "true");
       const res = await fetch(`/api/products?${params}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Failed to fetch products");
@@ -40,19 +36,7 @@ export default function TreezProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, locationId]);
-
-  const fetchLocations = useCallback(async () => {
-    try {
-      const res = await fetch("/api/locations");
-      const data = await res.json();
-      if (data.success && Array.isArray(data.locations)) {
-        setLocations(data.locations);
-      }
-    } catch {
-      setLocations([]);
-    }
-  }, []);
+  }, [page]);
 
   const checkTreezStatus = useCallback(async () => {
     try {
@@ -79,8 +63,7 @@ export default function TreezProductsPage() {
   useEffect(() => {
     checkTreezStatus();
     checkOpticonStatus();
-    fetchLocations();
-  }, [checkTreezStatus, checkOpticonStatus, fetchLocations]);
+  }, [checkTreezStatus, checkOpticonStatus]);
 
   useEffect(() => {
     if (treezStatus === "ok") fetchProducts();
@@ -138,6 +121,22 @@ export default function TreezProductsPage() {
     return val || "-";
   };
 
+  const getInternalTags = (p: TreezProduct): string => {
+    const attrs = p.attributes as { internal_tags?: any[] } | undefined;
+    const directTags = (p as { internal_tags?: any[] }).internal_tags;
+    const tags = attrs?.internal_tags ?? directTags;
+    
+    if (!Array.isArray(tags) || tags.length === 0) return "-";
+    
+    return tags.map(t => {
+      if (typeof t === 'string') return t;
+      if (typeof t === 'object' && t !== null) {
+        return (t as any).name ?? (t as any).label ?? JSON.stringify(t);
+      }
+      return String(t);
+    }).join(', ');
+  };
+
   const columns = [
     "Name",
     "Status",
@@ -151,12 +150,13 @@ export default function TreezProductsPage() {
     "Subtype",
     "Qty",
     "Min Visible",
+    "Internal Tags",
   ] as const;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-zinc-900">Treez Products - ESL Tagged</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Treez Products - All Products</h1>
         <div className="flex items-center gap-4">
           <StatusBadge status={treezStatus} label="Treez" />
           <StatusBadge status={opticonStatus} label="Opticon" />
@@ -181,39 +181,6 @@ export default function TreezProductsPage() {
         </div>
       )}
 
-      {treezStatus === "ok" && locations.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setLocationId(undefined)}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              !locationId
-                ? "text-white"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-            }`}
-            style={!locationId ? { backgroundColor: BRAND_BLUE } : undefined}
-          >
-            All Locations
-          </button>
-          {locations.map((loc) => {
-            const id = loc.id ?? (loc as { location_id?: string }).location_id;
-            const name = loc.name ?? (loc as { location_name?: string }).location_name ?? "Location";
-            const isActive = !locationId ? false : id === locationId;
-            return (
-              <button
-                key={id ?? name}
-                onClick={() => setLocationId(id ? String(id) : undefined)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                  isActive ? "text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-                }`}
-                style={isActive ? { backgroundColor: BRAND_BLUE } : undefined}
-              >
-                {name}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
         {loading ? (
           <div className="flex justify-center py-24">
@@ -224,7 +191,7 @@ export default function TreezProductsPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
-            No products with ESL internal tag found.
+            No products found.
           </div>
         ) : (
           <>
@@ -292,6 +259,9 @@ export default function TreezProductsPage() {
                         </td>
                         <td className="px-3 py-2 text-zinc-600">{d.qty}</td>
                         <td className="px-3 py-2 text-zinc-600">{d.minVisible}</td>
+                        <td className="max-w-[140px] truncate px-3 py-2 text-zinc-600" title={getInternalTags(p)}>
+                          {getInternalTags(p)}
+                        </td>
                       </tr>
                     );
                   })}
@@ -301,7 +271,7 @@ export default function TreezProductsPage() {
             {totalPages >= 1 && (
               <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3">
                 <p className="text-sm text-zinc-500">
-                  {totalCount.toLocaleString()} ESL tagged products · Page {page} of {totalPages}
+                  {totalCount.toLocaleString()} total products · Page {page} of {totalPages}
                 </p>
                 <div className="flex gap-2">
                   <button

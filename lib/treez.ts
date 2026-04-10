@@ -112,11 +112,39 @@ export function getNestedValue(obj: unknown, path: string): unknown {
 
 /** Check if product has "ESL" in attributes.internal_tags or internal_tags directly */
 export function productHasEslTag(p: TreezProduct): boolean {
-  const attrs = p.attributes as { internal_tags?: string[] } | undefined;
-  const directTags = (p as { internal_tags?: string[] }).internal_tags;
+  const attrs = p.attributes as { internal_tags?: any[] } | undefined;
+  const directTags = (p as { internal_tags?: any[] }).internal_tags;
   const tags = attrs?.internal_tags ?? directTags;
-  if (!Array.isArray(tags)) return false;
-  return tags.some((t) => String(t).toUpperCase() === "ESL");
+  
+  const productName = p.name ?? p.productName ?? (p.product_configurable_fields as any)?.name ?? 'Unknown';
+  
+  if (!Array.isArray(tags)) {
+    // Check if internal_tags exists anywhere else in the product object
+    const allKeys = Object.keys(p);
+    const tagKeys = allKeys.filter(k => k.toLowerCase().includes('tag'));
+    if (tagKeys.length > 0) {
+      console.log(`[ESL Check] ${productName} - Found tag-related keys:`, tagKeys.map(k => `${k}: ${JSON.stringify((p as any)[k])}`));
+    }
+    return false;
+  }
+  
+  // Log the actual structure of tags
+  console.log(`[ESL Check] ${productName} - Tags structure:`, JSON.stringify(tags, null, 2));
+  
+  // Check if tags contain ESL as text or if there's a UUID
+  const hasEslText = tags.some((t) => String(t).toUpperCase() === "ESL");
+  const hasEslInObject = tags.some((t) => {
+    if (typeof t === 'object' && t !== null) {
+      const str = JSON.stringify(t).toUpperCase();
+      return str.includes('ESL');
+    }
+    return false;
+  });
+  
+  const hasEsl = hasEslText || hasEslInObject;
+  console.log(`[ESL Check] ${productName} - Has ESL: ${hasEsl} (text: ${hasEslText}, in object: ${hasEslInObject})`);
+  
+  return hasEsl;
 }
 
 /** Check if product has a barcode (product_barcodes, manufacturer_barcode, or barcode) */
@@ -258,6 +286,8 @@ export interface FetchProductsOptions {
   sellable_quantity_in_type?: "MEDICAL" | "ADULT" | "ALL";
   /** include discount data */
   include_discounts?: boolean;
+  /** filter by internal tag (e.g., "ESL") */
+  internal_tag?: string;
 }
 
 /**
@@ -284,10 +314,12 @@ export async function fetchTreezProducts(
   if (options.sellable_quantity_in_type)
     defaultParams.sellable_quantity_in_type = options.sellable_quantity_in_type;
   if (options.include_discounts === true) defaultParams.include_discounts = "TRUE";
+  if (options.internal_tag) defaultParams.internal_tag = options.internal_tag;
 
   const allProducts: TreezProduct[] = [];
-  let page = options.page ?? 1;
+  let page = 1;
   let hasMore = true;
+  const singlePageMode = options.page !== undefined;
 
   while (hasMore) {
     const params = new URLSearchParams({ ...defaultParams, page: String(page) });
@@ -326,17 +358,24 @@ export async function fetchTreezProducts(
     }
     const list = Array.isArray(products) ? products : [];
     allProducts.push(...list);
+    
+    console.log(`[Treez] Page ${page}: fetched ${list.length} products, total so far: ${allProducts.length}`);
 
     const pageSize = data.page_count ?? (list.length || 1000);
     const totalCount = data.total_count ?? 0;
     const totalPages =
       pageSize > 0 && totalCount > 0 ? Math.ceil(totalCount / pageSize) : 0;
 
-    hasMore =
-      list.length >= pageSize && (totalPages === 0 || page < totalPages);
+    if (singlePageMode) {
+      hasMore = false;
+    } else {
+      hasMore =
+        list.length >= pageSize && (totalPages === 0 || page < totalPages);
+    }
     page++;
   }
 
+  console.log(`[Treez] Total products fetched: ${allProducts.length}`);
   return allProducts;
 }
 
@@ -371,8 +410,11 @@ export async function fetchTreezProductsPage(
     params.sellable_quantity_in_location = options.sellable_quantity_in_location;
   if (options.sellable_quantity_in_type)
     params.sellable_quantity_in_type = options.sellable_quantity_in_type;
+  if (options.internal_tag) params.internal_tag = options.internal_tag;
 
   const url = `${baseUrl}/product/product_list?${new URLSearchParams(params)}`;
+  
+  console.log(`[Treez API] Calling: ${url.replace(baseUrl, '[BASE_URL]')}`);
 
   const response = await fetch(url, {
     method: "GET",
@@ -406,6 +448,8 @@ export async function fetchTreezProductsPage(
     pageCount = data.page_count ?? products.length;
     totalCount = data.total_count ?? 0;
   }
+
+  console.log(`[Treez API] Response - products: ${products.length}, page_count: ${pageCount}, total_count: ${totalCount}`);
 
   return {
     products: Array.isArray(products) ? products : [],
