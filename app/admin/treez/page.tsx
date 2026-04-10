@@ -79,31 +79,76 @@ export default function TreezProductsPage() {
     setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
     
     try {
+      // Extract all possible data structures
       const pricing = product.pricing as { price_sell?: number } | undefined;
       const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
-      
-      // Get price - try multiple sources
-      const price = pricing?.price_sell ?? product.price ?? product.retailPrice ?? 0;
-      
-      // Get barcode - try multiple sources
       const barcodes = product.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
-      const barcodeValue = barcodes?.[0]?.barcode ?? barcodes?.[0]?.sku ?? cfg?.manufacturer_barcode ?? product.barcode ?? "";
       
+      // Get product name
       const productName = cfg?.name ?? product.name ?? product.productName ?? "";
+      
+      // Get price - DEEP search in all possible locations
+      let price = 0;
+      
+      // Try direct fields
+      if (pricing?.price_sell) price = Number(pricing.price_sell);
+      else if (product.price) price = Number(product.price);
+      else if (product.retailPrice) price = Number(product.retailPrice);
+      else if ((product as any).sellPrice) price = Number((product as any).sellPrice);
+      
+      // If still 0, search in nested objects
+      if (price === 0) {
+        const searchForPrice = (obj: any, depth = 0): number => {
+          if (depth > 3 || !obj || typeof obj !== 'object') return 0;
+          
+          // Check common price field names
+          const priceFields = ['price_sell', 'price', 'sellPrice', 'retailPrice', 'standardPrice', 'SellPrice', 'StandardPrice'];
+          for (const field of priceFields) {
+            if (obj[field] && Number(obj[field]) > 0) {
+              return Number(obj[field]);
+            }
+          }
+          
+          // Recursively search nested objects
+          for (const key in obj) {
+            if (typeof obj[key] === 'object') {
+              const found = searchForPrice(obj[key], depth + 1);
+              if (found > 0) return found;
+            }
+          }
+          return 0;
+        };
+        
+        price = searchForPrice(product);
+      }
+      
+      // Get barcode - Try actual barcode field first, NOT product name or sku
+      let barcodeValue = "";
+      
+      // First check if barcode exists and is NOT the product name
+      if (barcodes?.[0]?.barcode && barcodes[0].barcode !== productName) {
+        barcodeValue = String(barcodes[0].barcode);
+      } else if (cfg?.manufacturer_barcode && cfg.manufacturer_barcode !== productName) {
+        barcodeValue = String(cfg.manufacturer_barcode);
+      } else if (product.barcode && product.barcode !== productName) {
+        barcodeValue = String(product.barcode);
+      }
+      
+      // Get SKU separately
       const sku = barcodes?.[0]?.sku ?? cfg?.external_id ?? product.sku ?? "";
       
       // Use simple sequential number as ProductId
       const simpleId = String(index + 1);
 
-      // Clean Opticon product - ALL fields properly filled
+      // Clean Opticon product
       const opticonProduct = {
         NotUsed: "",
         ProductId: simpleId,
-        Barcode: String(barcodeValue || simpleId),
+        Barcode: String(barcodeValue || sku || simpleId),
         Description: String(productName || "Product " + simpleId),
         Group: String(product.category_type ?? product.category ?? product.categoryName ?? ""),
-        StandardPrice: String(price || 0),
-        SellPrice: String(price || 0),
+        StandardPrice: String(price),
+        SellPrice: String(price),
         Discount: "",
         Content: String(cfg?.size ?? ""),
         Unit: String(cfg?.size_unit ?? "EA"),
@@ -111,10 +156,12 @@ export default function TreezProductsPage() {
 
       console.log(`[Upload] Product #${simpleId}:`, {
         name: productName,
-        price: price,
-        barcode: barcodeValue,
+        extractedPrice: price,
+        extractedBarcode: barcodeValue,
+        extractedSku: sku,
         treezUUID: productId,
-        sku: sku,
+        rawPricing: pricing,
+        rawBarcodes: barcodes,
         opticonData: opticonProduct
       });
 
