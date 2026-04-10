@@ -84,13 +84,20 @@ export default function TreezProductsPage() {
       const barcode = getBarcodeDisplay(product);
       const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
       
-      // Use barcode as ProductId (shorter) and store full UUID in description
-      // This allows future sync while staying within Opticon's MaxLength limit
-      const shortId = barcode !== "-" ? barcode : String(productId).substring(0, 20);
+      // Generate a short numeric ID (use SKU or first 10 chars of barcode)
+      // Opticon ProductId has strict MaxLength limit
+      const sku = product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "";
+      let shortId = sku || barcode;
+      
+      // If still too long, use first 10 characters or hash of UUID
+      if (shortId.length > 15 || shortId === "-") {
+        // Use last 8 characters of UUID (more unique than first)
+        shortId = String(productId).slice(-12);
+      }
       
       const opticonProduct = {
         NotUsed: "",
-        ProductId: shortId, // Use shorter ID (barcode or truncated UUID)
+        ProductId: shortId, // Short ID (max 15 chars)
         Barcode: barcode,
         Description: `${productName} [${productId}]`, // Include full Treez ID in description for sync
         Group: product.category ?? product.categoryName ?? "",
@@ -101,7 +108,7 @@ export default function TreezProductsPage() {
         Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
 
-      console.log(`[Upload] Product ${shortId}: Using ProductId="${shortId}", Full ID in Description="${productId}"`);
+      console.log(`[Upload] Product: ProductId="${shortId}" (${shortId.length} chars), Barcode="${barcode}", Full UUID="${productId}"`);
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
