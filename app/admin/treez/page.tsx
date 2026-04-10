@@ -83,25 +83,28 @@ export default function TreezProductsPage() {
       const price = product.price ?? (product.pricing as any)?.price_sell ?? 0;
       const barcode = getBarcodeDisplay(product);
       const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
+      const sku = product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "";
       
       // Use simple sequential number as ProductId (1, 2, 3, etc.)
-      // Store full Treez UUID in Description for sync
       const simpleId = String(index + 1);
       
+      // Store Treez data in "unused" fields to avoid MaxLength issues:
+      // NotUsed field → Treez Product ID (UUID)
+      // Discount field → Treez SKU
       const opticonProduct = {
-        NotUsed: "",
+        NotUsed: String(productId), // Store full Treez UUID here (custom field)
         ProductId: simpleId, // Simple number: 1, 2, 3, etc.
         Barcode: barcode,
-        Description: `${productName} [TREEZ_ID:${productId}]`, // Full Treez UUID in description
+        Description: productName, // Clean product name only
         Group: product.category ?? product.categoryName ?? "",
         StandardPrice: String(price),
         SellPrice: String(price),
-        Discount: "",
+        Discount: sku, // Store Treez SKU here (custom field)
         Content: (product.product_configurable_fields as any)?.size ?? "",
         Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
 
-      console.log(`[Upload] Product #${simpleId}: ProductId="${simpleId}", Treez UUID="${productId}", Barcode="${barcode}"`);
+      console.log(`[Upload] Product #${simpleId}: Treez UUID="${productId}", SKU="${sku}", Barcode="${barcode}"`);
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
