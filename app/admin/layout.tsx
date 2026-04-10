@@ -10,6 +10,7 @@ const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/68
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: "◉" },
   { href: "/admin/treez", label: "Treez Products", icon: "▸" },
+  { href: "/admin/treez/mapping", label: "Product Mapping", icon: "⚡" },
   { href: "/admin/opticon", label: "Opticon Products", icon: "▸" },
 ];
 
