@@ -191,33 +191,49 @@ export async function getTreezAccessToken(): Promise<string> {
   }
 
   const baseUrl = await getBaseUrl();
-  const response = await fetch(`${baseUrl}/config/api/gettokens`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      apikey: apiKey,
-      client_id: getClientId(),
-    }),
-  });
+  
+  // Add timeout to prevent hanging
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+  
+  try {
+    const response = await fetch(`${baseUrl}/config/api/gettokens`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        apikey: apiKey,
+        client_id: getClientId(),
+      }),
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    throw new Error(`Treez auth failed: ${response.status} ${response.statusText}`);
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Treez auth failed: ${response.status} ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as TreezTokenResponse;
+    if (data.resultCode !== "SUCCESS") {
+      throw new Error(data.resultReason || "Treez authentication failed");
+    }
+
+    const expiresIn = (data.expires_in || 7200) * 1000;
+    cachedToken = {
+      token: data.access_token,
+      expiresAt: Date.now() + expiresIn,
+    };
+
+    return data.access_token;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Treez authentication timed out after 30 seconds. Please check your network connection and Treez server status.');
+    }
+    throw error;
   }
-
-  const data = (await response.json()) as TreezTokenResponse;
-  if (data.resultCode !== "SUCCESS") {
-    throw new Error(data.resultReason || "Treez authentication failed");
-  }
-
-  const expiresIn = (data.expires_in || 7200) * 1000;
-  cachedToken = {
-    token: data.access_token,
-    expiresAt: Date.now() + expiresIn,
-  };
-
-  return data.access_token;
 }
 
 export interface TreezLocation {

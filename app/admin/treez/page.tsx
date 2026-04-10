@@ -185,7 +185,7 @@ export default function TreezProductsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-zinc-900">Treez Products - All Products</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Treez Products - Configured IDs</h1>
         <div className="flex items-center gap-4">
           <StatusBadge status={treezStatus} label="Treez" />
           <StatusBadge status={opticonStatus} label="Opticon" />
@@ -232,7 +232,26 @@ export default function TreezProductsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">{error}</div>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-red-600 text-xl">⚠️</span>
+            <div>
+              <p className="font-semibold text-red-800">Error loading products</p>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+              {error.includes('timeout') || error.includes('504') ? (
+                <div className="mt-3 text-sm text-red-600">
+                  <p className="font-medium">Possible causes:</p>
+                  <ul className="list-disc list-inside mt-1 space-y-1">
+                    <li>Treez server is experiencing high load</li>
+                    <li>Network connection issues</li>
+                    <li>Treez API may be temporarily unavailable</li>
+                  </ul>
+                  <p className="mt-2">Try refreshing the page or wait a few minutes.</p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
       )}
 
       {treezStatus !== "ok" && (
