@@ -17,27 +17,55 @@ export default function TreezProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<TreezProduct | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [loadingProgress, setLoadingProgress] = useState<string>("");
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setLoadingProgress("Connecting to Treez...");
+    
     try {
       const params = new URLSearchParams({
         page: String(page),
       });
+      if (debouncedSearch) {
+        params.set("search", debouncedSearch);
+      }
+      
+      // Poll for progress updates from console logs
+      const startTime = Date.now();
+      const progressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        setLoadingProgress(`Fetching products... (${elapsed}s)`);
+      }, 500);
+      
       const res = await fetch(`/api/products?${params}`);
+      clearInterval(progressInterval);
+      
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Failed to fetch products");
+      
       setProducts(data.products ?? []);
       setTotalPages(data.total_pages ?? 1);
       setTotalCount(data.total_count ?? 0);
+      setLoadingProgress("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load products");
       setProducts([]);
+      setLoadingProgress("");
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, debouncedSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const checkTreezStatus = useCallback(async () => {
     try {
@@ -154,17 +182,6 @@ export default function TreezProductsPage() {
     "Internal Tags",
   ] as const;
 
-  const filteredProducts = products.filter(p => {
-    if (!searchQuery.trim()) return true;
-    
-    const query = searchQuery.toLowerCase();
-    const tags = getInternalTags(p).toLowerCase();
-    const name = getProductDisplay(p).name.toLowerCase();
-    const sku = getProductDisplay(p).sku.toLowerCase();
-    
-    return tags.includes(query) || name.includes(query) || sku.includes(query);
-  });
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -191,8 +208,9 @@ export default function TreezProductsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by tags, name, or SKU (e.g., ESL)..."
             className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            disabled={loading}
           />
-          {searchQuery && (
+          {searchQuery && !loading && (
             <button
               onClick={() => setSearchQuery("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
@@ -201,9 +219,14 @@ export default function TreezProductsPage() {
             </button>
           )}
         </div>
-        {searchQuery && (
+        {loading && loadingProgress && (
+          <span className="text-sm text-blue-600 font-medium animate-pulse">
+            {loadingProgress}
+          </span>
+        )}
+        {!loading && searchQuery && (
           <span className="text-sm text-zinc-600">
-            {filteredProducts.length} of {products.length} products
+            {totalCount} results
           </span>
         )}
       </div>
@@ -226,7 +249,7 @@ export default function TreezProductsPage() {
               style={{ borderTopColor: BRAND_BLUE }}
             />
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="py-24 text-center text-zinc-500">
             {searchQuery ? `No products found matching "${searchQuery}"` : "No products found."}
           </div>
@@ -248,7 +271,7 @@ export default function TreezProductsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((p, i) => {
+                  {products.map((p, i) => {
                     const d = getProductDisplay(p);
                     return (
                       <tr

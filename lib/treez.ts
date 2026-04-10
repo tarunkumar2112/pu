@@ -369,13 +369,19 @@ export async function fetchTreezProducts(
     if (singlePageMode) {
       hasMore = false;
     } else {
-      hasMore =
-        list.length >= pageSize && (totalPages === 0 || page < totalPages);
+      // Continue fetching if we got products and haven't reached the end
+      hasMore = list.length > 0 && (totalPages === 0 || page < totalPages);
     }
     page++;
+    
+    // Safety check to prevent infinite loops (max 100 pages = ~100k products)
+    if (page > 100) {
+      console.warn(`[Treez] Stopped at page 100 for safety. Total products: ${allProducts.length}`);
+      hasMore = false;
+    }
   }
 
-  console.log(`[Treez] Total products fetched: ${allProducts.length}`);
+  console.log(`[Treez] ✓ Completed fetching all products. Total: ${allProducts.length}`);
   return allProducts;
 }
 
