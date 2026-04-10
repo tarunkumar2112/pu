@@ -79,15 +79,19 @@ export default function TreezProductsPage() {
     setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
     
     try {
-      // Map Treez product to Opticon format
+      // Map Treez product to Opticon format (matches Opticon's expected structure)
+      const price = product.price ?? (product.pricing as any)?.price_sell ?? 0;
       const opticonProduct = {
-        ID: productId,
+        NotUsed: "",
+        ProductId: String(productId),
         Barcode: getBarcodeDisplay(product),
         Description: product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "",
-        Price: product.price ?? (product.pricing as any)?.price_sell ?? 0,
-        SKU: product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "",
-        Category: product.category ?? product.categoryName ?? "",
-        Brand: (product.product_configurable_fields as any)?.brand ?? product.brand ?? "",
+        Group: product.category ?? product.categoryName ?? "",
+        StandardPrice: String(price),
+        SellPrice: String(price),
+        Discount: "",
+        Content: (product.product_configurable_fields as any)?.size ?? "",
+        Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
 
       const res = await fetch("/api/opticon/products", {

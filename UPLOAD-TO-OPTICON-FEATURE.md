@@ -26,17 +26,24 @@ Feature to upload Treez products to Opticon EBS50 ESL system.
 
 ### 3. Data Mapping (Treez → Opticon)
 
+Maps Treez product fields to Opticon's required format:
+
 ```javascript
 {
-  ID: product_id,              // Unique product identifier
-  Barcode: barcode,            // Product barcode
-  Description: name,           // Product name
-  Price: price,                // Product price
-  SKU: sku,                    // Product SKU
-  Category: category,          // Product category
-  Brand: brand                 // Product brand
+  NotUsed: "",                    // Required empty field
+  ProductId: product_id,          // Unique product identifier
+  Barcode: barcode,               // Product barcode (from barcodes array)
+  Description: name,              // Product name
+  Group: category,                // Product category/group
+  StandardPrice: price,           // Regular price (as string)
+  SellPrice: price,               // Selling price (same as standard for now)
+  Discount: "",                   // Discount (empty if none)
+  Content: size,                  // Product size/content
+  Unit: size_unit or "EA"         // Unit of measure (EA = Each)
 }
 ```
+
+**Note:** All price values are converted to strings as required by Opticon API.
 
 ### 4. Status Tracking
 - Each product has its own upload status
