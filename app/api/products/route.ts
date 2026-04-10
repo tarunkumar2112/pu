@@ -8,18 +8,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
-    const filter = searchParams.get("filter") ?? "SELLABLE";
     const locationId = searchParams.get("location") ?? undefined;
     const barcodeOnly = searchParams.get("barcode_only") === "true";
     const eslTaggedOnly = searchParams.get("esl_tagged_only") === "true";
 
-    const filterConfig: Record<string, { active: "ALL" | "TRUE" | "FALSE"; above_threshold: boolean }> = {
-      SELLABLE: { active: "ALL", above_threshold: true },
-      ALL: { active: "ALL", above_threshold: false },
-      ACTIVE: { active: "TRUE", above_threshold: false },
-      DEACTIVATED: { active: "FALSE", above_threshold: false },
-    };
-    const { active, above_threshold } = filterConfig[filter] ?? filterConfig.SELLABLE;
+    let active: "ALL" | "TRUE" | "FALSE" = "ALL";
+    let above_threshold = false;
 
     let products: Awaited<ReturnType<typeof fetchTreezProductsPage>>["products"];
     let totalCount: number;
@@ -30,9 +24,11 @@ export async function GET(request: NextRequest) {
         above_threshold,
         sellable_quantity_in_location: locationId,
       });
+      console.log(`[API] Fetched ${allProducts.length} total products from Treez`);
       let filtered = allProducts;
       if (barcodeOnly) filtered = filtered.filter(productHasBarcode);
       if (eslTaggedOnly) filtered = filtered.filter(productHasEslTag);
+      console.log(`[API] After ESL filter: ${filtered.length} products`);
       totalCount = filtered.length;
       const start = (page - 1) * PAGE_SIZE;
       products = filtered.slice(start, start + PAGE_SIZE);

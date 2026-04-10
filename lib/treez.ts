@@ -110,10 +110,11 @@ export function getNestedValue(obj: unknown, path: string): unknown {
   return current;
 }
 
-/** Check if product has "ESL" in attributes.internal_tags */
+/** Check if product has "ESL" in attributes.internal_tags or internal_tags directly */
 export function productHasEslTag(p: TreezProduct): boolean {
   const attrs = p.attributes as { internal_tags?: string[] } | undefined;
-  const tags = attrs?.internal_tags;
+  const directTags = (p as { internal_tags?: string[] }).internal_tags;
+  const tags = attrs?.internal_tags ?? directTags;
   if (!Array.isArray(tags)) return false;
   return tags.some((t) => String(t).toUpperCase() === "ESL");
 }
