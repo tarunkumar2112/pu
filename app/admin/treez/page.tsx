@@ -238,6 +238,7 @@ export default function TreezProductsPage() {
     "Qty",
     "Min Visible",
     "Internal Tags",
+    "Actions",
   ] as const;
 
   return (
@@ -359,13 +360,19 @@ export default function TreezProductsPage() {
                 <tbody>
                   {products.map((p, i) => {
                     const d = getProductDisplay(p);
+                    const productId = p.product_id ?? p.productId ?? String(i);
+                    const status = uploadStatus[productId] || "idle";
+                    
                     return (
                       <tr
-                        key={p.product_id ?? p.productId ?? i}
-                        onClick={() => handleRowClick(p)}
-                        className="cursor-pointer border-b border-zinc-100 transition hover:bg-zinc-50"
+                        key={productId}
+                        className="border-b border-zinc-100 transition hover:bg-zinc-50"
                       >
-                        <td className="max-w-[140px] truncate px-3 py-2 text-zinc-600" title={d.name}>
+                        <td 
+                          className="max-w-[140px] truncate px-3 py-2 text-zinc-600 cursor-pointer" 
+                          title={d.name}
+                          onClick={() => handleRowClick(p)}
+                        >
                           {d.name}
                         </td>
                         <td className="px-3 py-2">
@@ -407,6 +414,27 @@ export default function TreezProductsPage() {
                         <td className="px-3 py-2 text-zinc-600">{d.minVisible}</td>
                         <td className="max-w-[140px] truncate px-3 py-2 text-zinc-600" title={getInternalTags(p)}>
                           {getInternalTags(p)}
+                        </td>
+                        <td className="px-3 py-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              uploadToOpticon(p);
+                            }}
+                            disabled={status === "uploading" || opticonStatus !== "ok"}
+                            className={`rounded px-3 py-1 text-xs font-medium transition ${
+                              status === "uploading"
+                                ? "bg-blue-100 text-blue-600 cursor-wait"
+                                : status === "success"
+                                  ? "bg-green-100 text-green-700"
+                                  : status === "error"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                            } disabled:opacity-50`}
+                            title={opticonStatus !== "ok" ? "Connect to Opticon first" : "Upload to Opticon"}
+                          >
+                            {status === "uploading" ? "Uploading..." : status === "success" ? "✓ Uploaded" : status === "error" ? "✗ Failed" : "Upload"}
+                          </button>
                         </td>
                       </tr>
                     );
