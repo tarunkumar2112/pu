@@ -79,31 +79,44 @@ export default function TreezProductsPage() {
     setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
     
     try {
-      // Map Treez product to Opticon format (matches Opticon's expected structure)
-      const price = product.price ?? (product.pricing as any)?.price_sell ?? 0;
-      const barcode = getBarcodeDisplay(product);
-      const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
-      const sku = product.sku ?? (product.product_barcodes as any)?.[0]?.sku ?? "";
+      const pricing = product.pricing as { price_sell?: number } | undefined;
+      const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
       
-      // Use simple sequential number as ProductId (1, 2, 3, etc.)
+      // Get price - try multiple sources
+      const price = pricing?.price_sell ?? product.price ?? product.retailPrice ?? 0;
+      
+      // Get barcode - try multiple sources
+      const barcodes = product.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+      const barcodeValue = barcodes?.[0]?.barcode ?? barcodes?.[0]?.sku ?? cfg?.manufacturer_barcode ?? product.barcode ?? "";
+      
+      const productName = cfg?.name ?? product.name ?? product.productName ?? "";
+      const sku = barcodes?.[0]?.sku ?? cfg?.external_id ?? product.sku ?? "";
+      
+      // Use simple sequential number as ProductId
       const simpleId = String(index + 1);
 
-      // Clean Opticon product - NO long strings to avoid MaxLength
-      // Mapping saved separately in treez-opticon-mapping.json
+      // Clean Opticon product - ALL fields properly filled
       const opticonProduct = {
         NotUsed: "",
-        ProductId: simpleId, // Simple number: 1, 2, 3, etc.
-        Barcode: barcode,
-        Description: productName, // Clean product name only
-        Group: product.category ?? product.categoryName ?? "",
-        StandardPrice: String(price),
-        SellPrice: String(price),
+        ProductId: simpleId,
+        Barcode: String(barcodeValue || simpleId),
+        Description: String(productName || "Product " + simpleId),
+        Group: String(product.category_type ?? product.category ?? product.categoryName ?? ""),
+        StandardPrice: String(price || 0),
+        SellPrice: String(price || 0),
         Discount: "",
-        Content: (product.product_configurable_fields as any)?.size ?? "",
-        Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
+        Content: String(cfg?.size ?? ""),
+        Unit: String(cfg?.size_unit ?? "EA"),
       };
 
-      console.log(`[Upload] Product #${simpleId}: Name="${productName}", Treez UUID="${productId}", SKU="${sku}", Barcode="${barcode}"`);
+      console.log(`[Upload] Product #${simpleId}:`, {
+        name: productName,
+        price: price,
+        barcode: barcodeValue,
+        treezUUID: productId,
+        sku: sku,
+        opticonData: opticonProduct
+      });
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
@@ -111,32 +124,45 @@ export default function TreezProductsPage() {
         body: JSON.stringify(opticonProduct),
       });
 
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+      }
+
       const data = await res.json();
+      
+      console.log(`[Upload] Response for #${simpleId}:`, data);
 
       if (data.success) {
         // Save mapping to file for future sync
-        await fetch("/api/sync/mapping", {
+        const mappingRes = await fetch("/api/sync/mapping", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             opticonProductId: simpleId,
             treezProductId: productId,
             treezSku: sku,
-            barcode: barcode,
+            barcode: String(barcodeValue),
           }),
-        }).catch(err => console.warn("Failed to save mapping:", err));
+        });
+        
+        if (!mappingRes.ok) {
+          console.warn(`[Mapping] Failed to save mapping for #${simpleId}`);
+        } else {
+          console.log(`[Mapping] ✓ Saved mapping for #${simpleId}`);
+        }
         
         setUploadStatus(prev => ({ ...prev, [productId]: "success" }));
         setTimeout(() => {
           setUploadStatus(prev => ({ ...prev, [productId]: "idle" }));
-        }, 3000);
+        }, 5000);
       } else {
-        setUploadStatus(prev => ({ ...prev, [productId]: "error" }));
-        console.error(`Upload failed for ${productId}:`, data.error);
+        throw new Error(data.error || "Upload failed");
       }
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`[Upload] ✗ Error for product ${productId}:`, errorMsg);
       setUploadStatus(prev => ({ ...prev, [productId]: "error" }));
-      console.error(`Upload error for ${productId}:`, error);
     }
   };
 
