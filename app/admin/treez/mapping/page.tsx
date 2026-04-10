@@ -79,7 +79,12 @@ export default function TreezMappingPage() {
   const extractProductMapping = (product: TreezProduct, index: number): MappedProduct => {
     const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
     const barcodes = product.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
-    const pricing = product.pricing as { price_sell?: number; price_type?: string } | undefined;
+    const pricing = product.pricing as { 
+      price_sell?: number; 
+      price_type?: string;
+      tier_name?: string;
+      tier_pricing_detail?: Array<{ price_per_value?: number }>;
+    } | undefined;
 
     // Extract all possible values
     const productName = cfg?.name ?? product.name ?? product.productName ?? "";
@@ -95,15 +100,18 @@ export default function TreezMappingPage() {
       barcode = String(product.barcode);
     }
 
-    // Try to find price
-    let price = "";
-    if (pricing?.price_sell) {
-      price = String(pricing.price_sell);
-    } else if (product.price) {
-      price = String(product.price);
-    } else if (product.retailPrice) {
-      price = String(product.retailPrice);
-    }
+    // EXACT SAME LOGIC as getProductDisplay in lib/treez.ts
+    const tierDetail = pricing?.tier_pricing_detail?.[0];
+    const priceVal = pricing?.price_sell ?? tierDetail?.price_per_value ?? product.price ?? product.retailPrice;
+    const price = typeof priceVal === "number" && priceVal > 0 ? String(priceVal) : "";
+
+    console.log(`[Mapping] Product ${index + 1}:`, {
+      name: productName,
+      extractedPrice: price,
+      rawPricing: pricing,
+      tierDetail: tierDetail,
+      priceVal: priceVal,
+    });
 
     const category = product.category_type ?? product.category ?? product.categoryName ?? "";
     const size = cfg?.size ?? "";
