@@ -73,7 +73,7 @@ export default function TreezProductsPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const uploadToOpticon = async (product: TreezProduct) => {
+  const uploadToOpticon = async (product: TreezProduct, index: number) => {
     const productId = product.product_id ?? product.productId ?? "";
     
     setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
@@ -84,15 +84,15 @@ export default function TreezProductsPage() {
       const barcode = getBarcodeDisplay(product);
       const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
       
-      // Generate a very short ID (max 8 characters) for Opticon's strict limit
-      // Use last 8 chars of UUID (more unique than first chars)
-      const shortId = String(productId).slice(-8);
+      // Use simple sequential number as ProductId (1, 2, 3, etc.)
+      // Store full Treez UUID in Description for sync
+      const simpleId = String(index + 1);
       
       const opticonProduct = {
         NotUsed: "",
-        ProductId: shortId, // Very short ID (8 chars max)
+        ProductId: simpleId, // Simple number: 1, 2, 3, etc.
         Barcode: barcode,
-        Description: `${productName} [${productId}]`, // Include full Treez ID in description for sync
+        Description: `${productName} [TREEZ_ID:${productId}]`, // Full Treez UUID in description
         Group: product.category ?? product.categoryName ?? "",
         StandardPrice: String(price),
         SellPrice: String(price),
@@ -101,7 +101,7 @@ export default function TreezProductsPage() {
         Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
 
-      console.log(`[Upload] Product: ProductId="${shortId}" (${shortId.length} chars), Barcode="${barcode}", Full UUID="${productId}"`);
+      console.log(`[Upload] Product #${simpleId}: ProductId="${simpleId}", Treez UUID="${productId}", Barcode="${barcode}"`);
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
@@ -129,8 +129,8 @@ export default function TreezProductsPage() {
   const uploadAllToOpticon = async () => {
     setUploadingAll(true);
     
-    for (const product of products) {
-      await uploadToOpticon(product);
+    for (let i = 0; i < products.length; i++) {
+      await uploadToOpticon(products[i], i);
       // Small delay between uploads to avoid overwhelming the API
       await new Promise(resolve => setTimeout(resolve, 500));
     }
@@ -432,7 +432,7 @@ export default function TreezProductsPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              uploadToOpticon(p);
+                              uploadToOpticon(p, i);
                             }}
                             disabled={status === "uploading" || opticonStatus !== "ok"}
                             className={`rounded px-3 py-1 text-xs font-medium transition ${
@@ -444,9 +444,9 @@ export default function TreezProductsPage() {
                                     ? "bg-red-100 text-red-700"
                                     : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
                             } disabled:opacity-50`}
-                            title={opticonStatus !== "ok" ? "Connect to Opticon first" : "Upload to Opticon"}
+                            title={opticonStatus !== "ok" ? "Connect to Opticon first" : `Upload as Product #${i + 1}`}
                           >
-                            {status === "uploading" ? "Uploading..." : status === "success" ? "✓ Uploaded" : status === "error" ? "✗ Failed" : "Upload"}
+                            {status === "uploading" ? "Uploading..." : status === "success" ? "✓ Uploaded" : status === "error" ? "✗ Failed" : `Upload (#${i + 1})`}
                           </button>
                         </td>
                       </tr>
