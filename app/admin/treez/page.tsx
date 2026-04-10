@@ -81,11 +81,18 @@ export default function TreezProductsPage() {
     try {
       // Map Treez product to Opticon format (matches Opticon's expected structure)
       const price = product.price ?? (product.pricing as any)?.price_sell ?? 0;
+      const barcode = getBarcodeDisplay(product);
+      const productName = product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "";
+      
+      // Use barcode as ProductId (shorter) and store full UUID in description
+      // This allows future sync while staying within Opticon's MaxLength limit
+      const shortId = barcode !== "-" ? barcode : String(productId).substring(0, 20);
+      
       const opticonProduct = {
         NotUsed: "",
-        ProductId: String(productId),
-        Barcode: getBarcodeDisplay(product),
-        Description: product.name ?? product.productName ?? (product.product_configurable_fields as any)?.name ?? "",
+        ProductId: shortId, // Use shorter ID (barcode or truncated UUID)
+        Barcode: barcode,
+        Description: `${productName} [${productId}]`, // Include full Treez ID in description for sync
         Group: product.category ?? product.categoryName ?? "",
         StandardPrice: String(price),
         SellPrice: String(price),
@@ -93,6 +100,8 @@ export default function TreezProductsPage() {
         Content: (product.product_configurable_fields as any)?.size ?? "",
         Unit: (product.product_configurable_fields as any)?.size_unit ?? "EA",
       };
+
+      console.log(`[Upload] Product ${shortId}: Using ProductId="${shortId}", Full ID in Description="${productId}"`);
 
       const res = await fetch("/api/opticon/products", {
         method: "POST",
