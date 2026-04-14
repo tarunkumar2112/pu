@@ -109,8 +109,8 @@ export default function MonitorPage() {
       if (changesError) throw changesError;
 
       // Enrich changes with product names
-      const enrichedChanges = (changesData || []).map(change => {
-        const product = productsData?.find(p => p.treez_product_id === change.treez_product_id);
+      const enrichedChanges = (changesData || []).map((change: any) => {
+        const product = productsData?.find((p: any) => p.treez_product_id === change.treez_product_id);
         return {
           ...change,
           product_name: product?.product_name,

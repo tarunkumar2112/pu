@@ -1,4 +1,3 @@
-import cron from 'node-cron';
 import { fetchTreezProductById } from './treez';
 import { 
   extractProductSnapshot, 
@@ -11,37 +10,59 @@ import fs from 'fs';
 import path from 'path';
 
 let isJobRunning = false;
+let cronInitialized = false;
 
 /**
  * Background job to check for product changes every minute
  * Runs independently of whether the monitor page is open
  */
-export function startBackgroundChangeDetection() {
-  console.log('\n🚀 [Background Monitor] Starting automatic change detection (1 minute interval)');
-  
-  // Run every 1 minute
-  cron.schedule('*/1 * * * *', async () => {
-    if (isJobRunning) {
-      console.log('[Background Monitor] ⏭ Skipping - previous job still running');
-      return;
-    }
+export async function startBackgroundChangeDetection() {
+  // Only run on server side
+  if (typeof window !== 'undefined') {
+    return;
+  }
 
-    isJobRunning = true;
+  // Prevent multiple initializations
+  if (cronInitialized) {
+    console.log('[Background Monitor] Already initialized, skipping');
+    return;
+  }
+
+  try {
+    // Dynamic import to avoid Turbopack issues
+    const cron = await import('node-cron');
     
-    try {
-      console.log('\n⏰ [Background Monitor] Starting scheduled check...');
-      await checkForChanges();
-    } catch (error) {
-      console.error('[Background Monitor] ✗ Error:', error);
-    } finally {
-      isJobRunning = false;
-    }
-  });
+    console.log('\n🚀 [Background Monitor] Starting automatic change detection (1 minute interval)');
+    
+    // Run every 1 minute
+    cron.schedule('*/1 * * * *', async () => {
+      if (isJobRunning) {
+        console.log('[Background Monitor] ⏭ Skipping - previous job still running');
+        return;
+      }
 
-  console.log('✅ [Background Monitor] Cron job scheduled successfully');
-  console.log('   - Checking every 1 minute');
-  console.log('   - Works even when monitor page is closed');
-  console.log('   - Changes will be synced to Supabase automatically\n');
+      isJobRunning = true;
+      
+      try {
+        console.log('\n⏰ [Background Monitor] Starting scheduled check...');
+        await checkForChanges();
+      } catch (error) {
+        console.error('[Background Monitor] ✗ Error:', error);
+      } finally {
+        isJobRunning = false;
+      }
+    });
+
+    cronInitialized = true;
+    
+    console.log('✅ [Background Monitor] Cron job scheduled successfully');
+    console.log('   - Checking every 1 minute');
+    console.log('   - Works even when monitor page is closed');
+    console.log('   - Changes will be synced to Supabase automatically\n');
+    
+  } catch (error) {
+    console.error('[Background Monitor] Failed to initialize:', error);
+  }
 }
 
 /**
@@ -114,8 +135,9 @@ async function checkForChanges(): Promise<void> {
         allChanges.push(...changes);
 
         // Update snapshot with latest data
-        latestSnapshot.last_checked_at = new Date().toISOString();
-        await saveProductSnapshot(latestSnapshot);
+        const updatedSnapshot: any = { ...latestSnapshot };
+        updatedSnapshot.last_checked_at = new Date().toISOString();
+        await saveProductSnapshot(updatedSnapshot);
       }
 
     } catch (error) {

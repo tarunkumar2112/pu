@@ -101,8 +101,8 @@ export function extractProductSnapshot(product: TreezProduct): Omit<ProductSnaps
   const treezProductId = product.product_id ?? product.productId ?? "";
 
   return {
-    treez_product_id: treezProductId,
-    opticon_barcode: treezProductId, // Use Treez ID as Opticon barcode
+    treez_product_id: String(treezProductId),
+    opticon_barcode: String(treezProductId), // Use Treez ID as Opticon barcode
     product_name: productName ? String(productName) : null,
     price: price,
     barcode: barcode ? String(barcode) : null,

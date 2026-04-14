@@ -84,8 +84,9 @@ export async function POST() {
           allChanges.push(...changes);
 
           // Update snapshot with latest data
-          latestSnapshot.last_checked_at = new Date().toISOString();
-          await saveProductSnapshot(latestSnapshot);
+          const updatedSnapshot: any = { ...latestSnapshot };
+          updatedSnapshot.last_checked_at = new Date().toISOString();
+          await saveProductSnapshot(updatedSnapshot);
 
         } else {
           console.log(`[Check] ✓ No changes`);

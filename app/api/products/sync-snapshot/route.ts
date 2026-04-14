@@ -63,7 +63,7 @@ export async function POST() {
         }
 
         // Extract snapshot data
-        const snapshot = extractProductSnapshot(product);
+        const snapshot: any = extractProductSnapshot(product);
         snapshot.last_checked_at = new Date().toISOString();
 
         console.log(`[Sync] Product: ${snapshot.product_name}, Price: $${snapshot.price}`);

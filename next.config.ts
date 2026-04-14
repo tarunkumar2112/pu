@@ -12,12 +12,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     turbopackUseSystemTlsCerts: true,
-    serverComponentsExternalPackages: ['node-cron'],
   },
-  webpack: (config) => {
-    config.externals = [...(config.externals || []), 'node-cron'];
-    return config;
-  },
+  serverExternalPackages: ['node-cron'],
 };
 
 export default nextConfig;
