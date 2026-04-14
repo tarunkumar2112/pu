@@ -132,7 +132,7 @@ export default function TreezMappingPage() {
       },
       opticonData: {
         ProductId: simpleId,
-        Barcode: barcode || sku || simpleId,
+        Barcode: String(barcode || sku || simpleId),
         Description: String(productName),
         Group: String(category),
         StandardPrice: price,

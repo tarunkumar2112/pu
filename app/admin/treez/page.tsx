@@ -76,7 +76,7 @@ export default function TreezProductsPage() {
   const uploadToOpticon = async (product: TreezProduct, index: number) => {
     const productId = product.product_id ?? product.productId ?? "";
     
-    setUploadStatus(prev => ({ ...prev, [productId]: "uploading" }));
+    setUploadStatus(prev => ({ ...prev, [productId]: "uploading" as const }));
     
     try {
       // Extract all possible data structures
@@ -199,9 +199,9 @@ export default function TreezProductsPage() {
           console.log(`[Mapping] ✓ Saved mapping for #${simpleId}`);
         }
         
-        setUploadStatus(prev => ({ ...prev, [productId]: "success" }));
+        setUploadStatus(prev => ({ ...prev, [productId]: "success" as const }));
         setTimeout(() => {
-          setUploadStatus(prev => ({ ...prev, [productId]: "idle" }));
+          setUploadStatus(prev => ({ ...prev, [productId]: "idle" as const }));
         }, 5000);
       } else {
         throw new Error(data.error || "Upload failed");
@@ -209,7 +209,7 @@ export default function TreezProductsPage() {
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error(`[Upload] ✗ Error for product ${productId}:`, errorMsg);
-      setUploadStatus(prev => ({ ...prev, [productId]: "error" }));
+      setUploadStatus(prev => ({ ...prev, [productId]: "error" as const }));
     }
   };
 
