@@ -29,6 +29,7 @@ interface ProductChange {
 
 interface ChangeWithProduct extends ProductChange {
   product_name?: string;
+  synced_at?: string;
 }
 
 export default function MonitorPage() {
