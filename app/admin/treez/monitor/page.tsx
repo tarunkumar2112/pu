@@ -41,11 +41,10 @@ export default function MonitorPage() {
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(5); // minutes
-  const [bgMonitoringActive, setBgMonitoringActive] = useState(false);
+  const [bgMonitoringActive, setBgMonitoringActive] = useState(true); // Always true since middleware starts it
 
   useEffect(() => {
     fetchData();
-    startBackgroundMonitoring();
     
     // Setup real-time subscription
     const channel = supabase
@@ -64,20 +63,6 @@ export default function MonitorPage() {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  const startBackgroundMonitoring = async () => {
-    try {
-      const res = await fetch('/api/monitoring/start');
-      const data = await res.json();
-      
-      if (data.success) {
-        setBgMonitoringActive(true);
-        console.log('✅ Background monitoring active');
-      }
-    } catch (error) {
-      console.error('Failed to start background monitoring:', error);
-    }
-  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;

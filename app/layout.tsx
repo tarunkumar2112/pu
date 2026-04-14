@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { BackgroundMonitorInit } from "@/components/BackgroundMonitorInit";
 
 export const metadata: Metadata = {
   title: "Perfect Union | Product Sync Admin",
@@ -17,6 +18,7 @@ export default function RootLayout({
         className="antialiased"
         suppressHydrationWarning
       >
+        <BackgroundMonitorInit />
         {children}
       </body>
     </html>
