@@ -80,6 +80,43 @@ export default function MonitorPage() {
     return () => clearInterval(interval);
   }, [autoRefresh, refreshInterval]);
 
+  const [uploadStatus, setUploadStatus] = useState<Record<string, "idle" | "syncing" | "success" | "error">>({});
+
+  const syncToOpticon = async (changeId: string, productName: string) => {
+    setUploadStatus(prev => ({ ...prev, [changeId]: "syncing" }));
+
+    try {
+      const res = await fetch('/api/products/sync-to-opticon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changeId }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Sync failed');
+      }
+
+      setUploadStatus(prev => ({ ...prev, [changeId]: "success" }));
+      
+      // Refresh data to show updated sync status
+      setTimeout(() => {
+        fetchData();
+        setUploadStatus(prev => ({ ...prev, [changeId]: "idle" }));
+      }, 2000);
+
+    } catch (error) {
+      console.error('Sync error:', error);
+      setUploadStatus(prev => ({ ...prev, [changeId]: "error" }));
+      setError(error instanceof Error ? error.message : 'Sync failed');
+      
+      setTimeout(() => {
+        setUploadStatus(prev => ({ ...prev, [changeId]: "idle" }));
+      }, 3000);
+    }
+  };
+
   const fetchData = async () => {
     if (!supabase) {
       setError('Supabase not configured. Add credentials to .env.local');
@@ -309,7 +346,10 @@ export default function MonitorPage() {
               No changes detected yet. Click "Check for Changes" to start monitoring.
             </div>
           ) : (
-            changes.map((change) => (
+            changes.map((change) => {
+              const syncStatus = uploadStatus[change.id] || "idle";
+              
+              return (
               <div key={change.id} className="px-6 py-4 hover:bg-gray-50">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -322,7 +362,7 @@ export default function MonitorPage() {
                       <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800 border border-green-300">
                         ✓ Synced to Supabase
                       </span>
-                      {!change.synced_to_opticon && (
+                      {!change.synced_to_opticon && syncStatus === "idle" && (
                         <span className="text-xs px-2 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-300">
                           ⏳ Pending on Opticon
                         </span>
@@ -330,6 +370,21 @@ export default function MonitorPage() {
                       {change.synced_to_opticon && (
                         <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-300">
                           ✓ Synced to Opticon
+                        </span>
+                      )}
+                      {syncStatus === "syncing" && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-300 animate-pulse">
+                          🔄 Syncing...
+                        </span>
+                      )}
+                      {syncStatus === "success" && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800 border border-green-300">
+                          ✓ Just Synced!
+                        </span>
+                      )}
+                      {syncStatus === "error" && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-800 border border-red-300">
+                          ✗ Sync Failed
                         </span>
                       )}
                     </div>
@@ -340,11 +395,23 @@ export default function MonitorPage() {
                     </div>
                     <div className="text-xs text-gray-400 mt-1">
                       Detected: {new Date(change.detected_at).toLocaleString()}
+                      {change.synced_to_opticon && change.synced_at && (
+                        <> • Synced to Opticon: {new Date(change.synced_at).toLocaleString()}</>
+                      )}
                     </div>
                   </div>
+                  {!change.synced_to_opticon && (
+                    <button
+                      onClick={() => syncToOpticon(change.id, change.product_name || 'Product')}
+                      disabled={syncStatus === "syncing"}
+                      className="ml-4 px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {syncStatus === "syncing" ? "Syncing..." : "Sync to Opticon"}
+                    </button>
+                  )}
                 </div>
               </div>
-            ))
+            )})
           )}
         </div>
       </div>
