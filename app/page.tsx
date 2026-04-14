@@ -22,13 +22,22 @@ export default function Home() {
         <p className="text-lg text-zinc-600">
           Sync products from Treez to Opticon ESL labels. Manage inventory and product data.
         </p>
-        <Link
-          href="/admin"
-          className="rounded-lg px-6 py-3 text-base font-medium text-white transition hover:opacity-90"
-          style={{ backgroundColor: BRAND_BLUE }}
-        >
-          Open Dashboard
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href="/admin"
+            className="rounded-lg px-6 py-3 text-base font-medium text-white transition hover:opacity-90"
+            style={{ backgroundColor: BRAND_BLUE }}
+          >
+            Open Dashboard
+          </Link>
+          <Link
+            href="/knowledge-base"
+            className="rounded-lg px-6 py-3 text-base font-medium border-2 transition hover:bg-zinc-100"
+            style={{ borderColor: BRAND_BLUE, color: BRAND_BLUE }}
+          >
+            How it Works?
+          </Link>
+        </div>
       </main>
     </div>
   );
