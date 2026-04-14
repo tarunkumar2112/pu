@@ -144,6 +144,13 @@ async function checkForChanges(): Promise<void> {
         updatedSnapshot.last_checked_at = new Date().toISOString();
         await saveProductSnapshot(updatedSnapshot);
         console.log(`  ✓ Snapshot updated in Supabase with new price: $${latestSnapshot.price}`);
+        
+        // Update the snapshot in our local array for auto-sync
+        const snapshotIndex = snapshots.findIndex(s => s.treez_product_id === snapshot.treez_product_id);
+        if (snapshotIndex !== -1) {
+          snapshots[snapshotIndex] = { ...snapshots[snapshotIndex], ...updatedSnapshot };
+        }
+        
       } else {
         console.log(`  ✓ No changes detected`);
       }
