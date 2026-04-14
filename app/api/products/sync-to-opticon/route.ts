@@ -68,16 +68,18 @@ export async function POST(request: NextRequest) {
     console.log(`[Opticon Sync] Product: ${product.product_name}`);
     console.log(`[Opticon Sync] Current state:`, {
       price: product.price,
-      barcode: product.barcode,
+      treezId: product.treez_product_id,
       opticonBarcode: product.opticon_barcode,
     });
 
     // Build Opticon product payload
-    // IMPORTANT: ProductId in Opticon = Barcode (Treez Product ID)
+    // IMPORTANT: Find product in Opticon by BARCODE (Treez UUID), not ProductId
+    // We need to UPDATE existing product, not create new one
+    // Opticon uses Barcode field to identify which product to update
     const opticonProduct = {
       NotUsed: "",
-      ProductId: product.opticon_barcode, // Treez ProductId as barcode
-      Barcode: product.barcode || product.opticon_barcode, // Physical barcode
+      ProductId: "", // Empty - Opticon will find by Barcode
+      Barcode: product.opticon_barcode, // Treez UUID - THIS is how Opticon identifies product
       Description: product.product_name || "",
       Group: product.category || "",
       StandardPrice: String(product.price || 0),
@@ -88,6 +90,7 @@ export async function POST(request: NextRequest) {
     };
 
     console.log(`[Opticon Sync] Pushing to Opticon:`, opticonProduct);
+    console.log(`[Opticon Sync] Note: Looking up product by Barcode = ${product.opticon_barcode}`);
 
     // Push to Opticon
     const result = await pushProductToEbs50(opticonProduct);

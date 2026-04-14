@@ -160,12 +160,89 @@ async function checkForChanges(): Promise<void> {
     
     if (saveResult.success) {
       console.log('[Background Monitor] ✓ Changes synced to Supabase successfully!');
+      
+      // AUTO-SYNC TO OPTICON
+      console.log('[Background Monitor] 🔄 Auto-syncing changes to Opticon...');
+      await autoSyncToOpticon(allChanges, snapshots);
+      
     } else {
       console.error('[Background Monitor] ✗ Failed to save changes:', saveResult.error);
     }
   }
 
   console.log(`[Background Monitor] ✓ Check complete: ${changesDetected} product(s) changed, ${totalChanges} total change(s)\n`);
+}
+
+/**
+ * Automatically sync changes to Opticon ESL
+ */
+async function autoSyncToOpticon(changes: any[], snapshots: any[]): Promise<void> {
+  let syncedCount = 0;
+  let failedCount = 0;
+
+  for (const change of changes) {
+    try {
+      // Find the product snapshot
+      const product = snapshots.find(s => s.treez_product_id === change.treez_product_id);
+      
+      if (!product) {
+        console.error(`[Opticon Auto-Sync] Product not found: ${change.treez_product_id}`);
+        failedCount++;
+        continue;
+      }
+
+      console.log(`[Opticon Auto-Sync] Syncing ${product.product_name}...`);
+
+      // Build Opticon payload
+      const opticonProduct = {
+        NotUsed: "",
+        ProductId: "",
+        Barcode: product.opticon_barcode, // Treez UUID
+        Description: product.product_name || "",
+        Group: product.category || "",
+        StandardPrice: String(product.price || 0),
+        SellPrice: String(product.price || 0),
+        Discount: "",
+        Content: product.size || "",
+        Unit: product.unit || "EA",
+      };
+
+      // Dynamic import to avoid edge runtime issues
+      const { pushProductToEbs50 } = await import('./opticon');
+      
+      // Push to Opticon
+      const result = await pushProductToEbs50(opticonProduct);
+
+      if (result.success) {
+        console.log(`[Opticon Auto-Sync] ✓ Synced ${product.product_name} to Opticon`);
+        
+        // Mark as synced in Supabase
+        const { supabase } = await import('./supabase');
+        if (supabase) {
+          await supabase
+            .from('product_changes')
+            .update({
+              synced_to_opticon: true,
+              synced_at: new Date().toISOString(),
+            })
+            .eq('treez_product_id', change.treez_product_id)
+            .eq('change_type', change.change_type)
+            .is('synced_to_opticon', false);
+        }
+        
+        syncedCount++;
+      } else {
+        console.error(`[Opticon Auto-Sync] ✗ Failed: ${result.error}`);
+        failedCount++;
+      }
+
+    } catch (error) {
+      console.error(`[Opticon Auto-Sync] ✗ Error:`, error);
+      failedCount++;
+    }
+  }
+
+  console.log(`[Opticon Auto-Sync] Complete: ${syncedCount} synced, ${failedCount} failed\n`);
 }
 
 /**
