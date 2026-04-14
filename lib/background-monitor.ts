@@ -91,7 +91,7 @@ async function checkForChanges(): Promise<void> {
   const snapshotsResult = await getAllSnapshots();
   
   if (!snapshotsResult.success || !snapshotsResult.snapshots) {
-    console.error('[Background Monitor] Failed to fetch snapshots from Supabase');
+    console.error('[Background Monitor] Failed to fetch snapshots from Supabase:', snapshotsResult.error);
     return;
   }
 
@@ -111,15 +111,20 @@ async function checkForChanges(): Promise<void> {
   // Check each product
   for (const snapshot of snapshots) {
     try {
+      console.log(`[Background Monitor] Checking: ${snapshot.product_name}`);
+      console.log(`  Current snapshot price in Supabase: $${snapshot.price}`);
+      
       // Fetch latest from Treez
       const latestProduct = await fetchTreezProductById(snapshot.treez_product_id);
       
       if (!latestProduct) {
+        console.log(`  ⚠ Product not found in Treez`);
         continue;
       }
 
       // Extract latest snapshot
       const latestSnapshot = extractProductSnapshot(latestProduct);
+      console.log(`  Latest price from Treez: $${latestSnapshot.price}`);
 
       // Detect changes
       const changes = detectProductChanges(snapshot, latestSnapshot);
@@ -138,6 +143,9 @@ async function checkForChanges(): Promise<void> {
         const updatedSnapshot: any = { ...latestSnapshot };
         updatedSnapshot.last_checked_at = new Date().toISOString();
         await saveProductSnapshot(updatedSnapshot);
+        console.log(`  ✓ Snapshot updated in Supabase with new price: $${latestSnapshot.price}`);
+      } else {
+        console.log(`  ✓ No changes detected`);
       }
 
     } catch (error) {
@@ -157,7 +165,7 @@ async function checkForChanges(): Promise<void> {
     }
   }
 
-  console.log(`[Background Monitor] ✓ Check complete: ${changesDetected} product(s) changed, ${totalChanges} total change(s)`);
+  console.log(`[Background Monitor] ✓ Check complete: ${changesDetected} product(s) changed, ${totalChanges} total change(s)\n`);
 }
 
 /**
