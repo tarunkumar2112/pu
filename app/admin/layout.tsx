@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: "◉" },
   { href: "/admin/treez", label: "Treez Products", icon: "▸" },
   { href: "/admin/treez/mapping", label: "Product Mapping", icon: "⚡" },
+  { href: "/admin/treez/monitor", label: "Change Monitor", icon: "🔔" },
   { href: "/admin/opticon", label: "Opticon Products", icon: "▸" },
 ];
 
