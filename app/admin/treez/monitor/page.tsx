@@ -44,6 +44,12 @@ export default function MonitorPage() {
   const [bgMonitoringActive, setBgMonitoringActive] = useState(true); // Always true since middleware starts it
 
   useEffect(() => {
+    if (!supabase) {
+      setError('Supabase not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local');
+      setLoading(false);
+      return;
+    }
+    
     fetchData();
     
     // Setup real-time subscription
@@ -75,6 +81,12 @@ export default function MonitorPage() {
   }, [autoRefresh, refreshInterval]);
 
   const fetchData = async () => {
+    if (!supabase) {
+      setError('Supabase not configured. Add credentials to .env.local');
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {

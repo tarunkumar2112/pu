@@ -118,6 +118,10 @@ export function extractProductSnapshot(product: TreezProduct): Omit<ProductSnaps
  * Save or update product snapshot in Supabase
  */
 export async function saveProductSnapshot(snapshot: Omit<ProductSnapshot, 'id' | 'created_at'>): Promise<{ success: boolean; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+  
   try {
     const { error } = await supabase
       .from('product_snapshots')
@@ -139,6 +143,10 @@ export async function saveProductSnapshot(snapshot: Omit<ProductSnapshot, 'id' |
  * Record detected changes in Supabase
  */
 export async function saveProductChanges(changes: ProductChange[]): Promise<{ success: boolean; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+  
   if (changes.length === 0) return { success: true };
 
   try {
@@ -162,6 +170,10 @@ export async function saveProductChanges(changes: ProductChange[]): Promise<{ su
  * Get all product snapshots from Supabase
  */
 export async function getAllSnapshots(): Promise<{ success: boolean; snapshots?: ProductSnapshot[]; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+  
   try {
     const { data, error } = await supabase
       .from('product_snapshots')
@@ -184,6 +196,10 @@ export async function getAllSnapshots(): Promise<{ success: boolean; snapshots?:
  * Get recent changes from Supabase
  */
 export async function getRecentChanges(limit = 50): Promise<{ success: boolean; changes?: ProductChange[]; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+  
   try {
     const { data, error } = await supabase
       .from('product_changes')
@@ -207,6 +223,10 @@ export async function getRecentChanges(limit = 50): Promise<{ success: boolean; 
  * Get unsynced changes (not yet pushed to Opticon)
  */
 export async function getUnsyncedChanges(): Promise<{ success: boolean; changes?: ProductChange[]; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+  
   try {
     const { data, error } = await supabase
       .from('product_changes')
