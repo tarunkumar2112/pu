@@ -107,6 +107,7 @@ async function checkForChanges(): Promise<void> {
   let changesDetected = 0;
   let totalChanges = 0;
   const allChanges = [];
+  const updatedSnapshots: any[] = []; // Store updated snapshots for auto-sync
 
   // Check each product
   for (const snapshot of snapshots) {
@@ -145,11 +146,8 @@ async function checkForChanges(): Promise<void> {
         await saveProductSnapshot(updatedSnapshot);
         console.log(`  ✓ Snapshot updated in Supabase with new price: $${latestSnapshot.price}`);
         
-        // Update the snapshot in our local array for auto-sync
-        const snapshotIndex = snapshots.findIndex(s => s.treez_product_id === snapshot.treez_product_id);
-        if (snapshotIndex !== -1) {
-          snapshots[snapshotIndex] = { ...snapshots[snapshotIndex], ...updatedSnapshot };
-        }
+        // Store the UPDATED snapshot for auto-sync
+        updatedSnapshots.push(updatedSnapshot);
         
       } else {
         console.log(`  ✓ No changes detected`);
@@ -168,9 +166,9 @@ async function checkForChanges(): Promise<void> {
     if (saveResult.success) {
       console.log('[Background Monitor] ✓ Changes synced to Supabase successfully!');
       
-      // AUTO-SYNC TO OPTICON
+      // AUTO-SYNC TO OPTICON with UPDATED snapshots
       console.log('[Background Monitor] 🔄 Auto-syncing changes to Opticon...');
-      await autoSyncToOpticon(allChanges, snapshots);
+      await autoSyncToOpticon(allChanges, updatedSnapshots);
       
     } else {
       console.error('[Background Monitor] ✗ Failed to save changes:', saveResult.error);
