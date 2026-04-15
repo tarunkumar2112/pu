@@ -1,35 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
+import { TreezProduct, getProductDisplay } from "@/lib/treez";
 
 const BRAND_BLUE = "#1F2B44";
-const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
 
-interface TreezProduct {
-  id: string;
-  name: string;
-  sku: string;
-  barcode?: string;
-  category?: string;
-  brand?: string;
-  size?: string;
-  unit?: string;
-  pricing?: any;
-  sellable_quantity_detail?: any[];
-  internal_tags?: string[];
-}
+type UploadStatus = {
+  [productId: string]: "idle" | "uploading" | "success" | "error";
+};
 
 export default function TreezLocationProductsPage() {
   const [products, setProducts] = useState<TreezProduct[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [treezStatus, setTreezStatus] = useState<"checking" | "ok" | "fail">("checking");
+  const [opticonStatus, setOpticonStatus] = useState<"checking" | "ok" | "fail" | "not_configured">("checking");
+  const [selectedProduct, setSelectedProduct] = useState<TreezProduct | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({});
+  const [uploadingAll, setUploadingAll] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("FRONT OF HOUSE");
 
-  const fetchProductsByLocation = async () => {
+  const fetchProductsByLocation = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setError(null);
     
     try {
       const response = await fetch(`/api/products/by-location?location=${encodeURIComponent(selectedLocation)}`);
@@ -46,232 +41,477 @@ export default function TreezLocationProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedLocation]);
 
   // Auto-fetch on page load
   useEffect(() => {
-    fetchProductsByLocation();
-  }, []); // Empty dependency array = run once on mount
-
-  const getPrice = (product: TreezProduct): string => {
-    if (!product.pricing) return "N/A";
-
-    // FLAT pricing
-    if (product.pricing.price_type === "FLAT" && product.pricing.price_sell) {
-      return `$${product.pricing.price_sell}`;
+    if (treezStatus === "ok") {
+      fetchProductsByLocation();
     }
+  }, [treezStatus, fetchProductsByLocation]);
 
-    // TIER pricing
-    if (product.pricing.price_type === "TIER" && product.pricing.tier_pricing_detail) {
-      const tierPrices = product.pricing.tier_pricing_detail
-        .map((tier: any) => `$${tier.price_per_value}`)
-        .join(", ");
-      return `Tier: ${tierPrices}`;
+  const uploadToOpticon = async (product: TreezProduct, index: number) => {
+    const productId = product.product_id ?? product.productId ?? product.id ?? "";
+    
+    setUploadStatus(prev => ({ ...prev, [productId]: "uploading" as const }));
+    
+    try {
+      const pricing = product.pricing as { price_sell?: number; tier_pricing_detail?: Array<{ price_per_value?: number }> } | undefined;
+      const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
+      const barcodes = product.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+      
+      const productName = cfg?.name ?? product.name ?? product.productName ?? "";
+      
+      let price = 0;
+      if (pricing?.price_sell) price = Number(pricing.price_sell);
+      else if (pricing?.tier_pricing_detail?.[0]?.price_per_value) price = Number(pricing.tier_pricing_detail[0].price_per_value);
+      else if (product.price) price = Number(product.price);
+      else if (product.retailPrice) price = Number(product.retailPrice);
+      
+      let barcodeValue = "";
+      if (barcodes?.[0]?.barcode && barcodes[0].barcode !== productName) {
+        barcodeValue = String(barcodes[0].barcode);
+      } else if (cfg?.manufacturer_barcode && cfg.manufacturer_barcode !== productName) {
+        barcodeValue = String(cfg.manufacturer_barcode);
+      } else if (product.barcode && product.barcode !== productName) {
+        barcodeValue = String(product.barcode);
+      }
+      
+      const sku = barcodes?.[0]?.sku ?? cfg?.external_id ?? product.sku ?? "";
+      const simpleId = String(index + 1);
+
+      const opticonProduct = {
+        NotUsed: "",
+        ProductId: simpleId,
+        Barcode: String(barcodeValue || sku || simpleId),
+        Description: String(productName || "Product " + simpleId),
+        Group: String(product.category_type ?? product.category ?? product.categoryName ?? ""),
+        StandardPrice: String(price),
+        SellPrice: String(price),
+        Discount: "",
+        Content: String(cfg?.size ?? ""),
+        Unit: String(cfg?.size_unit ?? "EA"),
+      };
+
+      const res = await fetch("/api/opticon/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(opticonProduct),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+      }
+
+      const data = await res.json();
+
+      if (data.success) {
+        const mappingRes = await fetch("/api/sync/mapping", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            opticonProductId: simpleId,
+            treezProductId: productId,
+            treezSku: sku,
+            barcode: String(barcodeValue),
+          }),
+        });
+        
+        if (mappingRes.ok) {
+          console.log(`[Mapping] ✓ Saved mapping for #${simpleId}`);
+        }
+        
+        setUploadStatus(prev => ({ ...prev, [productId]: "success" as const }));
+        setTimeout(() => {
+          setUploadStatus(prev => ({ ...prev, [productId]: "idle" as const }));
+        }, 5000);
+      } else {
+        throw new Error(data.error || "Upload failed");
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`[Upload] ✗ Error for product ${productId}:`, errorMsg);
+      setUploadStatus(prev => ({ ...prev, [productId]: "error" as const }));
     }
-
-    return "N/A";
   };
 
-  const getInventoryLocation = (product: TreezProduct): string => {
-    if (!product.sellable_quantity_detail || product.sellable_quantity_detail.length === 0) {
-      return "N/A";
+  const uploadAllToOpticon = async () => {
+    setUploadingAll(true);
+    
+    for (let i = 0; i < filteredProducts.length; i++) {
+      await uploadToOpticon(filteredProducts[i], i);
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    const frontOfHouse = product.sellable_quantity_detail.find(
-      (detail: any) => detail.location === "FRONT OF HOUSE"
+    setUploadingAll(false);
+  };
+
+  const checkTreezStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth");
+      const data = await res.json();
+      setTreezStatus(data.success ? "ok" : "fail");
+    } catch {
+      setTreezStatus("fail");
+    }
+  }, []);
+
+  const checkOpticonStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/opticon");
+      const data = await res.json();
+      if (data.success && data.authenticated) setOpticonStatus("ok");
+      else if (data.error?.toLowerCase().includes("not set")) setOpticonStatus("not_configured");
+      else setOpticonStatus("fail");
+    } catch {
+      setOpticonStatus("fail");
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTreezStatus();
+    checkOpticonStatus();
+  }, [checkTreezStatus, checkOpticonStatus]);
+
+  const handleRowClick = (product: TreezProduct) => {
+    const id = product.product_id ?? product.productId ?? product.id;
+    if (!id) return;
+    setDetailLoading(true);
+    setSelectedProduct(null);
+    fetch(`/api/products/${encodeURIComponent(String(id))}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.product) setSelectedProduct(data.product);
+      })
+      .catch(() => {})
+      .finally(() => setDetailLoading(false));
+  };
+
+  const StatusBadge = ({
+    status,
+    label,
+  }: {
+    status: "checking" | "ok" | "fail" | "not_configured";
+    label: string;
+  }) => {
+    const ok = status === "ok";
+    const fail = status === "fail";
+    const warn = status === "not_configured";
+    return (
+      <span
+        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${
+          ok ? "bg-emerald-100 text-emerald-800" : fail ? "bg-red-100 text-red-800" : warn ? "bg-amber-100 text-amber-800" : "bg-zinc-200 text-zinc-600"
+        }`}
+        title={label}
+      >
+        <span
+          className={`h-2 w-2 rounded-full ${
+            ok ? "bg-emerald-500" : fail ? "bg-red-500" : warn ? "bg-amber-500" : "animate-pulse bg-zinc-400"
+          }`}
+        />
+        {ok ? "Connected" : fail ? "Disconnected" : warn ? "Not configured" : "Checking..."}
+      </span>
     );
+  };
+
+  const getBarcodeDisplay = (p: TreezProduct): string => {
+    const barcodes = p.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+    const first = barcodes?.[0];
+    const fromBarcodes = first?.sku ?? (first as { barcode?: string })?.barcode;
+    const cfg = p.product_configurable_fields as Record<string, unknown> | undefined;
+    const manufacturerBc = cfg?.manufacturer_barcode as string | undefined;
+    const val = fromBarcodes ?? manufacturerBc ?? p.barcode ?? "";
+    return val || "-";
+  };
+
+  const getInternalTags = (p: TreezProduct): string => {
+    const attrs = p.attributes as { internal_tags?: any[] } | undefined;
+    const directTags = (p as { internal_tags?: any[] }).internal_tags;
+    const tags = attrs?.internal_tags ?? directTags;
     
-    if (frontOfHouse) {
-      return `${frontOfHouse.location} (Qty: ${frontOfHouse.sellable_quantity || 0})`;
-    }
+    if (!Array.isArray(tags) || tags.length === 0) return "-";
     
-    return product.sellable_quantity_detail[0].location || "N/A";
+    return tags.map(t => {
+      if (typeof t === 'string') return t;
+      if (typeof t === 'object' && t !== null) {
+        return (t as any).name ?? (t as any).label ?? JSON.stringify(t);
+      }
+      return String(t);
+    }).join(', ');
   };
 
   const filteredProducts = products.filter((product) => {
-    const searchLower = searchTerm.toLowerCase();
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    const d = getProductDisplay(product);
     return (
-      product.name?.toLowerCase().includes(searchLower) ||
-      product.sku?.toLowerCase().includes(searchLower) ||
-      product.barcode?.toLowerCase().includes(searchLower) ||
-      product.category?.toLowerCase().includes(searchLower)
+      d.name.toLowerCase().includes(searchLower) ||
+      d.sku.toLowerCase().includes(searchLower) ||
+      getBarcodeDisplay(product).toLowerCase().includes(searchLower) ||
+      d.category.toLowerCase().includes(searchLower) ||
+      getInternalTags(product).toLowerCase().includes(searchLower)
     );
   });
 
+  const columns = [
+    "Name",
+    "Status",
+    "SKU",
+    "Barcode",
+    "Category",
+    "Brand",
+    "Size",
+    "Price",
+    "Tier",
+    "Subtype",
+    "Qty",
+    "Min Visible",
+    "Internal Tags",
+    "Actions",
+  ] as const;
+
   return (
-    <div className="min-h-screen bg-zinc-50">
-      {/* Header */}
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto max-w-[1600px] px-8 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src={LOGO_URL}
-              alt="Perfect Union"
-              width={120}
-              height={36}
-              className="h-9 w-auto object-contain"
-              unoptimized
-            />
-            <div className="h-8 w-px bg-zinc-300" />
-            <h1 className="text-xl font-semibold text-zinc-900">
-              Treez Products by Location (NEW)
-            </h1>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-zinc-900">Treez Products by Location (NEW)</h1>
+        <div className="flex items-center gap-4">
+          <StatusBadge status={treezStatus} label="Treez" />
+          <StatusBadge status={opticonStatus} label="Opticon" />
+          <button
+            onClick={uploadAllToOpticon}
+            disabled={loading || uploadingAll || filteredProducts.length === 0 || opticonStatus !== "ok"}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: "#10b981" }}
+            title={opticonStatus !== "ok" ? "Connect to Opticon first" : "Upload all products to Opticon"}
+          >
+            {uploadingAll ? "Uploading..." : `Upload All to Opticon (${filteredProducts.length})`}
+          </button>
+          <button
+            onClick={() => fetchProductsByLocation()}
+            disabled={loading || treezStatus !== "ok"}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: BRAND_BLUE }}
+          >
+            {loading ? "Loading..." : "Refresh"}
+          </button>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-[1600px] px-8 py-8">
-        {/* Controls */}
-        <div className="mb-6 bg-white rounded-lg border border-zinc-200 p-6">
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-zinc-700 mb-2">
-                Location Filter
-              </label>
-              <input
-                type="text"
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                placeholder="Enter location (e.g., FRONT OF HOUSE)"
-                className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by tags, name, or SKU..."
+            className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            disabled={loading}
+          />
+          {searchQuery && !loading && (
             <button
-              onClick={fetchProductsByLocation}
-              disabled={loading}
-              className="rounded-lg px-6 py-2 text-white font-medium transition disabled:opacity-50"
-              style={{ backgroundColor: BRAND_BLUE }}
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
             >
-              {loading ? "Fetching..." : "Fetch Products"}
+              ✕
             </button>
-          </div>
-
-          {error && (
-            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
           )}
         </div>
+        {!loading && (
+          <span className="text-sm text-zinc-600">
+            {filteredProducts.length} of {products.length} products
+          </span>
+        )}
+      </div>
 
-        {/* Search Bar */}
-        {products.length > 0 && (
-          <div className="mb-6 bg-white rounded-lg border border-zinc-200 p-4">
-            <input
-              type="text"
-              placeholder="Search by name, SKU, barcode, or category..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-red-600 text-xl">⚠️</span>
+            <div>
+              <p className="font-semibold text-red-800">Error loading products</p>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {treezStatus !== "ok" && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
+          Connect to Treez first. Check .env.local (TREEZ_API_URL, TREEZ_DISPENSARY, TREEZ_API_KEY).
+        </div>
+      )}
+
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        {loading ? (
+          <div className="flex justify-center py-24">
+            <div
+              className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300"
+              style={{ borderTopColor: BRAND_BLUE }}
             />
           </div>
-        )}
-
-        {/* Stats */}
-        {products.length > 0 && (
-          <div className="mb-6 grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg border border-zinc-200 p-4">
-              <p className="text-sm text-zinc-600">Total Products</p>
-              <p className="text-2xl font-bold text-zinc-900">{products.length}</p>
-            </div>
-            <div className="bg-white rounded-lg border border-zinc-200 p-4">
-              <p className="text-sm text-zinc-600">Filtered Results</p>
-              <p className="text-2xl font-bold text-zinc-900">{filteredProducts.length}</p>
-            </div>
-            <div className="bg-white rounded-lg border border-zinc-200 p-4">
-              <p className="text-sm text-zinc-600">Location</p>
-              <p className="text-lg font-semibold text-zinc-900">{selectedLocation}</p>
-            </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="py-24 text-center text-zinc-500">
+            {searchQuery ? `No products found matching "${searchQuery}"` : "No products found."}
           </div>
-        )}
-
-        {/* Products Table */}
-        {filteredProducts.length > 0 && (
-          <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+        ) : (
+          <>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-zinc-50 border-b border-zinc-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      SKU
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Barcode
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Category
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Brand
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Price
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Size
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Location
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-700 uppercase">
-                      Tags
-                    </th>
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-200 bg-zinc-50">
+                    {columns.map((col) => (
+                      <th
+                        key={col}
+                        className="max-w-[140px] truncate px-3 py-3 font-medium text-zinc-900"
+                        title={col}
+                      >
+                        {col}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-200">
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-zinc-50">
-                      <td className="px-4 py-3 text-sm text-zinc-900">
-                        {product.name || "N/A"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {product.sku || "N/A"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600 font-mono text-xs">
-                        {product.barcode || product.id}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {product.category || "N/A"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {product.brand || "N/A"}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-zinc-900">
-                        {getPrice(product)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {product.size ? `${product.size} ${product.unit || ""}` : "N/A"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {getInventoryLocation(product)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {product.internal_tags?.join(", ") || "N/A"}
-                      </td>
-                    </tr>
-                  ))}
+                <tbody>
+                  {filteredProducts.map((p, i) => {
+                    const d = getProductDisplay(p);
+                    const productId = p.product_id ?? p.productId ?? p.id ?? String(i);
+                    const status = uploadStatus[productId] || "idle";
+                    
+                    return (
+                      <tr
+                        key={productId}
+                        className="border-b border-zinc-100 transition hover:bg-zinc-50"
+                      >
+                        <td 
+                          className="max-w-[140px] truncate px-3 py-2 text-zinc-600 cursor-pointer" 
+                          title={d.name}
+                          onClick={() => handleRowClick(p)}
+                        >
+                          {d.name}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                              d.status === "Active"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : d.status === "Deactivated"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-zinc-100 text-zinc-600"
+                            }`}
+                          >
+                            {d.status}
+                          </span>
+                        </td>
+                        <td className="max-w-[100px] truncate px-3 py-2 text-zinc-600" title={d.sku}>
+                          {d.sku}
+                        </td>
+                        <td className="max-w-[120px] truncate px-3 py-2 font-mono text-zinc-600" title={getBarcodeDisplay(p)}>
+                          {getBarcodeDisplay(p)}
+                        </td>
+                        <td className="max-w-[120px] truncate px-3 py-2 text-zinc-600" title={d.category}>
+                          {d.category}
+                        </td>
+                        <td className="max-w-[120px] truncate px-3 py-2 text-zinc-600" title={d.brand}>
+                          {d.brand}
+                        </td>
+                        <td className="max-w-[80px] truncate px-3 py-2 text-zinc-600" title={d.size}>
+                          {d.size}
+                        </td>
+                        <td className="px-3 py-2 text-zinc-600">{d.price}</td>
+                        <td className="max-w-[80px] truncate px-3 py-2 text-zinc-600" title={d.tier}>
+                          {d.tier}
+                        </td>
+                        <td className="max-w-[80px] truncate px-3 py-2 text-zinc-600" title={d.subtype}>
+                          {d.subtype}
+                        </td>
+                        <td className="px-3 py-2 text-zinc-600">{d.qty}</td>
+                        <td className="px-3 py-2 text-zinc-600">{d.minVisible}</td>
+                        <td className="max-w-[140px] truncate px-3 py-2 text-zinc-600" title={getInternalTags(p)}>
+                          {getInternalTags(p)}
+                        </td>
+                        <td className="px-3 py-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              uploadToOpticon(p, i);
+                            }}
+                            disabled={status === "uploading" || opticonStatus !== "ok"}
+                            className={`rounded px-3 py-1 text-xs font-medium transition ${
+                              status === "uploading"
+                                ? "bg-blue-100 text-blue-600 cursor-wait"
+                                : status === "success"
+                                  ? "bg-green-100 text-green-700"
+                                  : status === "error"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                            } disabled:opacity-50`}
+                            title={opticonStatus !== "ok" ? "Connect to Opticon first" : `Upload as Product #${i + 1}`}
+                          >
+                            {status === "uploading" ? "Uploading..." : status === "success" ? "✓ Uploaded" : status === "error" ? "✗ Failed" : `Upload (#${i + 1})`}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-          </div>
+            <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3">
+              <p className="text-sm text-zinc-500">
+                {filteredProducts.length.toLocaleString()} products from {selectedLocation}
+              </p>
+            </div>
+          </>
         )}
+      </div>
 
-        {/* Empty State */}
-        {!loading && products.length === 0 && (
-          <div className="bg-white rounded-lg border border-zinc-200 p-12 text-center">
-            <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">
-              No Products Loaded
-            </h3>
-            <p className="text-zinc-600">
-              Enter a location and click "Fetch Products" to load products from Treez
-            </p>
+      {(selectedProduct !== null || detailLoading) && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => !detailLoading && setSelectedProduct(null)}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
+              <h3 className="text-lg font-semibold text-zinc-900">Product Detail</h3>
+              <button
+                onClick={() => !detailLoading && setSelectedProduct(null)}
+                disabled={detailLoading}
+                className="rounded p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50"
+              >
+                ✕
+              </button>
+            </div>
+            {detailLoading ? (
+              <div className="flex justify-center py-12">
+                <div
+                  className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300"
+                  style={{ borderTopColor: BRAND_BLUE }}
+                />
+              </div>
+            ) : selectedProduct ? (
+              <div className="mt-4 space-y-4">
+                <dl className="grid gap-2 sm:grid-cols-2">
+                  {Object.entries(getProductDisplay(selectedProduct)).map(([key, value]) => (
+                    <div key={key} className="rounded bg-zinc-50 px-3 py-2">
+                      <dt className="text-xs text-zinc-500">{key}</dt>
+                      <dd className="mt-0.5 font-medium text-zinc-900 break-all">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <div>
+                  <h4 className="mb-2 font-medium text-zinc-700">Raw JSON</h4>
+                  <pre className="max-h-64 overflow-auto rounded bg-zinc-100 p-3 text-xs">
+                    {JSON.stringify(selectedProduct, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            ) : null}
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 }
