@@ -324,33 +324,77 @@ export default function MiddlewarePage() {
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="bg-white rounded-xl border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Bulk Actions</h3>
-        <div className="flex flex-wrap gap-3">
+      {/* Action Buttons - PROMINENT */}
+      <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-emerald-50 rounded-2xl border-2 border-blue-300 p-8 shadow-lg">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-zinc-900 mb-2">Upload Products to Opticon + Supabase</h3>
+            <p className="text-zinc-600">Bulk sync products to both systems simultaneously</p>
+          </div>
+          <div className="text-6xl">⚡</div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             onClick={() => uploadAllProducts(true)}
             disabled={uploadingAll || stats.new === 0}
-            className="rounded-lg px-6 py-3 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
             style={{ backgroundColor: "#10b981" }}
           >
-            Upload New Products ({stats.new})
+            <div className="relative z-10">
+              <div className="text-3xl mb-2">🆕</div>
+              <div>Upload NEW Products</div>
+              <div className="text-sm font-normal opacity-90 mt-1">
+                {stats.new} products ready
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
+
           <button
             onClick={() => uploadAllProducts(false)}
             disabled={uploadingAll || (stats.new + stats.partial) === 0}
-            className="rounded-lg px-6 py-3 text-sm font-medium text-white transition disabled:opacity-50 hover:opacity-90"
+            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
             style={{ backgroundColor: "#f59e0b" }}
           >
-            Upload New + Partial ({stats.new + stats.partial})
+            <div className="relative z-10">
+              <div className="text-3xl mb-2">⚠️</div>
+              <div>Upload NEW + PARTIAL</div>
+              <div className="text-sm font-normal opacity-90 mt-1">
+                {stats.new + stats.partial} products ready
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
+
           <button
             onClick={fetchProducts}
             disabled={loading || uploadingAll}
-            className="rounded-lg px-6 py-3 text-sm font-medium bg-zinc-100 text-zinc-700 transition disabled:opacity-50 hover:bg-zinc-200"
+            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-zinc-700 bg-white border-2 border-zinc-300 transition-all disabled:opacity-50 hover:scale-105 hover:shadow-xl hover:border-zinc-400"
           >
-            Refresh from Treez
+            <div className="relative z-10">
+              <div className="text-3xl mb-2">🔄</div>
+              <div>Refresh from Treez</div>
+              <div className="text-sm font-normal opacity-70 mt-1">
+                Get latest products
+              </div>
+            </div>
           </button>
+        </div>
+
+        <div className="mt-6 bg-white/80 backdrop-blur rounded-lg p-4 border border-blue-200">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">ℹ️</div>
+            <div className="flex-1 text-sm text-zinc-700">
+              <p className="font-semibold mb-1">How it works:</p>
+              <ul className="space-y-1 list-disc list-inside">
+                <li>Products are uploaded to <strong>both Opticon and Supabase</strong> simultaneously</li>
+                <li>Treez UUID is stored as <strong>Barcode in Opticon</strong> for identification</li>
+                <li>Already synced products are <strong>automatically skipped</strong></li>
+                <li>Progress is shown in real-time with batch processing</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 

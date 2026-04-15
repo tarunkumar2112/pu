@@ -10,7 +10,6 @@ const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/68
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: "◉", group: "main" },
   { href: "/admin/middleware", label: "Sync Middleware", icon: "⚡", group: "main", highlight: true },
-  { href: "/admin/treez-location", label: "Browse Products", icon: "📍", group: "products" },
   { href: "/admin/treez/monitor", label: "Change Monitor", icon: "🔔", group: "monitor" },
   { href: "/admin/opticon", label: "Opticon Products", icon: "📱", group: "opticon" },
 ];
@@ -18,6 +17,7 @@ const navItems = [
 const hiddenNavItems = [
   { href: "/admin/treez", label: "Treez Products (Old)", icon: "▸", group: "hidden" },
   { href: "/admin/treez/mapping", label: "Product Mapping (Old)", icon: "⚡", group: "hidden" },
+  { href: "/admin/treez-location", label: "Browse Products", icon: "📍", group: "hidden" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
