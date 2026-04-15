@@ -51,9 +51,13 @@ export default function TreezLocationProductsPage() {
   }, [treezStatus, fetchProductsByLocation]);
 
   const uploadToOpticon = async (product: TreezProduct, index: number) => {
-    const productId = product.product_id ?? product.productId ?? product.id ?? "";
+    const productId = String(product.product_id ?? product.productId ?? product.id ?? "");
     
-    setUploadStatus(prev => ({ ...prev, [productId]: "uploading" as const }));
+    setUploadStatus(prev => {
+      const updated = { ...prev };
+      updated[productId] = "uploading" as const;
+      return updated;
+    });
     
     try {
       const pricing = product.pricing as { price_sell?: number; tier_pricing_detail?: Array<{ price_per_value?: number }> } | undefined;
@@ -122,9 +126,17 @@ export default function TreezLocationProductsPage() {
           console.log(`[Mapping] ✓ Saved mapping for #${simpleId}`);
         }
         
-        setUploadStatus(prev => ({ ...prev, [productId]: "success" as const }));
+        setUploadStatus(prev => {
+          const updated = { ...prev };
+          updated[productId] = "success" as const;
+          return updated;
+        });
         setTimeout(() => {
-          setUploadStatus(prev => ({ ...prev, [productId]: "idle" as const }));
+          setUploadStatus(prev => {
+            const updated = { ...prev };
+            updated[productId] = "idle" as const;
+            return updated;
+          });
         }, 5000);
       } else {
         throw new Error(data.error || "Upload failed");
@@ -132,7 +144,11 @@ export default function TreezLocationProductsPage() {
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error(`[Upload] ✗ Error for product ${productId}:`, errorMsg);
-      setUploadStatus(prev => ({ ...prev, [productId]: "error" as const }));
+      setUploadStatus(prev => {
+        const updated = { ...prev };
+        updated[productId] = "error" as const;
+        return updated;
+      });
     }
   };
 
@@ -374,7 +390,7 @@ export default function TreezLocationProductsPage() {
                 <tbody>
                   {filteredProducts.map((p, i) => {
                     const d = getProductDisplay(p);
-                    const productId = p.product_id ?? p.productId ?? p.id ?? String(i);
+                    const productId = String(p.product_id ?? p.productId ?? p.id ?? i);
                     const status = uploadStatus[productId] || "idle";
                     
                     return (
