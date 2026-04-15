@@ -20,21 +20,15 @@ export async function GET(request: NextRequest) {
 
     // Transform products to include proper pricing
     const transformedProducts = products.map((product: any) => {
-      return {
-        id: product.id || product.product_id,
-        name: product.name || product.productName,
-        sku: product.sku,
-        barcode: product.barcode || product.id,
-        category: product.category || product.categoryName || product.category_type,
-        brand: product.brand || product.brandName,
-        size: product.size,
-        unit: product.unit_of_measure || product.unit,
-        pricing: product.pricing || {},
-        sellable_quantity_detail: product.sellable_quantity_detail || [],
-        internal_tags: product.internal_tags || [],
-        sellable_quantity: product.sellable_quantity,
-      };
+      // Log first product to see structure
+      if (products.indexOf(product) === 0) {
+        console.log('[Location API] Sample product structure:', JSON.stringify(product, null, 2));
+      }
+
+      return product; // Return as-is since fetchTreezProducts already returns proper format
     });
+
+    console.log(`[Location API] Transformed ${transformedProducts.length} products`);
 
     return NextResponse.json({
       success: true,
