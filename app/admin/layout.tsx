@@ -8,57 +8,104 @@ const BRAND_BLUE = "#1F2B44";
 const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "◉" },
-  { href: "/admin/treez", label: "Treez Products", icon: "▸" },
-  { href: "/admin/treez-location", label: "Treez by Location (NEW)", icon: "📍" },
-  { href: "/admin/treez/mapping", label: "Product Mapping", icon: "⚡" },
-  { href: "/admin/treez/monitor", label: "Change Monitor", icon: "🔔" },
-  { href: "/admin/opticon", label: "Opticon Products", icon: "▸" },
+  { href: "/admin", label: "Dashboard", icon: "◉", group: "main" },
+  { href: "/admin/middleware", label: "Sync Middleware", icon: "⚡", group: "main", highlight: true },
+  { href: "/admin/treez-location", label: "Browse Products", icon: "📍", group: "products" },
+  { href: "/admin/treez/monitor", label: "Change Monitor", icon: "🔔", group: "monitor" },
+  { href: "/admin/opticon", label: "Opticon Products", icon: "📱", group: "opticon" },
+];
+
+const hiddenNavItems = [
+  { href: "/admin/treez", label: "Treez Products (Old)", icon: "▸", group: "hidden" },
+  { href: "/admin/treez/mapping", label: "Product Mapping (Old)", icon: "⚡", group: "hidden" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  const groupLabels: Record<string, string> = {
+    main: "Main",
+    products: "Products",
+    monitor: "Monitoring",
+    opticon: "Opticon",
+  };
+
+  const groupedItems = navItems.reduce((acc, item) => {
+    if (!acc[item.group]) acc[item.group] = [];
+    acc[item.group].push(item);
+    return acc;
+  }, {} as Record<string, typeof navItems>);
+
   return (
-    <div className="flex min-h-screen bg-zinc-50">
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-zinc-200 bg-white shadow-sm">
-        <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
+    <div className="flex min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100">
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-zinc-200 bg-white shadow-xl">
+        {/* Logo */}
+        <div className="flex h-20 items-center gap-3 border-b border-zinc-200 px-6 bg-gradient-to-r from-zinc-50 to-white">
           <Link href="/" className="flex items-center gap-3">
             <Image
               src={LOGO_URL}
               alt="Perfect Union"
-              width={120}
-              height={36}
-              className="h-9 w-auto object-contain"
+              width={140}
+              height={42}
+              className="h-10 w-auto object-contain"
               unoptimized
             />
           </Link>
         </div>
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-zinc-100 text-zinc-900"
-                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
-                }`}
-              >
-                <span className="text-base opacity-70">{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+          {Object.entries(groupedItems).map(([group, items]) => (
+            <div key={group}>
+              <p className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+                {groupLabels[group] || group}
+              </p>
+              <div className="space-y-1">
+                {items.map((item) => {
+                  const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30"
+                          : item.highlight
+                            ? "bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200 hover:from-emerald-100 hover:to-emerald-200"
+                            : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                      }`}
+                    >
+                      <span className={`text-lg ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                      {item.highlight && !isActive && (
+                        <span className="ml-auto text-xs font-semibold text-emerald-600 bg-emerald-200 px-2 py-0.5 rounded-full">
+                          NEW
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
-        <div className="border-t border-zinc-200 px-4 py-3">
-          <p className="text-xs text-zinc-500">Product Sync Admin</p>
-          <p className="text-xs text-zinc-400">Treez → Opticon</p>
+
+        {/* Footer */}
+        <div className="border-t border-zinc-200 bg-gradient-to-r from-zinc-50 to-white px-4 py-4">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm">
+              PU
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-zinc-900">Perfect Union</p>
+              <p className="text-xs text-zinc-500">Sync Middleware</p>
+            </div>
+          </div>
         </div>
       </aside>
-      <main className="ml-64 flex-1 p-8">{children}</main>
+      <main className="ml-72 flex-1 p-8">{children}</main>
     </div>
   );
 }
