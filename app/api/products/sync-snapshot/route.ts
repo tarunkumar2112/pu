@@ -11,11 +11,22 @@ import path from "path";
 export async function GET() {
   try {
     const result = await getAllSnapshots();
-    const snapshots = Array.isArray(result) ? result : [];
-    
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error || "Failed to fetch snapshots",
+          snapshots: [],
+          total: 0,
+        },
+        { status: 500 }
+      );
+    }
+    const snapshots = result.snapshots ?? [];
+
     return NextResponse.json({
       success: true,
-      snapshots: snapshots,
+      snapshots,
       total: snapshots.length,
     });
   } catch (error) {

@@ -173,19 +173,32 @@ export async function getAllSnapshots(): Promise<{ success: boolean; snapshots?:
   if (!supabase) {
     return { success: false, error: 'Supabase not configured' };
   }
-  
-  try {
-    const { data, error } = await supabase
-      .from('product_snapshots')
-      .select('*')
-      .order('product_name');
 
-    if (error) {
-      console.error('[Snapshots] Fetch error:', error);
-      return { success: false, error: error.message };
+  try {
+    // PostgREST returns at most 1000 rows per request unless paginated.
+    const pageSize = 1000;
+    const all: ProductSnapshot[] = [];
+    let from = 0;
+
+    for (;;) {
+      const { data, error } = await supabase
+        .from('product_snapshots')
+        .select('*')
+        .order('treez_product_id', { ascending: true })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error('[Snapshots] Fetch error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const batch = (data ?? []) as ProductSnapshot[];
+      all.push(...batch);
+      if (batch.length < pageSize) break;
+      from += pageSize;
     }
 
-    return { success: true, snapshots: data as ProductSnapshot[] };
+    return { success: true, snapshots: all };
   } catch (err) {
     console.error('[Snapshots] Exception:', err);
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
