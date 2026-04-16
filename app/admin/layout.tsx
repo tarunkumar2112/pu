@@ -3,13 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Zap, 
-  Eye, 
-  Smartphone,
-  CircleUser
-} from "lucide-react";
+import { LayoutDashboard, Zap, CircleUser } from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
 const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";

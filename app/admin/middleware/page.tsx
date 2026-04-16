@@ -2,18 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { TreezProduct, getProductDisplay } from "@/lib/treez";
-import { 
-  Package, 
-  CheckCircle2, 
-  AlertCircle, 
-  Sparkles, 
+import {
+  Package,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
   Zap,
   RefreshCw,
   Info,
   Upload,
   Database,
   Smartphone,
-  Loader2
+  Loader2,
+  Clock,
+  Webhook,
+  Activity,
+  Radio,
+  X,
+  Trash2,
+  TrendingUp,
 } from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
@@ -28,6 +35,47 @@ interface SyncStatus {
   uploadError?: string;
 }
 
+type EnginePayload = {
+  changeDetection: {
+    intervalMinutes: number;
+    lastTickAt: string | null;
+    lastCompleteAt: string | null;
+    lastError: string | null;
+    lastChangesDetected: number;
+    lastSyncedToSupabase: number;
+    lastSyncedToOpticon: number;
+  };
+  catalogSync: {
+    intervalMinutes: number;
+    lastTickAt: string | null;
+    lastCompleteAt: string | null;
+    lastError: string | null;
+    lastNewProducts: number;
+    lastRemovedFromSupabase: number;
+    lastOpticonUploads: number;
+    lastFailed: number;
+  };
+  webhook: {
+    lastReceivedAt: string | null;
+    lastEventType: string | null;
+    lastProductId: string | null;
+    totalReceived: number;
+    lastError: string | null;
+    lastSuccessAt: string | null;
+  };
+  activity: Array<{ at: string; channel: string; message: string }>;
+};
+
+type ProductChangeRow = {
+  id?: string;
+  treez_product_id: string;
+  change_type: string;
+  old_value: string | null;
+  new_value: string | null;
+  detected_at?: string;
+  synced_to_opticon?: boolean;
+};
+
 export default function MiddlewarePage() {
   const [products, setProducts] = useState<TreezProduct[]>([]);
   const [syncStatuses, setSyncStatuses] = useState<Map<string, SyncStatus>>(new Map());
@@ -36,6 +84,36 @@ export default function MiddlewarePage() {
   const [uploadingAll, setUploadingAll] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [searchQuery, setSearchQuery] = useState("");
+  const [engine, setEngine] = useState<EnginePayload | null>(null);
+  const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
+
+  const webhookUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/webhooks/treez/product`
+      : "/api/webhooks/treez/product";
+
+  const loadEngineStatus = async () => {
+    try {
+      const res = await fetch("/api/sync/engine-status");
+      const data = await res.json();
+      if (data.success) {
+        const { success: _s, ...rest } = data;
+        setEngine(rest as EnginePayload);
+      }
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const loadRecentChanges = async () => {
+    try {
+      const res = await fetch("/api/products/recent-changes?limit=20");
+      const data = await res.json();
+      if (data.success) setRecentChanges(data.changes || []);
+    } catch {
+      /* ignore */
+    }
+  };
 
   // Fetch products from Treez
   const fetchProducts = async () => {
@@ -257,6 +335,22 @@ export default function MiddlewarePage() {
     }
   }, [products]);
 
+  useEffect(() => {
+    loadEngineStatus();
+    loadRecentChanges();
+    const t = setInterval(() => {
+      loadEngineStatus();
+    }, 8000);
+    const t2 = setInterval(() => loadRecentChanges(), 15000);
+    return () => {
+      clearInterval(t);
+      clearInterval(t2);
+    };
+  }, []);
+
+  const fmt = (iso: string | null) =>
+    iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "short", timeStyle: "medium" }) : "—";
+
   const filteredProducts = products.filter((product) => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
@@ -292,6 +386,214 @@ export default function MiddlewarePage() {
           >
             {checking ? "Checking..." : "Check Status"}
           </button>
+        </div>
+      </div>
+
+      {/* Three sync channels: change detection (1m), catalog (5m), webhook */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+              <Radio className="h-5 w-5 text-blue-700" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-900">Change monitor (cron)</h2>
+              <p className="text-xs text-zinc-500">node-cron · compares Treez vs Supabase snapshots · pushes Opticon</p>
+            </div>
+          </div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
+              <Clock className="h-3.5 w-3.5" />
+              Interval: {engine?.changeDetection.intervalMinutes ?? 1} min
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+              <Database className="h-3.5 w-3.5" />
+              Rows to Supabase: {engine?.changeDetection.lastSyncedToSupabase ?? 0} (last run)
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-800">
+              <Smartphone className="h-3.5 w-3.5" />
+              Opticon pushes: {engine?.changeDetection.lastSyncedToOpticon ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-900">
+              <Activity className="h-3.5 w-3.5" />
+              Changes detected: {engine?.changeDetection.lastChangesDetected ?? 0}
+            </span>
+          </div>
+          <dl className="space-y-1 text-xs text-zinc-600">
+            <div className="flex justify-between gap-2">
+              <dt>Last tick</dt>
+              <dd className="font-mono text-zinc-800">{fmt(engine?.changeDetection.lastTickAt ?? null)}</dd>
+            </div>
+            <div className="flex justify-between gap-2">
+              <dt>Last success</dt>
+              <dd className="font-mono text-zinc-800">{fmt(engine?.changeDetection.lastCompleteAt ?? null)}</dd>
+            </div>
+            {engine?.changeDetection.lastError ? (
+              <div className="rounded border border-red-200 bg-red-50 p-2 text-red-800">{engine.changeDetection.lastError}</div>
+            ) : null}
+          </dl>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+              <RefreshCw className="h-5 w-5 text-emerald-700" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-900">Catalog add / remove (cron)</h2>
+              <p className="text-xs text-zinc-500">FRONT OF HOUSE vs Supabase · new rows + DB cleanup</p>
+            </div>
+          </div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
+              <Clock className="h-3.5 w-3.5" />
+              Interval: {engine?.catalogSync.intervalMinutes ?? 5} min
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+              <Sparkles className="h-3.5 w-3.5" />
+              New items: {engine?.catalogSync.lastNewProducts ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-800">
+              <Trash2 className="h-3.5 w-3.5" />
+              Removed (Supabase): {engine?.catalogSync.lastRemovedFromSupabase ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-800">
+              <Upload className="h-3.5 w-3.5" />
+              Opticon uploads: {engine?.catalogSync.lastOpticonUploads ?? 0}
+            </span>
+          </div>
+          <p className="text-xs text-zinc-500">
+            Products that disappear from this Treez location slice are deleted from <code className="rounded bg-zinc-100 px-1">product_snapshots</code> and related{" "}
+            <code className="rounded bg-zinc-100 px-1">product_changes</code>. Opticon rows are not auto-deleted yet (no delete API).
+          </p>
+          <dl className="mt-3 space-y-1 text-xs text-zinc-600">
+            <div className="flex justify-between gap-2">
+              <dt>Last tick</dt>
+              <dd className="font-mono text-zinc-800">{fmt(engine?.catalogSync.lastTickAt ?? null)}</dd>
+            </div>
+            <div className="flex justify-between gap-2">
+              <dt>Last success</dt>
+              <dd className="font-mono text-zinc-800">{fmt(engine?.catalogSync.lastCompleteAt ?? null)}</dd>
+            </div>
+            {engine?.catalogSync.lastError ? (
+              <div className="rounded border border-red-200 bg-red-50 p-2 text-red-800">{engine.catalogSync.lastError}</div>
+            ) : null}
+          </dl>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100">
+              <Webhook className="h-5 w-5 text-violet-700" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-900">Treez product webhook</h2>
+              <p className="text-xs text-zinc-500">PRODUCT create / update / activate / deactivate / image</p>
+            </div>
+          </div>
+          <div className="mb-3 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-3">
+            <p className="mb-1 text-xs font-medium text-zinc-500">POST URL (expose publicly for Treez)</p>
+            <code className="break-all text-xs text-zinc-800">{webhookUrl}</code>
+          </div>
+          <p className="mb-2 text-xs text-zinc-600">
+            Optional auth: set <code className="rounded bg-zinc-100 px-1">TREEZ_WEBHOOK_SECRET</code> in env and send{" "}
+            <code className="rounded bg-zinc-100 px-1">Authorization: Bearer …</code> or{" "}
+            <code className="rounded bg-zinc-100 px-1">X-Treez-Webhook-Secret</code>.
+          </p>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
+              Received (total): {engine?.webhook.totalReceived ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Last OK: {fmt(engine?.webhook.lastSuccessAt ?? null)}
+            </span>
+          </div>
+          <dl className="space-y-1 text-xs text-zinc-600">
+            <div className="flex justify-between gap-2">
+              <dt>Last product</dt>
+              <dd className="max-w-[60%] truncate font-mono text-zinc-800">{engine?.webhook.lastProductId ?? "—"}</dd>
+            </div>
+            <div className="flex justify-between gap-2">
+              <dt>Last received</dt>
+              <dd className="font-mono text-zinc-800">{fmt(engine?.webhook.lastReceivedAt ?? null)}</dd>
+            </div>
+            {engine?.webhook.lastError ? (
+              <div className="rounded border border-red-200 bg-red-50 p-2 text-red-800">{engine.webhook.lastError}</div>
+            ) : null}
+          </dl>
+        </div>
+      </div>
+
+      {/* Live activity + consolidated change monitor */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <Activity className="h-4 w-4 text-blue-600" />
+            Engine activity (latest)
+          </h3>
+          <ul className="max-h-56 space-y-2 overflow-y-auto text-xs">
+            {(engine?.activity ?? []).length === 0 ? (
+              <li className="text-zinc-500">No events yet — start the server and wait for cron or trigger a webhook.</li>
+            ) : (
+              (engine?.activity ?? []).map((a, i) => (
+                <li key={i} className="flex gap-2 border-b border-zinc-100 pb-2">
+                  <span className="shrink-0 font-mono text-zinc-400">{fmt(a.at)}</span>
+                  <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-600">
+                    {a.channel.replace("_", " ")}
+                  </span>
+                  <span className="text-zinc-700">{a.message}</span>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+            Recent changes (Supabase)
+          </h3>
+          <div className="max-h-56 overflow-x-auto overflow-y-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-zinc-200 text-zinc-500">
+                  <th className="py-2 pr-2">Type</th>
+                  <th className="py-2 pr-2">Old → New</th>
+                  <th className="py-2 pr-2">Opticon</th>
+                  <th className="py-2">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentChanges.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-4 text-zinc-500">
+                      No change rows yet.
+                    </td>
+                  </tr>
+                ) : (
+                  recentChanges.map((c) => (
+                    <tr key={c.id ?? `${c.treez_product_id}-${c.change_type}`} className="border-b border-zinc-50">
+                      <td className="py-1.5 pr-2 font-medium text-zinc-800">{c.change_type}</td>
+                      <td className="max-w-[140px] truncate py-1.5 pr-2 text-zinc-600" title={`${c.old_value} → ${c.new_value}`}>
+                        {c.old_value ?? "—"} → {c.new_value ?? "—"}
+                      </td>
+                      <td className="py-1.5 pr-2">
+                        {c.synced_to_opticon ? (
+                          <span className="inline-flex items-center gap-1 text-emerald-700">
+                            <CheckCircle2 className="h-3 w-3" /> Yes
+                          </span>
+                        ) : (
+                          <span className="text-amber-700">Pending</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap py-1.5 text-zinc-500">{fmt(c.detected_at ?? null)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -450,10 +752,12 @@ export default function MiddlewarePage() {
         />
         {searchQuery && (
           <button
+            type="button"
             onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+            aria-label="Clear search"
           >
-            ✕
+            <X className="h-4 w-4" />
           </button>
         )}
       </div>
@@ -527,22 +831,26 @@ export default function MiddlewarePage() {
                       <td className="px-4 py-3">
                         {status.status === "synced" && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                            ✓ Fully Synced
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Fully synced
                           </span>
                         )}
                         {status.status === "new" && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
-                            🆕 New
+                            <Sparkles className="h-3.5 w-3.5" />
+                            New
                           </span>
                         )}
                         {status.status === "partial" && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
-                            ⚠️ Partial
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            Partial
                           </span>
                         )}
                         {status.status === "checking" && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
-                            Checking...
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            Checking…
                           </span>
                         )}
                       </td>
@@ -552,8 +860,9 @@ export default function MiddlewarePage() {
                             Uploading...
                           </button>
                         ) : status.uploadSuccess ? (
-                          <button disabled className="rounded-lg px-3 py-1.5 text-xs font-medium bg-emerald-100 text-emerald-700">
-                            ✓ Uploaded
+                          <button disabled className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium bg-emerald-100 text-emerald-700">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Uploaded
                           </button>
                         ) : status.status !== "synced" ? (
                           <button

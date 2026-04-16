@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Add timestamp
+    // Add timestamp + raw_data for DB compatibility
     const snapshotWithTimestamp = {
       ...snapshot,
+      raw_data: snapshot.raw_data ?? {},
       last_checked_at: new Date().toISOString(),
     };
 

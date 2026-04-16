@@ -1,13 +1,17 @@
 import { fetchTreezProductById } from './treez';
-import { 
-  extractProductSnapshot, 
-  detectProductChanges, 
-  saveProductSnapshot, 
+import {
+  extractProductSnapshot,
+  detectProductChanges,
+  saveProductSnapshot,
   saveProductChanges,
-  getAllSnapshots 
+  getAllSnapshots,
 } from './change-detector';
-import fs from 'fs';
-import path from 'path';
+import { runAutoSyncCatalog } from './auto-sync-catalog';
+import {
+  recordChangeDetectionTick,
+  recordChangeDetectionResult,
+  recordCatalogSyncTick,
+} from './sync-engine-status';
 
 let isJobRunning = false;
 let cronInitialized = false;
@@ -45,6 +49,7 @@ export async function startBackgroundChangeDetection() {
       isJobRunning = true;
       
       try {
+        recordChangeDetectionTick();
         console.log('\n⏰ [Background Monitor] Starting scheduled check...');
         await checkForChanges();
       } catch (error) {
@@ -54,12 +59,12 @@ export async function startBackgroundChangeDetection() {
       }
     });
 
-    // Run auto-sync every 5 minutes
+    // Run catalog auto-sync every 5 minutes (in-process; no HTTP self-call)
     cron.schedule('*/5 * * * *', async () => {
       try {
-        console.log('\n🔄 [Auto-Sync] Running scheduled sync check...');
-        const response = await fetch('http://localhost:3000/api/auto-sync');
-        const data = await response.json();
+        recordCatalogSyncTick();
+        console.log('\n🔄 [Auto-Sync] Running scheduled catalog sync...');
+        const data = await runAutoSyncCatalog();
         console.log('[Auto-Sync] Result:', data);
       } catch (error) {
         console.error('[Auto-Sync] ✗ Error:', error);
@@ -83,29 +88,21 @@ export async function startBackgroundChangeDetection() {
  * Check for changes in all configured products
  */
 async function checkForChanges(): Promise<void> {
-  // Get product IDs from config
-  const configPath = path.join(process.cwd(), "product-ids.json");
-  let productIds: string[] = [];
-  
-  try {
-    const fileContent = fs.readFileSync(configPath, "utf-8");
-    const config = JSON.parse(fileContent);
-    productIds = config.productIds || [];
-  } catch (error) {
-    console.error('[Background Monitor] Could not read product-ids.json');
-    return;
-  }
-
-  if (productIds.length === 0) {
-    console.error('[Background Monitor] No product IDs configured');
-    return;
-  }
+  // Monitored set = whatever is already in Supabase (middleware / location sync).
+  // product-ids.json is optional legacy; do not block when it is empty.
 
   // Get existing snapshots from Supabase
   const snapshotsResult = await getAllSnapshots();
-  
+
   if (!snapshotsResult.success || !snapshotsResult.snapshots) {
-    console.error('[Background Monitor] Failed to fetch snapshots from Supabase:', snapshotsResult.error);
+    const err = snapshotsResult.error || 'Unknown error';
+    console.error('[Background Monitor] Failed to fetch snapshots from Supabase:', err);
+    recordChangeDetectionResult({
+      changesDetected: 0,
+      syncedToSupabase: 0,
+      syncedToOpticon: 0,
+      error: err,
+    });
     return;
   }
 
@@ -113,6 +110,12 @@ async function checkForChanges(): Promise<void> {
   
   if (snapshots.length === 0) {
     console.log('[Background Monitor] No products in Supabase yet. Run initial sync first.');
+    recordChangeDetectionResult({
+      changesDetected: 0,
+      syncedToSupabase: 0,
+      syncedToOpticon: 0,
+      error: null,
+    });
     return;
   }
 
@@ -120,9 +123,10 @@ async function checkForChanges(): Promise<void> {
 
   let changesDetected = 0;
   let totalChanges = 0;
-  const allChanges = [];
+  const allChanges: any[] = [];
   const updatedSnapshots: any[] = []; // Store updated snapshots for auto-sync
 
+  try {
   // Check each product
   for (const snapshot of snapshots) {
     try {
@@ -172,6 +176,9 @@ async function checkForChanges(): Promise<void> {
     }
   }
 
+  let supabaseChangeRows = 0;
+  let opticonSynced = 0;
+
   // Save all detected changes
   if (allChanges.length > 0) {
     console.log(`\n[Background Monitor] 💾 Saving ${allChanges.length} change(s) to Supabase...`);
@@ -179,23 +186,49 @@ async function checkForChanges(): Promise<void> {
     
     if (saveResult.success) {
       console.log('[Background Monitor] ✓ Changes synced to Supabase successfully!');
+      supabaseChangeRows = allChanges.length;
       
       // AUTO-SYNC TO OPTICON with UPDATED snapshots
       console.log('[Background Monitor] 🔄 Auto-syncing changes to Opticon...');
-      await autoSyncToOpticon(allChanges, updatedSnapshots);
+      const { synced } = await autoSyncToOpticon(allChanges, updatedSnapshots);
+      opticonSynced = synced;
       
     } else {
       console.error('[Background Monitor] ✗ Failed to save changes:', saveResult.error);
+      recordChangeDetectionResult({
+        changesDetected: totalChanges,
+        syncedToSupabase: 0,
+        syncedToOpticon: 0,
+        error: saveResult.error || 'saveProductChanges failed',
+      });
+      return;
     }
   }
 
   console.log(`[Background Monitor] ✓ Check complete: ${changesDetected} product(s) changed, ${totalChanges} total change(s)\n`);
+
+  recordChangeDetectionResult({
+    changesDetected: totalChanges,
+    syncedToSupabase: supabaseChangeRows,
+    syncedToOpticon: opticonSynced,
+    error: null,
+  });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[Background Monitor] Unexpected error:', err);
+    recordChangeDetectionResult({
+      changesDetected: 0,
+      syncedToSupabase: 0,
+      syncedToOpticon: 0,
+      error: msg,
+    });
+  }
 }
 
 /**
  * Automatically sync changes to Opticon ESL
  */
-async function autoSyncToOpticon(changes: any[], snapshots: any[]): Promise<void> {
+async function autoSyncToOpticon(changes: any[], snapshots: any[]): Promise<{ synced: number; failed: number }> {
   let syncedCount = 0;
   let failedCount = 0;
 
@@ -262,6 +295,7 @@ async function autoSyncToOpticon(changes: any[], snapshots: any[]): Promise<void
   }
 
   console.log(`[Opticon Auto-Sync] Complete: ${syncedCount} synced, ${failedCount} failed\n`);
+  return { synced: syncedCount, failed: failedCount };
 }
 
 /**
