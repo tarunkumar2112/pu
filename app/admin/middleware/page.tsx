@@ -25,27 +25,6 @@ import {
 
 const BRAND_BLUE = "#1F2B44";
 
-/** UUIDs from Treez / Supabase / Opticon may differ by case — normalize for set lookups */
-function normalizeTreezId(id: string): string {
-  return String(id).trim().toLowerCase();
-}
-
-function treezProductIdFromRow(product: TreezProduct): string {
-  const p = product as Record<string, unknown>;
-  const raw =
-    p.id ??
-    p.product_id ??
-    p.productId ??
-    p.inventory_product_id ??
-    p.product_uuid;
-  return raw !== undefined && raw !== null ? String(raw) : "";
-}
-
-function opticonBarcodeFromRow(p: Record<string, unknown>): string {
-  const b = p.Barcode ?? p.barcode ?? p.BARCODE;
-  return b !== undefined && b !== null ? String(b) : "";
-}
-
 interface SyncStatus {
   productId: string;
   inSupabase: boolean;
@@ -166,13 +145,14 @@ export default function MiddlewarePage() {
       
       const supabaseProducts = new Set<string>();
       if (supabaseData.snapshots && Array.isArray(supabaseData.snapshots)) {
-        supabaseData.snapshots.forEach((s: { treez_product_id?: string; opticon_barcode?: string }) => {
-          if (s.treez_product_id) supabaseProducts.add(normalizeTreezId(String(s.treez_product_id)));
-          if (s.opticon_barcode) supabaseProducts.add(normalizeTreezId(String(s.opticon_barcode)));
+        supabaseData.snapshots.forEach((s: any) => {
+          if (s.treez_product_id) {
+            supabaseProducts.add(String(s.treez_product_id));
+          }
         });
       }
 
-      console.log('[Middleware] Supabase snapshot IDs (normalized):', supabaseProducts.size);
+      console.log('[Middleware] Supabase products count:', supabaseProducts.size);
 
       // Fetch all Opticon products
       const opticonRes = await fetch("/api/opticon/products");
@@ -182,20 +162,18 @@ export default function MiddlewarePage() {
       
       const opticonBarcodes = new Set<string>();
       if (opticonData.products && Array.isArray(opticonData.products)) {
-        opticonData.products.forEach((p: Record<string, unknown>) => {
-          const bc = opticonBarcodeFromRow(p);
-          if (bc) opticonBarcodes.add(normalizeTreezId(bc));
+        opticonData.products.forEach((p: any) => {
+          if (p.Barcode) {
+            opticonBarcodes.add(String(p.Barcode));
+          }
         });
       }
 
-      console.log('[Middleware] Opticon barcode IDs (normalized):', opticonBarcodes.size);
+      console.log('[Middleware] Opticon products count:', opticonBarcodes.size);
 
       // Check each product
       products.forEach((product) => {
-        const rawId = treezProductIdFromRow(product);
-        const productId = normalizeTreezId(rawId);
-        if (!productId) return;
-
+        const productId = String(product.id || product.product_id || product.productId || "");
         const inSupabase = supabaseProducts.has(productId);
         const inOpticon = opticonBarcodes.has(productId);
 
@@ -204,7 +182,7 @@ export default function MiddlewarePage() {
         else if (inSupabase || inOpticon) status = "partial";
 
         statuses.set(productId, {
-          productId: rawId || productId,
+          productId,
           inSupabase,
           inOpticon,
           status,
@@ -222,21 +200,13 @@ export default function MiddlewarePage() {
 
   // Upload single product to both Supabase and Opticon
   const uploadProduct = async (product: TreezProduct, index: number): Promise<boolean> => {
-    const rawId = treezProductIdFromRow(product).trim();
-    const mapKey = normalizeTreezId(rawId);
-    if (!mapKey) return false;
-    const treezUuid = rawId || mapKey;
-
+    const productId = String(product.id || product.product_id || product.productId || "");
+    
     // Update status to uploading
     setSyncStatuses(prev => {
       const updated = new Map(prev);
-      const current = updated.get(mapKey) || {
-        productId: treezUuid,
-        inSupabase: false,
-        inOpticon: false,
-        status: "new" as const,
-      };
-      updated.set(mapKey, { ...current, uploading: true });
+      const current = updated.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "new" as const };
+      updated.set(productId, { ...current, uploading: true });
       return updated;
     });
 
@@ -253,7 +223,7 @@ export default function MiddlewarePage() {
       const opticonProduct = {
         NotUsed: "",
         ProductId: String(index + 1),
-        Barcode: treezUuid,
+        Barcode: productId, // Treez UUID
         Description: String(cfg?.name || product.name || ""),
         Group: String(product.category_type || product.category || ""),
         StandardPrice: String(price),
@@ -273,8 +243,8 @@ export default function MiddlewarePage() {
 
       // 2. Upload to Supabase (snapshot)
       const snapshot = {
-        treez_product_id: treezUuid,
-        opticon_barcode: treezUuid,
+        treez_product_id: productId,
+        opticon_barcode: productId,
         product_name: String(cfg?.name || product.name || ""),
         category: String(product.category_type || product.category || ""),
         price: price,
@@ -293,13 +263,13 @@ export default function MiddlewarePage() {
         throw new Error(`Supabase upload failed: ${errorData.error || 'Unknown error'}`);
       }
 
-      console.log(`✓ Uploaded ${treezUuid} to both Opticon and Supabase`);
+      console.log(`✓ Uploaded ${productId} to both Opticon and Supabase`);
 
       // Update status to success
       setSyncStatuses(prev => {
         const updated = new Map(prev);
-        updated.set(mapKey, {
-          productId: treezUuid,
+        updated.set(productId, {
+          productId,
           inSupabase: true,
           inOpticon: true,
           status: "synced" as const,
@@ -311,18 +281,13 @@ export default function MiddlewarePage() {
 
       return true;
     } catch (error) {
-      console.error(`Upload failed for ${treezUuid}:`, error);
+      console.error(`Upload failed for ${productId}:`, error);
       
       // Update status to error
       setSyncStatuses(prev => {
         const updated = new Map(prev);
-        const current = updated.get(mapKey) || {
-          productId: treezUuid,
-          inSupabase: false,
-          inOpticon: false,
-          status: "new" as const,
-        };
-        updated.set(mapKey, {
+        const current = updated.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "new" as const };
+        updated.set(productId, {
           ...current,
           uploading: false,
           uploadError: error instanceof Error ? error.message : "Upload failed",
@@ -340,9 +305,8 @@ export default function MiddlewarePage() {
     
     // Get all products that need uploading (new OR partial)
     const productsToUpload = products.filter((p) => {
-      const mapKey = normalizeTreezId(treezProductIdFromRow(p));
-      if (!mapKey) return false;
-      const status = syncStatuses.get(mapKey);
+      const productId = String(p.id || p.product_id || p.productId || "");
+      const status = syncStatuses.get(productId);
       return status?.status === "new" || status?.status === "partial";
     });
 
@@ -827,18 +791,11 @@ export default function MiddlewarePage() {
               <tbody>
                 {filteredProducts.map((product, index) => {
                   const d = getProductDisplay(product);
-                  const rawTreezId = treezProductIdFromRow(product);
-                  const mapKey = normalizeTreezId(rawTreezId);
-                  const rowId = rawTreezId.trim() || mapKey;
-                  const status = syncStatuses.get(mapKey) || {
-                    productId: rowId,
-                    inSupabase: false,
-                    inOpticon: false,
-                    status: "checking" as const,
-                  };
+                  const productId = String(product.id || product.product_id || product.productId || "");
+                  const status = syncStatuses.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "checking" as const };
 
                   return (
-                    <tr key={mapKey || rowId} className="border-b border-zinc-100 hover:bg-zinc-50">
+                    <tr key={productId} className="border-b border-zinc-100 hover:bg-zinc-50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-zinc-900">{d.name}</div>
                         <div className="text-xs text-zinc-500 font-mono">{d.sku}</div>
