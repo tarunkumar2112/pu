@@ -49,16 +49,36 @@ export default function MiddlewarePage() {
       // Fetch all Supabase snapshots
       const supabaseRes = await fetch("/api/products/sync-snapshot");
       const supabaseData = await supabaseRes.json();
-      const supabaseProducts = new Set(
-        (supabaseData.snapshots || []).map((s: any) => s.treez_product_id)
-      );
+      
+      console.log('[Middleware] Supabase response:', supabaseData);
+      
+      const supabaseProducts = new Set<string>();
+      if (supabaseData.snapshots && Array.isArray(supabaseData.snapshots)) {
+        supabaseData.snapshots.forEach((s: any) => {
+          if (s.treez_product_id) {
+            supabaseProducts.add(String(s.treez_product_id));
+          }
+        });
+      }
+
+      console.log('[Middleware] Supabase products count:', supabaseProducts.size);
 
       // Fetch all Opticon products
       const opticonRes = await fetch("/api/opticon/products");
       const opticonData = await opticonRes.json();
-      const opticonBarcodes = new Set(
-        (opticonData.products || []).map((p: any) => p.Barcode)
-      );
+      
+      console.log('[Middleware] Opticon response:', opticonData);
+      
+      const opticonBarcodes = new Set<string>();
+      if (opticonData.products && Array.isArray(opticonData.products)) {
+        opticonData.products.forEach((p: any) => {
+          if (p.Barcode) {
+            opticonBarcodes.add(String(p.Barcode));
+          }
+        });
+      }
+
+      console.log('[Middleware] Opticon products count:', opticonBarcodes.size);
 
       // Check each product
       products.forEach((product) => {
@@ -78,6 +98,7 @@ export default function MiddlewarePage() {
         });
       });
 
+      console.log('[Middleware] Status check complete. Statuses:', statuses.size);
       setSyncStatuses(statuses);
     } catch (error) {
       console.error("Error checking sync status:", error);
@@ -340,12 +361,13 @@ export default function MiddlewarePage() {
             disabled={uploadingAll || stats.new === 0}
             className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
             style={{ backgroundColor: "#10b981" }}
+            title="Upload ONLY products that don't exist in Supabase OR Opticon"
           >
             <div className="relative z-10">
               <div className="text-3xl mb-2">🆕</div>
-              <div>Upload NEW Products</div>
+              <div>Upload NEW Products ONLY</div>
               <div className="text-sm font-normal opacity-90 mt-1">
-                {stats.new} products ready
+                {stats.new} products (Not in DB/Opticon)
               </div>
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -356,12 +378,13 @@ export default function MiddlewarePage() {
             disabled={uploadingAll || (stats.new + stats.partial) === 0}
             className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
             style={{ backgroundColor: "#f59e0b" }}
+            title="Upload NEW products + products that exist in only ONE system (Supabase OR Opticon, not both)"
           >
             <div className="relative z-10">
               <div className="text-3xl mb-2">⚠️</div>
               <div>Upload NEW + PARTIAL</div>
               <div className="text-sm font-normal opacity-90 mt-1">
-                {stats.new + stats.partial} products ready
+                {stats.new + stats.partial} products (Missing from 1+ system)
               </div>
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -386,12 +409,22 @@ export default function MiddlewarePage() {
           <div className="flex items-start gap-3">
             <div className="text-2xl">ℹ️</div>
             <div className="flex-1 text-sm text-zinc-700">
+              <p className="font-semibold mb-2">Button Differences:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div className="bg-emerald-50 border border-emerald-200 rounded p-2">
+                  <p className="font-semibold text-emerald-800">🆕 NEW Products ONLY:</p>
+                  <p className="text-xs text-emerald-700">Products that exist in <strong>neither</strong> Supabase <strong>nor</strong> Opticon</p>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded p-2">
+                  <p className="font-semibold text-amber-800">⚠️ NEW + PARTIAL:</p>
+                  <p className="text-xs text-amber-700">NEW products + products in <strong>only one system</strong> (e.g., in Supabase but not Opticon)</p>
+                </div>
+              </div>
               <p className="font-semibold mb-1">How it works:</p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Products are uploaded to <strong>both Opticon and Supabase</strong> simultaneously</li>
-                <li>Treez UUID is stored as <strong>Barcode in Opticon</strong> for identification</li>
-                <li>Already synced products are <strong>automatically skipped</strong></li>
-                <li>Progress is shown in real-time with batch processing</li>
+              <ul className="space-y-1 list-disc list-inside text-xs">
+                <li>Uploads to <strong>both Opticon and Supabase</strong> simultaneously</li>
+                <li>Treez UUID stored as <strong>Barcode in Opticon</strong></li>
+                <li>Already fully synced products are <strong>skipped</strong></li>
               </ul>
             </div>
           </div>
