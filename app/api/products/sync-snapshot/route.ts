@@ -1,8 +1,31 @@
 import { NextResponse } from "next/server";
 import { fetchTreezProductById } from "@/lib/treez";
-import { extractProductSnapshot, saveProductSnapshot } from "@/lib/change-detector";
+import { extractProductSnapshot, saveProductSnapshot, getAllSnapshots } from "@/lib/change-detector";
 import fs from "fs";
 import path from "path";
+
+/**
+ * GET /api/products/sync-snapshot
+ * Fetch all product snapshots from Supabase
+ */
+export async function GET() {
+  try {
+    const snapshots = await getAllSnapshots();
+    
+    return NextResponse.json({
+      success: true,
+      snapshots: snapshots,
+      total: snapshots.length,
+    });
+  } catch (error) {
+    console.error('[Sync Snapshot GET] Error:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch snapshots",
+      snapshots: [],
+    }, { status: 500 });
+  }
+}
 
 /**
  * Sync products from product-ids.json to Supabase
