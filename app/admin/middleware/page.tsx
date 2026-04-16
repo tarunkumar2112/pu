@@ -174,13 +174,18 @@ export default function MiddlewarePage() {
         unit: String(cfg?.size_unit || "EA"),
       };
 
-      const supabaseRes = await fetch("/api/products/sync-snapshot", {
+      const supabaseRes = await fetch("/api/products/upload-snapshot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: snapshot }),
+        body: JSON.stringify({ snapshot }),
       });
 
-      if (!supabaseRes.ok) throw new Error("Supabase upload failed");
+      if (!supabaseRes.ok) {
+        const errorData = await supabaseRes.json();
+        throw new Error(`Supabase upload failed: ${errorData.error || 'Unknown error'}`);
+      }
+
+      console.log(`✓ Uploaded ${productId} to both Opticon and Supabase`);
 
       // Update status to success
       setSyncStatuses(prev => {
@@ -216,16 +221,14 @@ export default function MiddlewarePage() {
     }
   };
 
-  // Upload all new/partial products
-  const uploadAllProducts = async (onlyNew: boolean = false) => {
+  // Upload all products that need syncing (smart detection)
+  const uploadAllProducts = async () => {
     setUploadingAll(true);
     
+    // Get all products that need uploading (new OR partial)
     const productsToUpload = products.filter((p) => {
       const productId = String(p.id || p.product_id || p.productId || "");
       const status = syncStatuses.get(productId);
-      if (onlyNew) {
-        return status?.status === "new";
-      }
       return status?.status === "new" || status?.status === "partial";
     });
 
@@ -234,11 +237,14 @@ export default function MiddlewarePage() {
     for (let i = 0; i < productsToUpload.length; i++) {
       await uploadProduct(productsToUpload[i], i);
       setUploadProgress({ current: i + 1, total: productsToUpload.length });
-      await new Promise(resolve => setTimeout(resolve, 300)); // Small delay between uploads
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
 
     setUploadingAll(false);
     setUploadProgress({ current: 0, total: 0 });
+    
+    // Re-check status after upload
+    setTimeout(() => checkSyncStatus(), 1000);
   };
 
   useEffect(() => {
@@ -358,63 +364,48 @@ export default function MiddlewarePage() {
         </div>
       )}
 
-      {/* Action Buttons - PROMINENT */}
+      {/* Action Buttons - SINGLE SMART BUTTON */}
       <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-emerald-50 rounded-2xl border-2 border-blue-300 p-8 shadow-lg">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-2xl font-bold text-zinc-900 mb-2">Upload Products to Opticon + Supabase</h3>
-            <p className="text-zinc-600">Bulk sync products to both systems simultaneously</p>
+            <h3 className="text-2xl font-bold text-zinc-900 mb-2">Smart Sync Control</h3>
+            <p className="text-zinc-600">Intelligent sync to both Opticon + Supabase simultaneously</p>
           </div>
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
             <Zap className="w-8 h-8 text-white" />
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={() => uploadAllProducts(true)}
-            disabled={uploadingAll || stats.new === 0}
-            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
+            onClick={uploadAllProducts}
+            disabled={uploadingAll || (stats.new + stats.partial) === 0}
+            className="group relative overflow-hidden rounded-xl px-10 py-8 text-lg font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
             style={{ backgroundColor: "#10b981" }}
-            title="Upload ONLY products that don't exist in Supabase OR Opticon"
           >
             <div className="relative z-10">
-              <Sparkles className="w-8 h-8 mx-auto mb-2" />
-              <div>Upload NEW Products ONLY</div>
-              <div className="text-sm font-normal opacity-90 mt-1">
-                {stats.new} products (Not in DB/Opticon)
+              <Upload className="w-12 h-12 mx-auto mb-3" />
+              <div className="mb-2">Smart Upload All</div>
+              <div className="text-sm font-normal opacity-90">
+                {stats.new + stats.partial} products need syncing
+              </div>
+              <div className="text-xs font-normal opacity-80 mt-1">
+                Auto-detects missing from Supabase or Opticon
               </div>
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
 
           <button
-            onClick={() => uploadAllProducts(false)}
-            disabled={uploadingAll || (stats.new + stats.partial) === 0}
-            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
-            style={{ backgroundColor: "#f59e0b" }}
-            title="Upload NEW products + products that exist in only ONE system (Supabase OR Opticon, not both)"
-          >
-            <div className="relative z-10">
-              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-              <div>Upload NEW + PARTIAL</div>
-              <div className="text-sm font-normal opacity-90 mt-1">
-                {stats.new + stats.partial} products (Missing from 1+ system)
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-
-          <button
             onClick={fetchProducts}
             disabled={loading || uploadingAll}
-            className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-zinc-700 bg-white border-2 border-zinc-300 transition-all disabled:opacity-50 hover:scale-105 hover:shadow-xl hover:border-zinc-400"
+            className="group relative overflow-hidden rounded-xl px-10 py-8 text-lg font-bold text-zinc-700 bg-white border-2 border-zinc-300 transition-all disabled:opacity-50 hover:scale-105 hover:shadow-xl hover:border-zinc-400"
           >
             <div className="relative z-10">
-              <RefreshCw className="w-8 h-8 mx-auto mb-2" />
-              <div>Refresh from Treez</div>
-              <div className="text-sm font-normal opacity-70 mt-1">
-                Get latest products
+              <RefreshCw className="w-12 h-12 mx-auto mb-3" />
+              <div className="mb-2">Refresh from Treez</div>
+              <div className="text-sm font-normal opacity-70">
+                Get latest product data
               </div>
             </div>
           </button>
@@ -424,36 +415,23 @@ export default function MiddlewarePage() {
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1 text-sm text-zinc-700">
-              <p className="font-semibold mb-2">Button Differences:</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                <div className="bg-emerald-50 border border-emerald-200 rounded p-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
-                    <p className="font-semibold text-emerald-800">NEW Products ONLY:</p>
-                  </div>
-                  <p className="text-xs text-emerald-700">Products that exist in <strong>neither</strong> Supabase <strong>nor</strong> Opticon</p>
-                </div>
-                <div className="bg-amber-50 border border-amber-200 rounded p-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <AlertCircle className="w-4 h-4 text-amber-600" />
-                    <p className="font-semibold text-amber-800">NEW + PARTIAL:</p>
-                  </div>
-                  <p className="text-xs text-amber-700">NEW products + products in <strong>only one system</strong> (e.g., in Supabase but not Opticon)</p>
-                </div>
-              </div>
-              <p className="font-semibold mb-1">How it works:</p>
+              <p className="font-semibold mb-2">How Smart Upload Works:</p>
               <ul className="space-y-1 text-xs">
                 <li className="flex items-start gap-2">
-                  <Upload className="w-3 h-3 flex-shrink-0 mt-0.5" />
-                  <span>Uploads to <strong>both Opticon and Supabase</strong> simultaneously</span>
+                  <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
+                  <span><strong>Auto-detects</strong> products missing from Supabase OR Opticon</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Database className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <Upload className="w-3 h-3 flex-shrink-0 mt-0.5 text-blue-600" />
+                  <span>Uploads to <strong>both systems simultaneously</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Database className="w-3 h-3 flex-shrink-0 mt-0.5 text-purple-600" />
                   <span>Treez UUID stored as <strong>Barcode in Opticon</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5" />
-                  <span>Already fully synced products are <strong>skipped</strong></span>
+                  <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
+                  <span>Already synced products are <strong>automatically skipped</strong></span>
                 </li>
               </ul>
             </div>

@@ -33,8 +33,9 @@ export async function startBackgroundChangeDetection() {
     const cron = await import('node-cron');
     
     console.log('\n🚀 [Background Monitor] Starting automatic change detection (1 minute interval)');
+    console.log('🆕 [Auto-Sync] Starting automatic new product detection (5 minute interval)');
     
-    // Run every 1 minute
+    // Run change detection every 1 minute
     cron.schedule('*/1 * * * *', async () => {
       if (isJobRunning) {
         console.log('[Background Monitor] ⏭ Skipping - previous job still running');
@@ -53,10 +54,23 @@ export async function startBackgroundChangeDetection() {
       }
     });
 
+    // Run auto-sync every 5 minutes
+    cron.schedule('*/5 * * * *', async () => {
+      try {
+        console.log('\n🔄 [Auto-Sync] Running scheduled sync check...');
+        const response = await fetch('http://localhost:3000/api/auto-sync');
+        const data = await response.json();
+        console.log('[Auto-Sync] Result:', data);
+      } catch (error) {
+        console.error('[Auto-Sync] ✗ Error:', error);
+      }
+    });
+
     cronInitialized = true;
     
     console.log('✅ [Background Monitor] Cron job scheduled successfully');
-    console.log('   - Checking every 1 minute');
+    console.log('   - Change detection: every 1 minute');
+    console.log('   - Auto-sync new products: every 5 minutes');
     console.log('   - Works even when monitor page is closed');
     console.log('   - Changes will be synced to Supabase automatically\n');
     
