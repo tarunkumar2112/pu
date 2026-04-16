@@ -2,6 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { TreezProduct, getProductDisplay } from "@/lib/treez";
+import { 
+  Package, 
+  CheckCircle2, 
+  AlertCircle, 
+  Sparkles, 
+  Zap,
+  RefreshCw,
+  Info,
+  Upload,
+  Database,
+  Smartphone,
+  Loader2
+} from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
 
@@ -284,8 +297,8 @@ export default function MiddlewarePage() {
               <p className="text-sm font-medium text-blue-600">Total Products</p>
               <p className="text-3xl font-bold text-blue-900 mt-1">{stats.total}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-2xl">
-              📦
+            <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center">
+              <Package className="w-6 h-6 text-blue-700" />
             </div>
           </div>
         </div>
@@ -296,8 +309,8 @@ export default function MiddlewarePage() {
               <p className="text-sm font-medium text-emerald-600">Fully Synced</p>
               <p className="text-3xl font-bold text-emerald-900 mt-1">{stats.synced}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-emerald-200 flex items-center justify-center text-2xl">
-              ✓
+            <div className="w-12 h-12 rounded-full bg-emerald-200 flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-emerald-700" />
             </div>
           </div>
         </div>
@@ -308,8 +321,8 @@ export default function MiddlewarePage() {
               <p className="text-sm font-medium text-amber-600">New in Treez</p>
               <p className="text-3xl font-bold text-amber-900 mt-1">{stats.new}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center text-2xl">
-              🆕
+            <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-amber-700" />
             </div>
           </div>
         </div>
@@ -320,8 +333,8 @@ export default function MiddlewarePage() {
               <p className="text-sm font-medium text-purple-600">Partial Sync</p>
               <p className="text-3xl font-bold text-purple-900 mt-1">{stats.partial}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center text-2xl">
-              ⚠️
+            <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-purple-700" />
             </div>
           </div>
         </div>
@@ -352,7 +365,9 @@ export default function MiddlewarePage() {
             <h3 className="text-2xl font-bold text-zinc-900 mb-2">Upload Products to Opticon + Supabase</h3>
             <p className="text-zinc-600">Bulk sync products to both systems simultaneously</p>
           </div>
-          <div className="text-6xl">⚡</div>
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <Zap className="w-8 h-8 text-white" />
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -364,7 +379,7 @@ export default function MiddlewarePage() {
             title="Upload ONLY products that don't exist in Supabase OR Opticon"
           >
             <div className="relative z-10">
-              <div className="text-3xl mb-2">🆕</div>
+              <Sparkles className="w-8 h-8 mx-auto mb-2" />
               <div>Upload NEW Products ONLY</div>
               <div className="text-sm font-normal opacity-90 mt-1">
                 {stats.new} products (Not in DB/Opticon)
@@ -381,7 +396,7 @@ export default function MiddlewarePage() {
             title="Upload NEW products + products that exist in only ONE system (Supabase OR Opticon, not both)"
           >
             <div className="relative z-10">
-              <div className="text-3xl mb-2">⚠️</div>
+              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
               <div>Upload NEW + PARTIAL</div>
               <div className="text-sm font-normal opacity-90 mt-1">
                 {stats.new + stats.partial} products (Missing from 1+ system)
@@ -396,7 +411,7 @@ export default function MiddlewarePage() {
             className="group relative overflow-hidden rounded-xl px-8 py-6 text-base font-bold text-zinc-700 bg-white border-2 border-zinc-300 transition-all disabled:opacity-50 hover:scale-105 hover:shadow-xl hover:border-zinc-400"
           >
             <div className="relative z-10">
-              <div className="text-3xl mb-2">🔄</div>
+              <RefreshCw className="w-8 h-8 mx-auto mb-2" />
               <div>Refresh from Treez</div>
               <div className="text-sm font-normal opacity-70 mt-1">
                 Get latest products
@@ -407,24 +422,39 @@ export default function MiddlewarePage() {
 
         <div className="mt-6 bg-white/80 backdrop-blur rounded-lg p-4 border border-blue-200">
           <div className="flex items-start gap-3">
-            <div className="text-2xl">ℹ️</div>
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1 text-sm text-zinc-700">
               <p className="font-semibold mb-2">Button Differences:</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div className="bg-emerald-50 border border-emerald-200 rounded p-2">
-                  <p className="font-semibold text-emerald-800">🆕 NEW Products ONLY:</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <p className="font-semibold text-emerald-800">NEW Products ONLY:</p>
+                  </div>
                   <p className="text-xs text-emerald-700">Products that exist in <strong>neither</strong> Supabase <strong>nor</strong> Opticon</p>
                 </div>
                 <div className="bg-amber-50 border border-amber-200 rounded p-2">
-                  <p className="font-semibold text-amber-800">⚠️ NEW + PARTIAL:</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <p className="font-semibold text-amber-800">NEW + PARTIAL:</p>
+                  </div>
                   <p className="text-xs text-amber-700">NEW products + products in <strong>only one system</strong> (e.g., in Supabase but not Opticon)</p>
                 </div>
               </div>
               <p className="font-semibold mb-1">How it works:</p>
-              <ul className="space-y-1 list-disc list-inside text-xs">
-                <li>Uploads to <strong>both Opticon and Supabase</strong> simultaneously</li>
-                <li>Treez UUID stored as <strong>Barcode in Opticon</strong></li>
-                <li>Already fully synced products are <strong>skipped</strong></li>
+              <ul className="space-y-1 text-xs">
+                <li className="flex items-start gap-2">
+                  <Upload className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <span>Uploads to <strong>both Opticon and Supabase</strong> simultaneously</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Database className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <span>Already fully synced products are <strong>skipped</strong></span>
+                </li>
               </ul>
             </div>
           </div>
@@ -453,11 +483,15 @@ export default function MiddlewarePage() {
       {/* Products Table */}
       <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
         {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300" style={{ borderTopColor: BRAND_BLUE }} />
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+            <p className="text-sm text-zinc-600">Loading products...</p>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="py-24 text-center text-zinc-500">No products found</div>
+          <div className="flex flex-col items-center justify-center py-24 text-zinc-500">
+            <Package className="w-12 h-12 mb-3 opacity-30" />
+            <p>No products found</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">

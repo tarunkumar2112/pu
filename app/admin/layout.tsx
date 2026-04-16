@@ -3,15 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { 
+  LayoutDashboard, 
+  Zap, 
+  Eye, 
+  Smartphone,
+  CircleUser
+} from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
 const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "◉", group: "main" },
-  { href: "/admin/middleware", label: "Sync Middleware", icon: "⚡", group: "main", highlight: true },
-  { href: "/admin/treez/monitor", label: "Change Monitor", icon: "🔔", group: "monitor" },
-  { href: "/admin/opticon", label: "Opticon Products", icon: "📱", group: "opticon" },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "main" },
+  { href: "/admin/middleware", label: "Sync Middleware", icon: Zap, group: "main", highlight: true },
+  { href: "/admin/treez/monitor", label: "Change Monitor", icon: Eye, group: "monitor" },
+  { href: "/admin/opticon", label: "Opticon Products", icon: Smartphone, group: "opticon" },
 ];
 
 const hiddenNavItems = [
@@ -63,6 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="space-y-1">
                 {items.map((item) => {
                   const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
                   return (
                     <Link
                       key={item.href}
@@ -75,9 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
                       }`}
                     >
-                      <span className={`text-lg ${isActive ? 'opacity-100' : 'opacity-70'}`}>
-                        {item.icon}
-                      </span>
+                      <Icon className={`w-5 h-5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                       <span>{item.label}</span>
                       {item.highlight && !isActive && (
                         <span className="ml-auto text-xs font-semibold text-emerald-600 bg-emerald-200 px-2 py-0.5 rounded-full">
@@ -95,8 +101,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Footer */}
         <div className="border-t border-zinc-200 bg-gradient-to-r from-zinc-50 to-white px-4 py-4">
           <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm">
-              PU
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white">
+              <CircleUser className="w-5 h-5" />
             </div>
             <div className="flex-1">
               <p className="text-xs font-semibold text-zinc-900">Perfect Union</p>

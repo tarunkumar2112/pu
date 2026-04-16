@@ -10,7 +10,8 @@ import path from "path";
  */
 export async function GET() {
   try {
-    const snapshots = await getAllSnapshots();
+    const result = await getAllSnapshots();
+    const snapshots = Array.isArray(result) ? result : [];
     
     return NextResponse.json({
       success: true,
