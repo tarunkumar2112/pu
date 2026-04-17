@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TreezProduct, getProductDisplay } from "@/lib/treez";
+import {
+  TreezProduct,
+  getProductDisplay,
+  getTreezProductListId,
+  normalizeTreezProductId,
+} from "@/lib/treez";
 import {
   Package,
   CheckCircle2,
@@ -86,6 +91,11 @@ export default function MiddlewarePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
+  const [syncMeta, setSyncMeta] = useState<{
+    supabaseSnapshotRows: number;
+    opticonBarcodeCount: number;
+    supabaseError?: string;
+  } | null>(null);
 
   const webhookUrl =
     typeof window !== "undefined"
@@ -140,56 +150,75 @@ export default function MiddlewarePage() {
       // Fetch all Supabase snapshots
       const supabaseRes = await fetch("/api/products/sync-snapshot");
       const supabaseData = await supabaseRes.json();
-      
-      console.log('[Middleware] Supabase response:', supabaseData);
-      
+
+      console.log("[Middleware] Supabase response:", supabaseData);
+
       const supabaseProducts = new Set<string>();
       if (supabaseData.snapshots && Array.isArray(supabaseData.snapshots)) {
-        supabaseData.snapshots.forEach((s: any) => {
-          if (s.treez_product_id) {
-            supabaseProducts.add(String(s.treez_product_id));
-          }
+        supabaseData.snapshots.forEach((s: { treez_product_id?: string; opticon_barcode?: string }) => {
+          const tid = normalizeTreezProductId(s.treez_product_id);
+          const ob = normalizeTreezProductId(s.opticon_barcode);
+          if (tid) supabaseProducts.add(tid);
+          if (ob) supabaseProducts.add(ob);
         });
       }
 
-      console.log('[Middleware] Supabase products count:', supabaseProducts.size);
+      const supabaseError =
+        !supabaseRes.ok || supabaseData.success === false
+          ? String(supabaseData.error || `Supabase snapshots HTTP ${supabaseRes.status}`)
+          : undefined;
+      if (supabaseError) {
+        console.error("[Middleware] Supabase snapshot fetch failed:", supabaseError);
+      }
+
+      console.log("[Middleware] Supabase id keys (normalized):", supabaseProducts.size);
 
       // Fetch all Opticon products
       const opticonRes = await fetch("/api/opticon/products");
       const opticonData = await opticonRes.json();
-      
-      console.log('[Middleware] Opticon response:', opticonData);
-      
+
+      console.log("[Middleware] Opticon response:", opticonData);
+
       const opticonBarcodes = new Set<string>();
       if (opticonData.products && Array.isArray(opticonData.products)) {
-        opticonData.products.forEach((p: any) => {
-          if (p.Barcode) {
-            opticonBarcodes.add(String(p.Barcode));
-          }
+        opticonData.products.forEach((p: Record<string, unknown>) => {
+          const raw = p.Barcode ?? p.barcode ?? p.BARCODE;
+          if (raw === undefined || raw === null) return;
+          const n = normalizeTreezProductId(String(raw));
+          if (n) opticonBarcodes.add(n);
         });
       }
 
-      console.log('[Middleware] Opticon products count:', opticonBarcodes.size);
+      console.log("[Middleware] Opticon barcode keys (normalized):", opticonBarcodes.size);
 
-      // Check each product
+      setSyncMeta({
+        supabaseSnapshotRows: Number(supabaseData.total ?? supabaseData.snapshots?.length ?? 0),
+        opticonBarcodeCount: opticonBarcodes.size,
+        supabaseError,
+      });
+
+      // Check each product (map key = normalized Treez inventory id)
       products.forEach((product) => {
-        const productId = String(product.id || product.product_id || product.productId || "");
-        const inSupabase = supabaseProducts.has(productId);
-        const inOpticon = opticonBarcodes.has(productId);
+        const rawId = getTreezProductListId(product).trim();
+        const mapKey = normalizeTreezProductId(rawId);
+        if (!mapKey) return;
+
+        const inSupabase = supabaseProducts.has(mapKey);
+        const inOpticon = opticonBarcodes.has(mapKey);
 
         let status: "synced" | "new" | "partial" = "new";
         if (inSupabase && inOpticon) status = "synced";
         else if (inSupabase || inOpticon) status = "partial";
 
-        statuses.set(productId, {
-          productId,
+        statuses.set(mapKey, {
+          productId: rawId || mapKey,
           inSupabase,
           inOpticon,
           status,
         });
       });
 
-      console.log('[Middleware] Status check complete. Statuses:', statuses.size);
+      console.log("[Middleware] Status check complete. Statuses:", statuses.size);
       setSyncStatuses(statuses);
     } catch (error) {
       console.error("Error checking sync status:", error);
@@ -200,13 +229,21 @@ export default function MiddlewarePage() {
 
   // Upload single product to both Supabase and Opticon
   const uploadProduct = async (product: TreezProduct, index: number): Promise<boolean> => {
-    const productId = String(product.id || product.product_id || product.productId || "");
-    
+    const rawId = getTreezProductListId(product).trim();
+    const mapKey = normalizeTreezProductId(rawId);
+    if (!mapKey) return false;
+    const treezUuid = rawId || mapKey;
+
     // Update status to uploading
-    setSyncStatuses(prev => {
+    setSyncStatuses((prev) => {
       const updated = new Map(prev);
-      const current = updated.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "new" as const };
-      updated.set(productId, { ...current, uploading: true });
+      const current = updated.get(mapKey) || {
+        productId: treezUuid,
+        inSupabase: false,
+        inOpticon: false,
+        status: "new" as const,
+      };
+      updated.set(mapKey, { ...current, uploading: true });
       return updated;
     });
 
@@ -223,7 +260,7 @@ export default function MiddlewarePage() {
       const opticonProduct = {
         NotUsed: "",
         ProductId: String(index + 1),
-        Barcode: productId, // Treez UUID
+        Barcode: treezUuid,
         Description: String(cfg?.name || product.name || ""),
         Group: String(product.category_type || product.category || ""),
         StandardPrice: String(price),
@@ -243,8 +280,8 @@ export default function MiddlewarePage() {
 
       // 2. Upload to Supabase (snapshot)
       const snapshot = {
-        treez_product_id: productId,
-        opticon_barcode: productId,
+        treez_product_id: treezUuid,
+        opticon_barcode: treezUuid,
         product_name: String(cfg?.name || product.name || ""),
         category: String(product.category_type || product.category || ""),
         price: price,
@@ -263,13 +300,13 @@ export default function MiddlewarePage() {
         throw new Error(`Supabase upload failed: ${errorData.error || 'Unknown error'}`);
       }
 
-      console.log(`✓ Uploaded ${productId} to both Opticon and Supabase`);
+      console.log(`✓ Uploaded ${treezUuid} to both Opticon and Supabase`);
 
       // Update status to success
-      setSyncStatuses(prev => {
+      setSyncStatuses((prev) => {
         const updated = new Map(prev);
-        updated.set(productId, {
-          productId,
+        updated.set(mapKey, {
+          productId: treezUuid,
           inSupabase: true,
           inOpticon: true,
           status: "synced" as const,
@@ -281,13 +318,18 @@ export default function MiddlewarePage() {
 
       return true;
     } catch (error) {
-      console.error(`Upload failed for ${productId}:`, error);
-      
+      console.error(`Upload failed for ${treezUuid}:`, error);
+
       // Update status to error
-      setSyncStatuses(prev => {
+      setSyncStatuses((prev) => {
         const updated = new Map(prev);
-        const current = updated.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "new" as const };
-        updated.set(productId, {
+        const current = updated.get(mapKey) || {
+          productId: treezUuid,
+          inSupabase: false,
+          inOpticon: false,
+          status: "new" as const,
+        };
+        updated.set(mapKey, {
           ...current,
           uploading: false,
           uploadError: error instanceof Error ? error.message : "Upload failed",
@@ -305,8 +347,9 @@ export default function MiddlewarePage() {
     
     // Get all products that need uploading (new OR partial)
     const productsToUpload = products.filter((p) => {
-      const productId = String(p.id || p.product_id || p.productId || "");
-      const status = syncStatuses.get(productId);
+      const mapKey = normalizeTreezProductId(getTreezProductListId(p));
+      if (!mapKey) return false;
+      const status = syncStatuses.get(mapKey);
       return status?.status === "new" || status?.status === "partial";
     });
 
@@ -648,6 +691,18 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
+      {syncMeta ? (
+        <p className="text-xs text-zinc-500">
+          Last compare: {syncMeta.supabaseSnapshotRows.toLocaleString()} Supabase snapshot row
+          {syncMeta.supabaseSnapshotRows === 1 ? "" : "s"},{" "}
+          {syncMeta.opticonBarcodeCount.toLocaleString()} Opticon barcode
+          {syncMeta.opticonBarcodeCount === 1 ? "" : "s"}.
+          {syncMeta.supabaseError ? (
+            <span className="ml-2 font-medium text-red-600">Supabase load failed — counts may be wrong.</span>
+          ) : null}
+        </p>
+      ) : null}
+
       {/* Upload Progress */}
       {uploadingAll && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
@@ -791,11 +846,18 @@ export default function MiddlewarePage() {
               <tbody>
                 {filteredProducts.map((product, index) => {
                   const d = getProductDisplay(product);
-                  const productId = String(product.id || product.product_id || product.productId || "");
-                  const status = syncStatuses.get(productId) || { productId, inSupabase: false, inOpticon: false, status: "checking" as const };
+                  const rawTreezId = getTreezProductListId(product);
+                  const mapKey = normalizeTreezProductId(rawTreezId);
+                  const rowId = rawTreezId.trim() || mapKey;
+                  const status = syncStatuses.get(mapKey) || {
+                    productId: rowId,
+                    inSupabase: false,
+                    inOpticon: false,
+                    status: "checking" as const,
+                  };
 
                   return (
-                    <tr key={productId} className="border-b border-zinc-100 hover:bg-zinc-50">
+                    <tr key={mapKey || rowId} className="border-b border-zinc-100 hover:bg-zinc-50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-zinc-900">{d.name}</div>
                         <div className="text-xs text-zinc-500 font-mono">{d.sku}</div>

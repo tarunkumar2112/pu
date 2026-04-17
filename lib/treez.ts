@@ -18,6 +18,53 @@ export interface TreezTokenResponse {
   expires_in: number;
 }
 
+/** UUID v4-ish (Treez inventory ids); used to pick id from product_barcodes when needed */
+const TREEZ_INVENTORY_UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Normalize Treez / Supabase / Opticon ids for set lookups (trim + lowercase).
+ */
+export function normalizeTreezProductId(id: string | number | undefined | null): string {
+  if (id === undefined || id === null) return "";
+  const s = String(id).trim();
+  return s ? s.toLowerCase() : "";
+}
+
+function firstInventoryUuidFromBarcodes(product: TreezProduct): string {
+  const bcs = product.product_barcodes as Array<{ sku?: string; barcode?: string }> | undefined;
+  if (!bcs?.length) return "";
+  for (const row of bcs) {
+    const sku = row.sku?.trim();
+    if (sku && TREEZ_INVENTORY_UUID_RE.test(sku)) return sku;
+    const bc = row.barcode?.trim();
+    if (bc && TREEZ_INVENTORY_UUID_RE.test(bc)) return bc;
+  }
+  return "";
+}
+
+/**
+ * Canonical Treez inventory id for matching `product_snapshots.treez_product_id`
+ * and Opticon `Barcode` (same UUID string Treez uses for the sellable unit).
+ */
+export function getTreezProductListId(product: TreezProduct): string {
+  const r = product as Record<string, unknown>;
+  const candidates: unknown[] = [
+    r.inventory_product_id,
+    r.inventoryProductId,
+    r.product_id,
+    r.productId,
+    r.id,
+    r.product_uuid,
+    r.productUuid,
+  ];
+  for (const c of candidates) {
+    const s = c !== undefined && c !== null ? String(c).trim() : "";
+    if (s) return s;
+  }
+  return firstInventoryUuidFromBarcodes(product);
+}
+
 export interface TreezProduct {
   productId?: number;
   product_id?: string | number;

@@ -1,4 +1,4 @@
-import { TreezProduct } from "./treez";
+import { TreezProduct, getTreezProductListId } from "./treez";
 import { supabase, ProductSnapshot, ProductChange } from "./supabase";
 
 /**
@@ -98,7 +98,7 @@ export function extractProductSnapshot(product: TreezProduct): Omit<ProductSnaps
   const size = cfg?.size ?? null;
   const unit = cfg?.size_unit ?? "EA";
 
-  const treezProductId = product.product_id ?? product.productId ?? "";
+  const treezProductId = getTreezProductListId(product);
 
   return {
     treez_product_id: String(treezProductId),
@@ -175,17 +175,30 @@ export async function getAllSnapshots(): Promise<{ success: boolean; snapshots?:
   }
   
   try {
-    const { data, error } = await supabase
-      .from('product_snapshots')
-      .select('*')
-      .order('product_name');
+    // PostgREST returns at most ~1000 rows per request unless paginated.
+    const pageSize = 1000;
+    const all: ProductSnapshot[] = [];
+    let from = 0;
 
-    if (error) {
-      console.error('[Snapshots] Fetch error:', error);
-      return { success: false, error: error.message };
+    for (;;) {
+      const { data, error } = await supabase
+        .from('product_snapshots')
+        .select('*')
+        .order('treez_product_id', { ascending: true })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error('[Snapshots] Fetch error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const batch = (data ?? []) as ProductSnapshot[];
+      all.push(...batch);
+      if (batch.length < pageSize) break;
+      from += pageSize;
     }
 
-    return { success: true, snapshots: data as ProductSnapshot[] };
+    return { success: true, snapshots: all };
   } catch (err) {
     console.error('[Snapshots] Exception:', err);
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
