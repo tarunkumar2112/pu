@@ -94,6 +94,18 @@ export default function MiddlewarePage() {
   const [browseProductsOpen, setBrowseProductsOpen] = useState(false);
   const [brandSyncLoading, setBrandSyncLoading] = useState(false);
   const [brandSyncResult, setBrandSyncResult] = useState<Record<string, unknown> | null>(null);
+  const [brandSyncProgress, setBrandSyncProgress] = useState<{
+    totalRows: number;
+    processedRows: number;
+    batchIndex: number;
+    cumulativeUpdated: number;
+    cumulativeFailed: number;
+    cumulativeWouldUpdate: number;
+    cumulativeExamined: number;
+    cumulativeSkippedNoTreez: number;
+    cumulativeSkippedAlready: number;
+    dryRun: boolean;
+  } | null>(null);
   const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
   const [syncMeta, setSyncMeta] = useState<{
@@ -398,37 +410,133 @@ export default function MiddlewarePage() {
     setTimeout(() => checkSyncStatus(), 1000);
   };
 
-  /** Backfill Opticon `NotUsed` from Treez brand (Barcode = Treez UUID). */
+  const BRAND_SYNC_BATCH = 120;
+
+  /** Backfill Opticon `NotUsed` from Treez brand (Barcode = Treez UUID). Batched for progress + timeouts. */
   const runBrandSyncToNotUsed = async (dryRun: boolean) => {
     if (
       !dryRun &&
       !window.confirm(
-        "Update Opticon products: set NotUsed = Treez brand wherever Barcode matches the FOH catalog? This may take several minutes."
+        "Update Opticon products: set NotUsed = Treez brand wherever Barcode matches the FOH catalog? This runs in batches and may take several minutes."
       )
     ) {
       return;
     }
     setBrandSyncLoading(true);
     setBrandSyncResult(null);
+    setBrandSyncProgress({
+      totalRows: 0,
+      processedRows: 0,
+      batchIndex: 0,
+      cumulativeUpdated: 0,
+      cumulativeFailed: 0,
+      cumulativeWouldUpdate: 0,
+      cumulativeExamined: 0,
+      cumulativeSkippedNoTreez: 0,
+      cumulativeSkippedAlready: 0,
+      dryRun,
+    });
+
+    let offset = 0;
+    let batchNum = 0;
+    let cumUpdated = 0;
+    let cumFailed = 0;
+    let cumWould = 0;
+    let cumExamined = 0;
+    let cumSkipNo = 0;
+    let cumSkipAl = 0;
+    const allErrors: string[] = [];
+    let lastPayload: Record<string, unknown> | null = null;
+
     try {
-      const res = await fetch("/api/opticon/sync-brands-notused", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      for (;;) {
+        batchNum += 1;
+        const res = await fetch("/api/opticon/sync-brands-notused", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dryRun,
+            delayMs: 75,
+            location: "FRONT OF HOUSE",
+            offset,
+            batchSize: BRAND_SYNC_BATCH,
+          }),
+        });
+        const data = (await res.json()) as Record<string, unknown>;
+        lastPayload = data;
+
+        if (!res.ok || data.success !== true) {
+          setBrandSyncResult(data);
+          if (batchNum === 1) setBrandSyncProgress(null);
+          break;
+        }
+
+        const batch = (data.batch ?? {}) as Record<string, unknown>;
+        const prog = (data.progress ?? {}) as Record<string, unknown>;
+
+        cumUpdated += Number(batch.updated ?? 0);
+        cumFailed += Number(batch.failed ?? 0);
+        cumWould += Number(batch.wouldUpdate ?? 0);
+        cumExamined += Number(batch.examined ?? 0);
+        cumSkipNo += Number(batch.skippedNoTreezOrBrand ?? 0);
+        cumSkipAl += Number(batch.skippedAlready ?? 0);
+
+        const errs = batch.errors as string[] | undefined;
+        if (errs?.length) {
+          for (const e of errs) {
+            if (allErrors.length < 35) allErrors.push(e);
+          }
+        }
+
+        const totalRows = Number(prog.totalRows ?? 0);
+        const processedRows = Number(prog.processedRows ?? 0);
+        const pct = totalRows > 0 ? Math.min(100, Math.round((processedRows / totalRows) * 1000) / 10) : 0;
+
+        setBrandSyncProgress({
+          totalRows,
+          processedRows,
+          batchIndex: batchNum,
+          cumulativeUpdated: cumUpdated,
+          cumulativeFailed: cumFailed,
+          cumulativeWouldUpdate: cumWould,
+          cumulativeExamined: cumExamined,
+          cumulativeSkippedNoTreez: cumSkipNo,
+          cumulativeSkippedAlready: cumSkipAl,
           dryRun,
-          delayMs: 75,
-          location: "FRONT OF HOUSE",
-        }),
-      });
-      const data = (await res.json()) as Record<string, unknown>;
-      setBrandSyncResult(data);
-      if (res.ok && data.success === true && !dryRun) {
-        setTimeout(() => void checkSyncStatus(), 800);
+        });
+
+        const hasMore = Boolean(data.hasMore);
+        if (!hasMore) {
+          setBrandSyncResult({
+            success: true,
+            dryRun,
+            batches: batchNum,
+            treezProductCount: data.treezProductCount,
+            treezBarcodesWithBrand: data.treezBarcodesWithBrand,
+            opticonRowCount: data.opticonRowCount,
+            totals: {
+              examined: cumExamined,
+              updated: cumUpdated,
+              wouldUpdate: dryRun ? cumWould : undefined,
+              failed: cumFailed,
+              skippedNoTreezOrBrand: cumSkipNo,
+              skippedAlready: cumSkipAl,
+            },
+            errors: allErrors.length ? allErrors : undefined,
+            lastBatch: batch,
+          });
+          if (!dryRun) setTimeout(() => void checkSyncStatus(), 800);
+          break;
+        }
+
+        offset = Number(data.nextOffset ?? processedRows);
       }
     } catch (e) {
+      setBrandSyncProgress(null);
       setBrandSyncResult({
         success: false,
         error: e instanceof Error ? e.message : String(e),
+        lastOk: lastPayload,
       });
     } finally {
       setBrandSyncLoading(false);
@@ -893,8 +1001,8 @@ export default function MiddlewarePage() {
         <p className="mb-3 text-xs leading-relaxed text-violet-900/90">
           Loads Treez <strong>FRONT OF HOUSE</strong> products and Opticon rows, matches on{" "}
           <code className="rounded bg-violet-100 px-1">Barcode</code> (Treez UUID), then re-sends each Opticon product with{" "}
-          <code className="rounded bg-violet-100 px-1">NotUsed</code> set to the Treez brand (truncated to 100 chars).           Skips
-          rows that already match. Use <strong>Dry run</strong> first to see counts. If this app runs on
+          <code className="rounded bg-violet-100 px-1">NotUsed</code> set to the Treez brand (truncated to 100 chars). Skips
+          rows that already match. Runs in <strong>batches</strong> with a live progress bar. Use <strong>Dry run</strong> first. If this app runs on
           Vercel with a short request limit, run the same sync from your <strong>local / store server</strong> or
           increase <code className="rounded bg-violet-100 px-1">maxDuration</code> where supported.
         </p>
@@ -905,7 +1013,7 @@ export default function MiddlewarePage() {
             disabled={brandSyncLoading || loading}
             className="rounded-lg border border-violet-300 bg-white px-4 py-2 text-xs font-semibold text-violet-900 shadow-sm transition hover:bg-violet-50 disabled:opacity-50"
           >
-            {brandSyncLoading ? "Running…" : "Dry run (counts only)"}
+            {brandSyncLoading ? "Working…" : "Dry run (counts only)"}
           </button>
           <button
             type="button"
@@ -914,9 +1022,59 @@ export default function MiddlewarePage() {
             className="rounded-lg px-4 py-2 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50 hover:opacity-90"
             style={{ backgroundColor: "#6d28d9" }}
           >
-            {brandSyncLoading ? "Syncing…" : "Run sync to Opticon"}
+            {brandSyncLoading ? "Working…" : "Run sync to Opticon"}
           </button>
         </div>
+
+        {brandSyncProgress && brandSyncProgress.totalRows > 0 ? (
+          <div className="mt-4 rounded-lg border border-violet-200 bg-white/90 p-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-violet-950">
+              <span className="font-semibold">
+                Batch {brandSyncProgress.batchIndex}
+                {brandSyncLoading ? <Loader2 className="ml-1 inline h-3.5 w-3.5 animate-spin text-violet-600" /> : null}
+              </span>
+              <span className="font-mono text-violet-800">
+                {brandSyncProgress.processedRows.toLocaleString()} / {brandSyncProgress.totalRows.toLocaleString()} rows (
+                {Math.min(
+                  100,
+                  Math.round((brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 1000) / 10
+                )}
+                %)
+              </span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
+              <div
+                className="h-full rounded-full bg-violet-600 transition-[width] duration-300 ease-out"
+                style={{
+                  width: `${Math.min(100, (brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 100)}%`,
+                }}
+              />
+            </div>
+            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-zinc-700 sm:grid-cols-4">
+              <div>
+                <dt className="text-zinc-500">Examined (cumulative)</dt>
+                <dd className="font-semibold text-zinc-900">{brandSyncProgress.cumulativeExamined.toLocaleString()}</dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">{brandSyncProgress.dryRun ? "Would update" : "Updated"}</dt>
+                <dd className="font-semibold text-emerald-700">
+                  {(brandSyncProgress.dryRun ? brandSyncProgress.cumulativeWouldUpdate : brandSyncProgress.cumulativeUpdated).toLocaleString()}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Failed</dt>
+                <dd className="font-semibold text-red-700">{brandSyncProgress.cumulativeFailed.toLocaleString()}</dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Skip (no brand / already)</dt>
+                <dd className="font-semibold text-zinc-800">
+                  {(brandSyncProgress.cumulativeSkippedNoTreez + brandSyncProgress.cumulativeSkippedAlready).toLocaleString()}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+
         {brandSyncResult ? (
           <pre className="mt-3 max-h-48 overflow-auto rounded-lg border border-violet-200 bg-white p-3 font-mono text-[11px] leading-relaxed text-zinc-800">
             {JSON.stringify(brandSyncResult, null, 2)}
