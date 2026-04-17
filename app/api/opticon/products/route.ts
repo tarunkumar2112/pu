@@ -7,7 +7,7 @@ import { fetchEbs50Products, pushProductToEbs50 } from "@/lib/opticon";
  */
 export async function GET() {
   try {
-    const result = await fetchEbs50Products();
+    const result = await fetchEbs50Products({ bypassCache: true });
     return NextResponse.json({
       success: result.success,
       products: result.products,

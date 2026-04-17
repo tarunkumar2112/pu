@@ -22,12 +22,16 @@ function isInsecure(): boolean {
   return process.env.EBS50_INSECURE === "true";
 }
 
-async function ebs50Fetch(url: string, headers: Record<string, string> = {}): Promise<Response> {
+async function ebs50Fetch(
+  url: string,
+  headers: Record<string, string> = {},
+  timeoutMs = 10_000
+): Promise<Response> {
   if (!isInsecure()) {
     return fetch(url, {
       method: "GET",
       headers: { Accept: "application/json", ...headers },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   }
   const agent = new https.Agent({ rejectUnauthorized: false });
@@ -53,7 +57,7 @@ async function ebs50Fetch(url: string, headers: Record<string, string> = {}): Pr
       }
     );
     req.on("error", reject);
-    req.setTimeout(10000, () => {
+    req.setTimeout(timeoutMs, () => {
       req.destroy();
       reject(new Error("timeout"));
     });
@@ -165,16 +169,53 @@ export async function testEbs50Connection(): Promise<Ebs50ConnectionResult> {
   }
 }
 
+/** In-process cache so batched brand sync does not re-download the full table every request. */
+let ebs50ProductsCache: {
+  expires: number;
+  value: {
+    success: boolean;
+    products: Record<string, unknown>[];
+    columns?: string[];
+    error?: string;
+  };
+} | null = null;
+
+function productsCacheTtlMs(): number {
+  const n = Number(process.env.EBS50_PRODUCTS_CACHE_MS);
+  if (Number.isFinite(n) && n >= 0) return n;
+  return 180_000;
+}
+
+function productsFetchTimeoutMs(): number {
+  const n = Number(process.env.EBS50_PRODUCTS_TIMEOUT_MS);
+  if (Number.isFinite(n) && n >= 5_000) return n;
+  return 300_000;
+}
+
+/** Drop cached GET /api/Products (e.g. after external edits on the hub). */
+export function clearEbs50ProductsCache(): void {
+  ebs50ProductsCache = null;
+}
+
 /**
  * Fetch products from EBS50 product table.
  * GET /api/Products – returns all rows; response reveals table structure (columns).
+ *
+ * `bypassCache`: always hit the hub (e.g. admin product browser).
+ * Large stores: set `EBS50_PRODUCTS_TIMEOUT_MS` (default 300000) if downloads are slow.
  */
-export async function fetchEbs50Products(): Promise<{
+export async function fetchEbs50Products(options?: { bypassCache?: boolean }): Promise<{
   success: boolean;
   products: Record<string, unknown>[];
   columns?: string[];
   error?: string;
 }> {
+  const bypassCache = options?.bypassCache === true;
+  const ttl = productsCacheTtlMs();
+  if (!bypassCache && ttl > 0 && ebs50ProductsCache && ebs50ProductsCache.expires > Date.now()) {
+    return ebs50ProductsCache.value;
+  }
+
   const baseUrl = getEbs50BaseUrl();
   const apiKey = getEbs50ApiKey();
 
@@ -187,7 +228,7 @@ export async function fetchEbs50Products(): Promise<{
 
   try {
     const url = `${baseUrl}/api/Products`;
-    const res = await ebs50Fetch(url, { "x-api-key": apiKey });
+    const res = await ebs50Fetch(url, { "x-api-key": apiKey }, productsFetchTimeoutMs());
 
     if (res.status === 401) {
       return { success: false, products: [], error: "API key invalid or expired" };
@@ -214,7 +255,11 @@ export async function fetchEbs50Products(): Promise<{
         ? Object.keys(products[0] as Record<string, unknown>)
         : undefined;
 
-    return { success: true, products, columns };
+    const value = { success: true as const, products, columns };
+    if (!bypassCache && ttl > 0) {
+      ebs50ProductsCache = { expires: Date.now() + ttl, value };
+    }
+    return value;
   } catch (err) {
     return {
       success: false,

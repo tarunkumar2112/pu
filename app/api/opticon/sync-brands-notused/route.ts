@@ -87,9 +87,12 @@ export async function POST(request: NextRequest) {
       : undefined;
 
   try {
-    const { map: brandByBarcode, treezProductCount } = await getBrandByBarcodeMap(location);
+    // Treez + Opticon I/O in parallel; Opticon list is cached across batches (see lib/opticon.ts).
+    const [{ map: brandByBarcode, treezProductCount }, opt] = await Promise.all([
+      getBrandByBarcodeMap(location),
+      fetchEbs50Products(),
+    ]);
 
-    const opt = await fetchEbs50Products();
     if (!opt.success) {
       return NextResponse.json(
         { success: false, error: opt.error || "Opticon fetch failed" },
@@ -156,6 +159,8 @@ export async function POST(request: NextRequest) {
       const res = await pushProductToEbs50(payload);
       if (res.success) {
         updated++;
+        r.NotUsed = brand;
+        r.notUsed = brand;
       } else {
         failed++;
         if (errors.length < 20) {

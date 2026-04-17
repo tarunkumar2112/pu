@@ -1041,7 +1041,8 @@ export default function MiddlewarePage() {
           Loads Treez <strong>FRONT OF HOUSE</strong> products and Opticon rows, matches on{" "}
           <code className="rounded bg-violet-100 px-1">Barcode</code> (Treez UUID), then re-sends each Opticon product with{" "}
           <code className="rounded bg-violet-100 px-1">NotUsed</code> set to the Treez brand (truncated to 100 chars). Skips
-          rows that already match. Runs in <strong>batches</strong> with a live progress bar. Use <strong>Dry run</strong> first. If this app runs on
+          rows that already match. The <strong>first batch</strong> waits for the full Treez catalog and a full{" "}
+          <code className="rounded bg-violet-100 px-1">GET /api/Products</code> download from the hub (large stores can take several minutes); later batches reuse the in-memory product list. Runs in <strong>batches</strong> with a live progress bar. Use <strong>Dry run</strong> first. If this app runs on
           Vercel with a short request limit, run the same sync from your <strong>local / store server</strong> or
           increase <code className="rounded bg-violet-100 px-1">maxDuration</code> where supported.
         </p>
@@ -1088,7 +1089,7 @@ export default function MiddlewarePage() {
                   %)
                 </span>
               ) : (
-                <span className="text-violet-700/80">Loading Treez + Opticon…</span>
+                <span className="text-violet-700/80">Fetching full Treez catalog + Opticon product table…</span>
               )}
             </div>
 
