@@ -26,6 +26,7 @@ import {
   X,
   Trash2,
   TrendingUp,
+  ChevronDown,
 } from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
@@ -89,6 +90,7 @@ export default function MiddlewarePage() {
   const [uploadingAll, setUploadingAll] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [searchQuery, setSearchQuery] = useState("");
+  const [browseProductsOpen, setBrowseProductsOpen] = useState(false);
   const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
   const [syncMeta, setSyncMeta] = useState<{
@@ -457,6 +459,89 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
+      {/* Stats Cards — Treez list + raw system counts + OK vs gaps */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-600">Treez (FOH)</p>
+              <p className="text-3xl font-bold text-blue-900 mt-1">{stats.total.toLocaleString()}</p>
+              <p className="mt-1 text-xs text-blue-800/80">Products from Treez API · FRONT OF HOUSE</p>
+            </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-200">
+              <Package className="h-6 w-6 text-blue-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl border border-violet-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-violet-600">Opticon</p>
+              <p className="text-3xl font-bold text-violet-900 mt-1">
+                {syncMeta ? syncMeta.opticonBarcodeCount.toLocaleString() : "—"}
+              </p>
+              <p className="mt-1 text-xs text-violet-800/80">Unique barcodes on EBS50</p>
+            </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-200">
+              <Smartphone className="h-6 w-6 text-violet-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-emerald-600">Supabase</p>
+              <p className="text-3xl font-bold text-emerald-900 mt-1">
+                {syncMeta ? syncMeta.supabaseSnapshotRows.toLocaleString() : "—"}
+              </p>
+              <p className="mt-1 text-xs text-emerald-800/80">Rows in product_snapshots</p>
+            </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-200">
+              <Database className="h-6 w-6 text-emerald-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 p-6">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-amber-800">OK vs extra</p>
+              <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">OK</p>
+                  <p className="text-2xl font-bold text-amber-950">{stats.synced.toLocaleString()}</p>
+                  <p className="text-[10px] text-amber-900/75">In both Supabase &amp; Opticon</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">Extra</p>
+                  <p className="text-2xl font-bold text-amber-950">{(stats.new + stats.partial).toLocaleString()}</p>
+                  <p className="text-[10px] text-amber-900/75">Treez rows still need sync</p>
+                </div>
+              </div>
+              {syncMeta ? (
+                <p className="mt-2 border-t border-amber-200/80 pt-2 text-[10px] leading-snug text-amber-900/85">
+                  Outside this FOH list: +{syncMeta.opticonBarcodesNotInTreez.toLocaleString()} Opticon barcodes · +
+                  {syncMeta.supabaseSnapshotsNotInTreez.toLocaleString()} Supabase ids
+                </p>
+              ) : (
+                <p className="mt-2 text-[10px] text-amber-800/70">Run Check Status for system drift.</p>
+              )}
+            </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-200">
+              <TrendingUp className="h-6 w-6 text-amber-800" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {syncMeta?.supabaseError ? (
+        <p className="text-xs font-medium text-red-600">
+          Supabase snapshot load failed — Opticon/Supabase card totals may be wrong: {syncMeta.supabaseError}
+        </p>
+      ) : null}
+
       {/* Three sync channels: change detection (1m), catalog (5m), webhook */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
@@ -665,89 +750,6 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
-      {/* Stats Cards — Treez list + raw system counts + OK vs gaps */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-600">Treez (FOH)</p>
-              <p className="text-3xl font-bold text-blue-900 mt-1">{stats.total.toLocaleString()}</p>
-              <p className="mt-1 text-xs text-blue-800/80">Products from Treez API · FRONT OF HOUSE</p>
-            </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-200">
-              <Package className="h-6 w-6 text-blue-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl border border-violet-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-violet-600">Opticon</p>
-              <p className="text-3xl font-bold text-violet-900 mt-1">
-                {syncMeta ? syncMeta.opticonBarcodeCount.toLocaleString() : "—"}
-              </p>
-              <p className="mt-1 text-xs text-violet-800/80">Unique barcodes on EBS50</p>
-            </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-200">
-              <Smartphone className="h-6 w-6 text-violet-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-emerald-600">Supabase</p>
-              <p className="text-3xl font-bold text-emerald-900 mt-1">
-                {syncMeta ? syncMeta.supabaseSnapshotRows.toLocaleString() : "—"}
-              </p>
-              <p className="mt-1 text-xs text-emerald-800/80">Rows in product_snapshots</p>
-            </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-200">
-              <Database className="h-6 w-6 text-emerald-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 p-6">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-amber-800">OK vs extra</p>
-              <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">OK</p>
-                  <p className="text-2xl font-bold text-amber-950">{stats.synced.toLocaleString()}</p>
-                  <p className="text-[10px] text-amber-900/75">In both Supabase &amp; Opticon</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">Extra</p>
-                  <p className="text-2xl font-bold text-amber-950">{(stats.new + stats.partial).toLocaleString()}</p>
-                  <p className="text-[10px] text-amber-900/75">Treez rows still need sync</p>
-                </div>
-              </div>
-              {syncMeta ? (
-                <p className="mt-2 border-t border-amber-200/80 pt-2 text-[10px] leading-snug text-amber-900/85">
-                  Outside this FOH list: +{syncMeta.opticonBarcodesNotInTreez.toLocaleString()} Opticon barcodes · +
-                  {syncMeta.supabaseSnapshotsNotInTreez.toLocaleString()} Supabase ids
-                </p>
-              ) : (
-                <p className="mt-2 text-[10px] text-amber-800/70">Run Check Status for system drift.</p>
-              )}
-            </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-200">
-              <TrendingUp className="h-6 w-6 text-amber-800" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {syncMeta?.supabaseError ? (
-        <p className="text-xs font-medium text-red-600">
-          Supabase snapshot load failed — Opticon/Supabase card totals may be wrong: {syncMeta.supabaseError}
-        </p>
-      ) : null}
-
       {/* Upload Progress */}
       {uploadingAll && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
@@ -841,29 +843,52 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search products by name, SKU, or category..."
-          className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
-            aria-label="Clear search"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      {/* Product table — hidden by default; sync still runs in the background */}
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <button
+          type="button"
+          onClick={() => setBrowseProductsOpen((o) => !o)}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-zinc-50"
+          style={{ borderLeft: `3px solid ${BRAND_BLUE}` }}
+          aria-expanded={browseProductsOpen}
+        >
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
+            <span className="text-sm font-semibold text-zinc-900">Browse products</span>
+            <span className="truncate text-xs font-normal text-zinc-500">
+              {loading
+                ? "Loading catalog…"
+                : `${products.length.toLocaleString()} from Treez (FOH) — click to ${browseProductsOpen ? "hide" : "show"} search & table`}
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-zinc-500 transition-transform ${browseProductsOpen ? "rotate-180" : ""}`}
+            aria-hidden
+          />
+        </button>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
+        {browseProductsOpen ? (
+          <div className="space-y-4 border-t border-zinc-200 p-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products by name, SKU, or category..."
+                className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
@@ -990,6 +1015,9 @@ export default function MiddlewarePage() {
             </table>
           </div>
         )}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
