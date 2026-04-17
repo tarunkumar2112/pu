@@ -4,6 +4,27 @@ import { extractProductSnapshot, saveProductSnapshot } from "@/lib/change-detect
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { recordWebhookProduct } from "@/lib/sync-engine-status";
 
+/** Treez sometimes wraps the payload in `root`; portal “Test” may send non-PRODUCT types. */
+function normalizeWebhookPayload(raw: unknown): {
+  event_type?: string;
+  data?: Record<string, unknown>;
+} {
+  if (!raw || typeof raw !== "object") return {};
+  const b = raw as Record<string, unknown>;
+  const root = b.root;
+  if (root && typeof root === "object") {
+    const r = root as Record<string, unknown>;
+    return {
+      event_type: typeof r.event_type === "string" ? r.event_type : undefined,
+      data: r.data && typeof r.data === "object" ? (r.data as Record<string, unknown>) : undefined,
+    };
+  }
+  return {
+    event_type: typeof b.event_type === "string" ? b.event_type : undefined,
+    data: b.data && typeof b.data === "object" ? (b.data as Record<string, unknown>) : undefined,
+  };
+}
+
 function verifyWebhook(request: NextRequest): boolean {
   const secret = process.env.TREEZ_WEBHOOK_SECRET;
   if (!secret) return true;
@@ -27,21 +48,37 @@ function verifyWebhook(request: NextRequest): boolean {
  * Optional: set TREEZ_WEBHOOK_SECRET and send as
  * Authorization: Bearer <secret> or X-Treez-Webhook-Secret: <secret>
  */
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    path: "/api/webhooks/treez/product",
+    hint: "Treez sends PRODUCT events via POST. Use POST for integration tests.",
+  });
+}
+
 export async function POST(request: NextRequest) {
   if (!verifyWebhook(request)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const body = await request.json();
-    const eventType = body?.event_type;
-    const data = body?.data;
+    const rawBody = await request.json();
+    const { event_type: eventType, data } = normalizeWebhookPayload(rawBody);
 
-    if (eventType !== "PRODUCT" || !data?.product_id) {
-      return NextResponse.json(
-        { success: false, error: "Expected event_type PRODUCT and data.product_id" },
-        { status: 400 }
-      );
+    if (!eventType || eventType !== "PRODUCT") {
+      return NextResponse.json({
+        success: true,
+        ignored: true,
+        reason: `No PRODUCT handler for event_type=${eventType ?? "(missing)"} — subscription test OK`,
+      });
+    }
+
+    if (!data?.product_id) {
+      return NextResponse.json({
+        success: true,
+        ignored: true,
+        reason: "PRODUCT event without data.product_id — acknowledged",
+      });
     }
 
     const productId = String(data.product_id);

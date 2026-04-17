@@ -428,7 +428,8 @@ export default function MiddlewarePage() {
     return (
       d.name.toLowerCase().includes(searchLower) ||
       d.sku.toLowerCase().includes(searchLower) ||
-      d.category.toLowerCase().includes(searchLower)
+      d.category.toLowerCase().includes(searchLower) ||
+      d.brand.toLowerCase().includes(searchLower)
     );
   });
 
@@ -873,7 +874,7 @@ export default function MiddlewarePage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products by name, SKU, or category..."
+                placeholder="Search by name, SKU, brand, or category..."
                 className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
               {searchQuery ? (
@@ -905,6 +906,7 @@ export default function MiddlewarePage() {
               <thead>
                 <tr className="border-b border-zinc-200 bg-zinc-50">
                   <th className="px-4 py-3 font-semibold text-zinc-900">Product</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-900">Brand</th>
                   <th className="px-4 py-3 font-semibold text-zinc-900">Category</th>
                   <th className="px-4 py-3 font-semibold text-zinc-900">Price</th>
                   <th className="px-4 py-3 font-semibold text-zinc-900">Supabase</th>
@@ -931,6 +933,9 @@ export default function MiddlewarePage() {
                       <td className="px-4 py-3">
                         <div className="font-medium text-zinc-900">{d.name}</div>
                         <div className="text-xs text-zinc-500 font-mono">{d.sku}</div>
+                      </td>
+                      <td className="max-w-[140px] truncate px-4 py-3 text-zinc-700" title={d.brand}>
+                        {d.brand}
                       </td>
                       <td className="px-4 py-3 text-zinc-600">{d.category}</td>
                       <td className="px-4 py-3 font-semibold text-zinc-900">{d.price}</td>
