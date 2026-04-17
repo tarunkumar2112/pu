@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 import {
   TreezProduct,
   getProductDisplay,
@@ -105,6 +106,16 @@ export default function MiddlewarePage() {
     cumulativeSkippedNoTreez: number;
     cumulativeSkippedAlready: number;
     dryRun: boolean;
+    /** Last completed HTTP batch only (count-wise progress for this round) */
+    batchRowsInRange: number;
+    batchExamined: number;
+    batchUpdated: number;
+    batchWouldUpdate: number;
+    batchFailed: number;
+    batchSkippedNoTreez: number;
+    batchSkippedAlready: number;
+    batchRowFrom: number;
+    batchRowTo: number;
   } | null>(null);
   const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
@@ -435,6 +446,15 @@ export default function MiddlewarePage() {
       cumulativeSkippedNoTreez: 0,
       cumulativeSkippedAlready: 0,
       dryRun,
+      batchRowsInRange: 0,
+      batchExamined: 0,
+      batchUpdated: 0,
+      batchWouldUpdate: 0,
+      batchFailed: 0,
+      batchSkippedNoTreez: 0,
+      batchSkippedAlready: 0,
+      batchRowFrom: 0,
+      batchRowTo: 0,
     });
 
     let offset = 0;
@@ -490,19 +510,38 @@ export default function MiddlewarePage() {
 
         const totalRows = Number(prog.totalRows ?? 0);
         const processedRows = Number(prog.processedRows ?? 0);
-        const pct = totalRows > 0 ? Math.min(100, Math.round((processedRows / totalRows) * 1000) / 10) : 0;
+        const batchRowsInRange = Number(batch.rowsInBatch ?? 0);
+        const batchRowFrom = Number(batch.offsetStart ?? 0);
+        const batchRowTo = Number(batch.offsetEnd ?? 0);
+        const bEx = Number(batch.examined ?? 0);
+        const bUp = Number(batch.updated ?? 0);
+        const bWu = Number(batch.wouldUpdate ?? 0);
+        const bFa = Number(batch.failed ?? 0);
+        const bSn = Number(batch.skippedNoTreezOrBrand ?? 0);
+        const bSa = Number(batch.skippedAlready ?? 0);
 
-        setBrandSyncProgress({
-          totalRows,
-          processedRows,
-          batchIndex: batchNum,
-          cumulativeUpdated: cumUpdated,
-          cumulativeFailed: cumFailed,
-          cumulativeWouldUpdate: cumWould,
-          cumulativeExamined: cumExamined,
-          cumulativeSkippedNoTreez: cumSkipNo,
-          cumulativeSkippedAlready: cumSkipAl,
-          dryRun,
+        flushSync(() => {
+          setBrandSyncProgress({
+            totalRows,
+            processedRows,
+            batchIndex: batchNum,
+            cumulativeUpdated: cumUpdated,
+            cumulativeFailed: cumFailed,
+            cumulativeWouldUpdate: cumWould,
+            cumulativeExamined: cumExamined,
+            cumulativeSkippedNoTreez: cumSkipNo,
+            cumulativeSkippedAlready: cumSkipAl,
+            dryRun,
+            batchRowsInRange,
+            batchExamined: bEx,
+            batchUpdated: bUp,
+            batchWouldUpdate: bWu,
+            batchFailed: bFa,
+            batchSkippedNoTreez: bSn,
+            batchSkippedAlready: bSa,
+            batchRowFrom,
+            batchRowTo,
+          });
         });
 
         const hasMore = Boolean(data.hasMore);
@@ -1026,37 +1065,79 @@ export default function MiddlewarePage() {
           </button>
         </div>
 
-        {brandSyncProgress && brandSyncProgress.totalRows > 0 ? (
+        {brandSyncProgress && (brandSyncLoading || brandSyncProgress.totalRows > 0 || brandSyncProgress.batchIndex > 0) ? (
           <div className="mt-4 rounded-lg border border-violet-200 bg-white/90 p-3">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-violet-950">
               <span className="font-semibold">
-                Batch {brandSyncProgress.batchIndex}
-                {brandSyncLoading ? <Loader2 className="ml-1 inline h-3.5 w-3.5 animate-spin text-violet-600" /> : null}
-              </span>
-              <span className="font-mono text-violet-800">
-                {brandSyncProgress.processedRows.toLocaleString()} / {brandSyncProgress.totalRows.toLocaleString()} rows (
-                {Math.min(
-                  100,
-                  Math.round((brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 1000) / 10
+                {brandSyncProgress.totalRows === 0 && brandSyncLoading ? (
+                  <>Preparing first batch…</>
+                ) : (
+                  <>
+                    Batch {brandSyncProgress.batchIndex}
+                    {brandSyncLoading ? <Loader2 className="ml-1 inline h-3.5 w-3.5 animate-spin text-violet-600" /> : null}
+                  </>
                 )}
-                %)
               </span>
+              {brandSyncProgress.totalRows > 0 ? (
+                <span className="font-mono text-violet-800">
+                  Rows {brandSyncProgress.processedRows.toLocaleString()} / {brandSyncProgress.totalRows.toLocaleString()} (
+                  {Math.min(
+                    100,
+                    Math.round((brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 1000) / 10
+                  )}
+                  %)
+                </span>
+              ) : (
+                <span className="text-violet-700/80">Loading Treez + Opticon…</span>
+              )}
             </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
-              <div
-                className="h-full rounded-full bg-violet-600 transition-[width] duration-300 ease-out"
-                style={{
-                  width: `${Math.min(100, (brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 100)}%`,
-                }}
-              />
-            </div>
-            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-zinc-700 sm:grid-cols-4">
+
+            {brandSyncProgress.totalRows > 0 ? (
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
+                <div
+                  className="h-full rounded-full bg-violet-600 transition-[width] duration-300 ease-out"
+                  style={{
+                    width: `${Math.min(100, (brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
+                <div className="h-full w-1/3 animate-pulse rounded-full bg-violet-500" />
+              </div>
+            )}
+
+            {brandSyncProgress.batchIndex > 0 && brandSyncProgress.totalRows > 0 ? (
+              <div className="mt-3 rounded-md border border-violet-100 bg-violet-50/80 px-2.5 py-2 text-[11px] leading-snug text-violet-950">
+                <p className="font-semibold text-violet-900">This batch (rows {brandSyncProgress.batchRowFrom.toLocaleString()}–{(brandSyncProgress.batchRowTo - 1).toLocaleString()})</p>
+                <p className="mt-1 font-mono text-violet-800">
+                  Barcodes examined: <strong>{brandSyncProgress.batchExamined.toLocaleString()}</strong>
+                  {" · "}
+                  {brandSyncProgress.dryRun ? (
+                    <>
+                      Would set brand (NotUsed): <strong className="text-emerald-800">{brandSyncProgress.batchWouldUpdate.toLocaleString()}</strong>
+                    </>
+                  ) : (
+                    <>
+                      Brands written to Opticon: <strong className="text-emerald-800">{brandSyncProgress.batchUpdated.toLocaleString()}</strong>
+                    </>
+                  )}
+                  {" · "}
+                  Failed: <strong className="text-red-700">{brandSyncProgress.batchFailed.toLocaleString()}</strong>
+                  {" · "}
+                  Skip: <strong>{(brandSyncProgress.batchSkippedNoTreez + brandSyncProgress.batchSkippedAlready).toLocaleString()}</strong>
+                </p>
+              </div>
+            ) : null}
+
+            <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">Running totals (all batches)</p>
+            <dl className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-zinc-700 sm:grid-cols-4">
               <div>
-                <dt className="text-zinc-500">Examined (cumulative)</dt>
+                <dt className="text-zinc-500">Barcodes examined</dt>
                 <dd className="font-semibold text-zinc-900">{brandSyncProgress.cumulativeExamined.toLocaleString()}</dd>
               </div>
               <div>
-                <dt className="text-zinc-500">{brandSyncProgress.dryRun ? "Would update" : "Updated"}</dt>
+                <dt className="text-zinc-500">{brandSyncProgress.dryRun ? "Would set brand" : "Brands written"}</dt>
                 <dd className="font-semibold text-emerald-700">
                   {(brandSyncProgress.dryRun ? brandSyncProgress.cumulativeWouldUpdate : brandSyncProgress.cumulativeUpdated).toLocaleString()}
                 </dd>
