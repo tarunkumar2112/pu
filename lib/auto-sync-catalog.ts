@@ -1,4 +1,4 @@
-import { fetchTreezProducts } from "@/lib/treez";
+import { fetchTreezProducts, treezBrandForOpticonNotUsed } from "@/lib/treez";
 import { getAllSnapshots, saveProductSnapshot } from "@/lib/change-detector";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { supabase } from "@/lib/supabase";
@@ -116,7 +116,7 @@ export async function runAutoSyncCatalog(): Promise<CatalogSyncResult> {
         newProducts++;
 
         const opt = {
-          NotUsed: "",
+          NotUsed: treezBrandForOpticonNotUsed(product),
           ProductId: String(seq),
           Barcode: productId,
           Description: String(snapshot.product_name),

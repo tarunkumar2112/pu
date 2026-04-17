@@ -278,6 +278,39 @@ async function ebs50Post(url: string, body: unknown, headers: Record<string, str
 }
 
 /**
+ * Map one EBS50 GET /api/Products row into a POST body (PascalCase keys).
+ * Use existing row values so updates do not wipe fields.
+ */
+export function ebs50ProductRowToPayload(
+  row: Record<string, unknown>,
+  overrides?: Partial<Record<string, string>>
+): Record<string, unknown> {
+  const pick = (pascal: string, camel: string, def = ""): string => {
+    const v = row[pascal] ?? row[camel];
+    if (v === undefined || v === null) return def;
+    return String(v);
+  };
+  const payload: Record<string, unknown> = {
+    NotUsed: pick("NotUsed", "notUsed"),
+    ProductId: pick("ProductId", "productId"),
+    Barcode: pick("Barcode", "barcode"),
+    Description: pick("Description", "description"),
+    Group: pick("Group", "group"),
+    StandardPrice: pick("StandardPrice", "standardPrice"),
+    SellPrice: pick("SellPrice", "sellPrice"),
+    Discount: pick("Discount", "discount"),
+    Content: pick("Content", "content"),
+    Unit: pick("Unit", "unit") || "EA",
+  };
+  if (overrides) {
+    for (const [k, v] of Object.entries(overrides)) {
+      if (v !== undefined) payload[k] = v;
+    }
+  }
+  return payload;
+}
+
+/**
  * Push product(s) to EBS50.
  * Tries v1.0 POST /api/Products first (same format as GET returns).
  * Falls back to v2.0 POST /api/v2.0/Products/ChangeProducts if v1 returns 404.

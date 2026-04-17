@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { TreezProduct } from "@/lib/treez";
+import { type TreezProduct, treezBrandForOpticonNotUsed } from "@/lib/treez";
 import { extractProductSnapshot, saveProductSnapshot } from "@/lib/change-detector";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { recordWebhookProduct } from "@/lib/sync-engine-status";
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     const price = snapshot.price ?? 0;
     const opt = {
-      NotUsed: "",
+      NotUsed: treezBrandForOpticonNotUsed(treezProduct),
       ProductId: "",
       Barcode: snapshot.treez_product_id,
       Description: snapshot.product_name || "",

@@ -135,6 +135,13 @@ export function getProductDisplay(p: TreezProduct): ProductDisplay {
   };
 }
 
+/** Brand string for Opticon `NotUsed` (EBS50 field length limits — keep short). */
+export function treezBrandForOpticonNotUsed(p: TreezProduct, maxLen = 100): string {
+  const raw = getProductDisplay(p).brand.trim();
+  if (!raw || raw === "-") return "";
+  return raw.length > maxLen ? raw.slice(0, maxLen) : raw;
+}
+
 /**
  * Get nested value from object by dot path (e.g. "product_configurable_fields.name").
  * Supports array indices: "product_barcodes[0].sku"
@@ -378,6 +385,7 @@ export async function fetchTreezProducts(
     defaultParams.sellable_quantity_in_type = options.sellable_quantity_in_type;
   if (options.include_discounts === true) defaultParams.include_discounts = "TRUE";
   if (options.internal_tag) defaultParams.internal_tag = options.internal_tag;
+  if (options.page_size) defaultParams.page_size = String(options.page_size);
 
   const allProducts: TreezProduct[] = [];
   let page = 1;

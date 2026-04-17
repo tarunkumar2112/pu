@@ -6,6 +6,7 @@ import {
   getProductDisplay,
   getTreezProductListId,
   normalizeTreezProductId,
+  treezBrandForOpticonNotUsed,
 } from "@/lib/treez";
 import {
   Package,
@@ -91,6 +92,8 @@ export default function MiddlewarePage() {
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [searchQuery, setSearchQuery] = useState("");
   const [browseProductsOpen, setBrowseProductsOpen] = useState(false);
+  const [brandSyncLoading, setBrandSyncLoading] = useState(false);
+  const [brandSyncResult, setBrandSyncResult] = useState<Record<string, unknown> | null>(null);
   const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [recentChanges, setRecentChanges] = useState<ProductChangeRow[]>([]);
   const [syncMeta, setSyncMeta] = useState<{
@@ -283,9 +286,9 @@ export default function MiddlewarePage() {
       else if (pricing?.tier_pricing_detail?.[0]?.price_per_value) price = Number(pricing.tier_pricing_detail[0].price_per_value);
       else if (product.price) price = Number(product.price);
 
-      // 1. Upload to Opticon (using UUID as Barcode)
+      // 1. Upload to Opticon (using UUID as Barcode; brand in NotUsed for ESL templates)
       const opticonProduct = {
-        NotUsed: "",
+        NotUsed: treezBrandForOpticonNotUsed(product),
         ProductId: String(index + 1),
         Barcode: treezUuid,
         Description: String(cfg?.name || product.name || ""),
@@ -393,6 +396,43 @@ export default function MiddlewarePage() {
     
     // Re-check status after upload
     setTimeout(() => checkSyncStatus(), 1000);
+  };
+
+  /** Backfill Opticon `NotUsed` from Treez brand (Barcode = Treez UUID). */
+  const runBrandSyncToNotUsed = async (dryRun: boolean) => {
+    if (
+      !dryRun &&
+      !window.confirm(
+        "Update Opticon products: set NotUsed = Treez brand wherever Barcode matches the FOH catalog? This may take several minutes."
+      )
+    ) {
+      return;
+    }
+    setBrandSyncLoading(true);
+    setBrandSyncResult(null);
+    try {
+      const res = await fetch("/api/opticon/sync-brands-notused", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dryRun,
+          delayMs: 75,
+          location: "FRONT OF HOUSE",
+        }),
+      });
+      const data = (await res.json()) as Record<string, unknown>;
+      setBrandSyncResult(data);
+      if (res.ok && data.success === true && !dryRun) {
+        setTimeout(() => void checkSyncStatus(), 800);
+      }
+    } catch (e) {
+      setBrandSyncResult({
+        success: false,
+        error: e instanceof Error ? e.message : String(e),
+      });
+    } finally {
+      setBrandSyncLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -832,7 +872,7 @@ export default function MiddlewarePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Database className="w-3 h-3 flex-shrink-0 mt-0.5 text-purple-600" />
-                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong></span>
+                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong>; brand in <strong>NotUsed</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
@@ -842,6 +882,46 @@ export default function MiddlewarePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Backfill Opticon NotUsed with Treez brand (existing rows) */}
+      <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50/90 to-white p-5 shadow-sm">
+        <div className="mb-2 flex items-center gap-2">
+          <Smartphone className="h-4 w-4 text-violet-700" />
+          <h3 className="text-sm font-semibold text-violet-950">Opticon: brand → NotUsed</h3>
+        </div>
+        <p className="mb-3 text-xs leading-relaxed text-violet-900/90">
+          Loads Treez <strong>FRONT OF HOUSE</strong> products and Opticon rows, matches on{" "}
+          <code className="rounded bg-violet-100 px-1">Barcode</code> (Treez UUID), then re-sends each Opticon product with{" "}
+          <code className="rounded bg-violet-100 px-1">NotUsed</code> set to the Treez brand (truncated to 100 chars).           Skips
+          rows that already match. Use <strong>Dry run</strong> first to see counts. If this app runs on
+          Vercel with a short request limit, run the same sync from your <strong>local / store server</strong> or
+          increase <code className="rounded bg-violet-100 px-1">maxDuration</code> where supported.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void runBrandSyncToNotUsed(true)}
+            disabled={brandSyncLoading || loading}
+            className="rounded-lg border border-violet-300 bg-white px-4 py-2 text-xs font-semibold text-violet-900 shadow-sm transition hover:bg-violet-50 disabled:opacity-50"
+          >
+            {brandSyncLoading ? "Running…" : "Dry run (counts only)"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void runBrandSyncToNotUsed(false)}
+            disabled={brandSyncLoading || loading}
+            className="rounded-lg px-4 py-2 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: "#6d28d9" }}
+          >
+            {brandSyncLoading ? "Syncing…" : "Run sync to Opticon"}
+          </button>
+        </div>
+        {brandSyncResult ? (
+          <pre className="mt-3 max-h-48 overflow-auto rounded-lg border border-violet-200 bg-white p-3 font-mono text-[11px] leading-relaxed text-zinc-800">
+            {JSON.stringify(brandSyncResult, null, 2)}
+          </pre>
+        ) : null}
       </div>
 
       {/* Product table — hidden by default; sync still runs in the background */}
