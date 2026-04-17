@@ -1,59 +1,61 @@
 @echo off
+setlocal EnableExtensions
+REM Laravel-style launcher: new window, banner, checks, install, build, start
+
 if "%~1"=="" (
-  start "Treez Sync" cmd /k "%~f0" run
+  start "Treez Sync | Perfect Union" cmd /k "%~f0" run
   exit /b 0
 )
-cd /d "%~dp0"
-title Treez Sync - Opticon ESL
-echo ========================================
-echo   Treez Sync Middleware
-echo   Folder: %cd%
-echo ========================================
-echo.
 
-REM Check if Node.js is installed
+cd /d "%~dp0"
+chcp 65001 >nul
+title Treez Sync ^| Opticon ESL
+
+set "PS=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
+set "BANNER=%~dp0scripts\start-banner.ps1"
+
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Header
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "Working directory: %cd%"
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-  echo ERROR: Node.js is not installed.
-  echo Please install Node.js from https://nodejs.org/
-  echo Then run this file again.
+  call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Error -Text "Node.js is not installed. Install from https://nodejs.org/ and run this file again."
   pause
   exit /b 1
 )
+for /f "delims=" %%V in ('node -v 2^>nul') do set "NODE_VER=%%V"
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "Node.js %NODE_VER%"
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Line
 
-echo Node.js found: 
-node -v
-echo.
-
-REM Install dependencies if node_modules missing
 if not exist "node_modules" (
-  echo Installing dependencies - first run only...
+  call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "Installing npm dependencies (first run only)..."
   call npm install
   if errorlevel 1 (
-    echo Failed to install dependencies.
+    call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Error -Text "npm install failed."
     pause
     exit /b 1
   )
-  echo.
+  call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Success -Text "Dependencies installed."
+) else (
+  call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "node_modules present — skipping npm install."
 )
 
-REM Build the app
-echo Building...
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Line
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "Building production bundle (next build)..."
 call npm run build
 if errorlevel 1 (
-  echo Build failed.
+  call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Error -Text "npm run build failed."
   pause
   exit /b 1
 )
-echo.
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Success -Text "Build completed successfully."
 
-echo ========================================
-echo   App is starting at http://localhost:3000
-echo   Press Ctrl+C to stop the app
-echo ========================================
-echo.
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Line
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Url -Text "http://localhost:3000"
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Footer
 
 call npm start
 echo.
-echo App stopped. Press any key to close...
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Line
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Info -Text "Server stopped. Press any key to close this window."
 pause >nul
+endlocal
