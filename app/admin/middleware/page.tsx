@@ -95,6 +95,10 @@ export default function MiddlewarePage() {
     supabaseSnapshotRows: number;
     opticonBarcodeCount: number;
     supabaseError?: string;
+    /** Opticon barcodes with no matching Treez product in this FOH list */
+    opticonBarcodesNotInTreez: number;
+    /** Distinct snapshot `treez_product_id`s not in this FOH list */
+    supabaseSnapshotsNotInTreez: number;
   } | null>(null);
 
   const webhookUrl =
@@ -191,10 +195,31 @@ export default function MiddlewarePage() {
 
       console.log("[Middleware] Opticon barcode keys (normalized):", opticonBarcodes.size);
 
+      const treezIdSet = new Set<string>();
+      products.forEach((product) => {
+        const k = normalizeTreezProductId(getTreezProductListId(product));
+        if (k) treezIdSet.add(k);
+      });
+
+      let opticonBarcodesNotInTreez = 0;
+      opticonBarcodes.forEach((bc) => {
+        if (!treezIdSet.has(bc)) opticonBarcodesNotInTreez += 1;
+      });
+
+      const snapshotIdsNotInTreez = new Set<string>();
+      if (supabaseData.snapshots && Array.isArray(supabaseData.snapshots)) {
+        supabaseData.snapshots.forEach((s: { treez_product_id?: string }) => {
+          const tid = normalizeTreezProductId(s.treez_product_id);
+          if (tid && !treezIdSet.has(tid)) snapshotIdsNotInTreez.add(tid);
+        });
+      }
+
       setSyncMeta({
         supabaseSnapshotRows: Number(supabaseData.total ?? supabaseData.snapshots?.length ?? 0),
         opticonBarcodeCount: opticonBarcodes.size,
         supabaseError,
+        opticonBarcodesNotInTreez,
+        supabaseSnapshotsNotInTreez: snapshotIdsNotInTreez.size,
       });
 
       // Check each product (map key = normalized Treez inventory id)
@@ -640,16 +665,32 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards — Treez list + raw system counts + OK vs gaps */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-600">Total Products</p>
-              <p className="text-3xl font-bold text-blue-900 mt-1">{stats.total}</p>
+              <p className="text-sm font-medium text-blue-600">Treez (FOH)</p>
+              <p className="text-3xl font-bold text-blue-900 mt-1">{stats.total.toLocaleString()}</p>
+              <p className="mt-1 text-xs text-blue-800/80">Products from Treez API · FRONT OF HOUSE</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center">
-              <Package className="w-6 h-6 text-blue-700" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-200">
+              <Package className="h-6 w-6 text-blue-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl border border-violet-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-violet-600">Opticon</p>
+              <p className="text-3xl font-bold text-violet-900 mt-1">
+                {syncMeta ? syncMeta.opticonBarcodeCount.toLocaleString() : "—"}
+              </p>
+              <p className="mt-1 text-xs text-violet-800/80">Unique barcodes on EBS50</p>
+            </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-200">
+              <Smartphone className="h-6 w-6 text-violet-700" />
             </div>
           </div>
         </div>
@@ -657,49 +698,53 @@ export default function MiddlewarePage() {
         <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-emerald-600">Fully Synced</p>
-              <p className="text-3xl font-bold text-emerald-900 mt-1">{stats.synced}</p>
+              <p className="text-sm font-medium text-emerald-600">Supabase</p>
+              <p className="text-3xl font-bold text-emerald-900 mt-1">
+                {syncMeta ? syncMeta.supabaseSnapshotRows.toLocaleString() : "—"}
+              </p>
+              <p className="mt-1 text-xs text-emerald-800/80">Rows in product_snapshots</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-emerald-200 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-emerald-700" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-200">
+              <Database className="h-6 w-6 text-emerald-700" />
             </div>
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-amber-600">New in Treez</p>
-              <p className="text-3xl font-bold text-amber-900 mt-1">{stats.new}</p>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-amber-800">OK vs extra</p>
+              <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">OK</p>
+                  <p className="text-2xl font-bold text-amber-950">{stats.synced.toLocaleString()}</p>
+                  <p className="text-[10px] text-amber-900/75">In both Supabase &amp; Opticon</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-700/90">Extra</p>
+                  <p className="text-2xl font-bold text-amber-950">{(stats.new + stats.partial).toLocaleString()}</p>
+                  <p className="text-[10px] text-amber-900/75">Treez rows still need sync</p>
+                </div>
+              </div>
+              {syncMeta ? (
+                <p className="mt-2 border-t border-amber-200/80 pt-2 text-[10px] leading-snug text-amber-900/85">
+                  Outside this FOH list: +{syncMeta.opticonBarcodesNotInTreez.toLocaleString()} Opticon barcodes · +
+                  {syncMeta.supabaseSnapshotsNotInTreez.toLocaleString()} Supabase ids
+                </p>
+              ) : (
+                <p className="mt-2 text-[10px] text-amber-800/70">Run Check Status for system drift.</p>
+              )}
             </div>
-            <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-amber-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-purple-600">Partial Sync</p>
-              <p className="text-3xl font-bold text-purple-900 mt-1">{stats.partial}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-purple-700" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-200">
+              <TrendingUp className="h-6 w-6 text-amber-800" />
             </div>
           </div>
         </div>
       </div>
 
-      {syncMeta ? (
-        <p className="text-xs text-zinc-500">
-          Last compare: {syncMeta.supabaseSnapshotRows.toLocaleString()} Supabase snapshot row
-          {syncMeta.supabaseSnapshotRows === 1 ? "" : "s"},{" "}
-          {syncMeta.opticonBarcodeCount.toLocaleString()} Opticon barcode
-          {syncMeta.opticonBarcodeCount === 1 ? "" : "s"}.
-          {syncMeta.supabaseError ? (
-            <span className="ml-2 font-medium text-red-600">Supabase load failed — counts may be wrong.</span>
-          ) : null}
+      {syncMeta?.supabaseError ? (
+        <p className="text-xs font-medium text-red-600">
+          Supabase snapshot load failed — Opticon/Supabase card totals may be wrong: {syncMeta.supabaseError}
         </p>
       ) : null}
 
