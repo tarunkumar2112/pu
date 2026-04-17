@@ -11,6 +11,10 @@ cd /d "%~dp0"
 chcp 65001 >nul
 title Treez Sync ^| Opticon ESL
 
+REM Next.js production server URL; browser opens after BROWSER_DELAY_SEC (server needs time to bind)
+set "APP_URL=http://localhost:3000"
+set "BROWSER_DELAY_SEC=8"
+
 set "PS=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 set "BANNER=%~dp0scripts\start-banner.ps1"
 
@@ -50,8 +54,11 @@ if errorlevel 1 (
 call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Success -Text "Build completed successfully."
 
 call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Line
-call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Url -Text "http://localhost:3000"
+call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Url -Text "%APP_URL%"
 call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%BANNER%" -Mode Footer
+
+REM Auto-open default browser (separate process so npm start still owns this window)
+start "" cmd /c "timeout /t %BROWSER_DELAY_SEC% /nobreak >nul & start "" %APP_URL%"
 
 call npm start
 echo.
