@@ -3,21 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, CircleUser } from "lucide-react";
+import { Zap, CircleUser, Database, Smartphone, Package } from "lucide-react";
 
 const BRAND_BLUE = "#1F2B44";
 const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/6814932c8fdab74d7cd6845d_Group%201577708998.webp";
 
 const navItems = [
   { href: "/admin/middleware", label: "Sync Middleware", icon: Zap, group: "main", highlight: true },
-];
-
-const hiddenNavItems = [
-  { href: "/admin/treez", label: "Treez Products (Old)", icon: "▸", group: "hidden" },
-  { href: "/admin/treez/mapping", label: "Product Mapping (Old)", icon: "⚡", group: "hidden" },
-  { href: "/admin/treez-location", label: "Browse Products", icon: "📍", group: "hidden" },
-  { href: "/admin/treez/monitor", label: "Change Monitor (Old)", icon: "🔔", group: "hidden" },
-  { href: "/admin/opticon", label: "Opticon Products (Old)", icon: "📱", group: "hidden" },
+  { href: "/admin/treez-location", label: "Treez Table", icon: Package, group: "tables" },
+  { href: "/admin/opticon", label: "Opticon Table", icon: Smartphone, group: "tables" },
+  { href: "/admin/supabase", label: "Supabase Table", icon: Database, group: "tables" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -25,9 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const groupLabels: Record<string, string> = {
     main: "Main",
-    products: "Products",
-    monitor: "Monitoring",
-    opticon: "Opticon",
+    tables: "Tables",
   };
 
   const groupedItems = navItems.reduce((acc, item) => {

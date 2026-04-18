@@ -24,7 +24,7 @@ export default function Home() {
         </p>
         <div className="flex gap-4">
           <Link
-            href="/admin"
+            href="/admin/middleware"
             className="rounded-lg px-6 py-3 text-base font-medium text-white transition hover:opacity-90"
             style={{ backgroundColor: BRAND_BLUE }}
           >
