@@ -21,9 +21,19 @@ let cronInitialized = false;
  * Background job to check for product changes every minute
  * Runs independently of whether the monitor page is open
  */
+function isBackgroundSyncEnabled(): boolean {
+  const v = process.env.ENABLE_BACKGROUND_SYNC?.trim().toLowerCase();
+  return v === "true" || v === "1" || v === "yes";
+}
+
 export async function startBackgroundChangeDetection() {
   // Only run on server side
   if (typeof window !== 'undefined') {
+    return;
+  }
+
+  if (!isBackgroundSyncEnabled()) {
+    console.log("[Background Monitor] Skipped (set ENABLE_BACKGROUND_SYNC=true to enable cron jobs)");
     return;
   }
 
