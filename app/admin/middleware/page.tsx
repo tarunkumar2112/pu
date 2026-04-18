@@ -1,31 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { flushSync } from "react-dom";
 import {
   type TreezProduct,
   getProductDisplay,
   getTreezProductListId,
   normalizeTreezProductId,
-  treezBrandForOpticonNotUsed,
 } from "@/lib/treez";
-import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 import {
   Package,
   CheckCircle2,
   AlertCircle,
   Sparkles,
-  Zap,
-  RefreshCw,
-  Info,
-  Upload,
   Database,
   Smartphone,
   Loader2,
-  Clock,
-  Webhook,
   X,
-  Trash2,
   TrendingUp,
   ChevronDown,
 } from "lucide-react";
@@ -42,71 +32,13 @@ interface SyncStatus {
   uploadError?: string;
 }
 
-type EnginePayload = {
-  changeDetection: {
-    intervalMinutes: number;
-    lastTickAt: string | null;
-    lastCompleteAt: string | null;
-    lastError: string | null;
-    lastChangesDetected: number;
-    lastSyncedToSupabase: number;
-    lastSyncedToOpticon: number;
-  };
-  catalogSync: {
-    intervalMinutes: number;
-    lastTickAt: string | null;
-    lastCompleteAt: string | null;
-    lastError: string | null;
-    lastNewProducts: number;
-    lastRemovedFromSupabase: number;
-    lastOpticonUploads: number;
-    lastFailed: number;
-  };
-  webhook: {
-    lastReceivedAt: string | null;
-    lastEventType: string | null;
-    lastProductId: string | null;
-    totalReceived: number;
-    lastError: string | null;
-    lastSuccessAt: string | null;
-  };
-  activity: Array<{ at: string; channel: string; message: string }>;
-};
-
 export default function MiddlewarePage() {
   const [products, setProducts] = useState<TreezProduct[]>([]);
   const [syncStatuses, setSyncStatuses] = useState<Map<string, SyncStatus>>(new Map());
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
-  const [uploadingAll, setUploadingAll] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [searchQuery, setSearchQuery] = useState("");
   const [browseProductsOpen, setBrowseProductsOpen] = useState(false);
-  const [brandSyncLoading, setBrandSyncLoading] = useState(false);
-  const [brandSyncResult, setBrandSyncResult] = useState<Record<string, unknown> | null>(null);
-  const [brandSyncProgress, setBrandSyncProgress] = useState<{
-    totalRows: number;
-    processedRows: number;
-    batchIndex: number;
-    cumulativeUpdated: number;
-    cumulativeFailed: number;
-    cumulativeWouldUpdate: number;
-    cumulativeExamined: number;
-    cumulativeSkippedNoTreez: number;
-    cumulativeSkippedAlready: number;
-    dryRun: boolean;
-    /** Last completed HTTP batch only (count-wise progress for this round) */
-    batchRowsInRange: number;
-    batchExamined: number;
-    batchUpdated: number;
-    batchWouldUpdate: number;
-    batchFailed: number;
-    batchSkippedNoTreez: number;
-    batchSkippedAlready: number;
-    batchRowFrom: number;
-    batchRowTo: number;
-  } | null>(null);
-  const [engine, setEngine] = useState<EnginePayload | null>(null);
   const [syncMeta, setSyncMeta] = useState<{
     supabaseSnapshotRows: number;
     opticonBarcodeCount: number;
@@ -116,24 +48,6 @@ export default function MiddlewarePage() {
     /** Distinct snapshot `treez_product_id`s not in this FOH list */
     supabaseSnapshotsNotInTreez: number;
   } | null>(null);
-
-  const webhookUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/api/webhooks/treez/product`
-      : "/api/webhooks/treez/product";
-
-  const loadEngineStatus = async () => {
-    try {
-      const res = await fetch("/api/sync/engine-status");
-      const data = await res.json();
-      if (data.success) {
-        const { success: _s, ...rest } = data;
-        setEngine(rest as EnginePayload);
-      }
-    } catch {
-      /* ignore */
-    }
-  };
 
   // Fetch products from Treez
   const fetchProducts = async () => {
@@ -373,194 +287,6 @@ export default function MiddlewarePage() {
     }
   };
 
-  // Upload all products that need syncing (smart detection)
-  const uploadAllProducts = async () => {
-    setUploadingAll(true);
-    
-    // Get all products that need uploading (new OR partial)
-    const productsToUpload = products.filter((p) => {
-      const mapKey = normalizeTreezProductId(getTreezProductListId(p));
-      if (!mapKey) return false;
-      const status = syncStatuses.get(mapKey);
-      return status?.status === "new" || status?.status === "partial";
-    });
-
-    setUploadProgress({ current: 0, total: productsToUpload.length });
-
-    for (let i = 0; i < productsToUpload.length; i++) {
-      await uploadProduct(productsToUpload[i], i);
-      setUploadProgress({ current: i + 1, total: productsToUpload.length });
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    setUploadingAll(false);
-    setUploadProgress({ current: 0, total: 0 });
-    
-    // Re-check status after upload
-    setTimeout(() => checkSyncStatus(), 1000);
-  };
-
-  const BRAND_SYNC_BATCH = 120;
-
-  /** Backfill Opticon `Brandname` from Treez brand (Barcode = Treez UUID). Batched for progress + timeouts. */
-  const runBrandSyncToNotUsed = async (dryRun: boolean) => {
-    if (
-      !dryRun &&
-      !window.confirm(
-        "Update Opticon products: set Brandname = Treez brand wherever Barcode matches the FOH catalog? This runs in batches and may take several minutes."
-      )
-    ) {
-      return;
-    }
-    setBrandSyncLoading(true);
-    setBrandSyncResult(null);
-    setBrandSyncProgress({
-      totalRows: 0,
-      processedRows: 0,
-      batchIndex: 0,
-      cumulativeUpdated: 0,
-      cumulativeFailed: 0,
-      cumulativeWouldUpdate: 0,
-      cumulativeExamined: 0,
-      cumulativeSkippedNoTreez: 0,
-      cumulativeSkippedAlready: 0,
-      dryRun,
-      batchRowsInRange: 0,
-      batchExamined: 0,
-      batchUpdated: 0,
-      batchWouldUpdate: 0,
-      batchFailed: 0,
-      batchSkippedNoTreez: 0,
-      batchSkippedAlready: 0,
-      batchRowFrom: 0,
-      batchRowTo: 0,
-    });
-
-    let offset = 0;
-    let batchNum = 0;
-    let cumUpdated = 0;
-    let cumFailed = 0;
-    let cumWould = 0;
-    let cumExamined = 0;
-    let cumSkipNo = 0;
-    let cumSkipAl = 0;
-    const allErrors: string[] = [];
-    let lastPayload: Record<string, unknown> | null = null;
-
-    try {
-      for (;;) {
-        batchNum += 1;
-        const res = await fetch("/api/opticon/sync-brands-notused", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            dryRun,
-            delayMs: 75,
-            location: "FRONT OF HOUSE",
-            offset,
-            batchSize: BRAND_SYNC_BATCH,
-          }),
-        });
-        const data = (await res.json()) as Record<string, unknown>;
-        lastPayload = data;
-
-        if (!res.ok || data.success !== true) {
-          setBrandSyncResult(data);
-          if (batchNum === 1) setBrandSyncProgress(null);
-          break;
-        }
-
-        const batch = (data.batch ?? {}) as Record<string, unknown>;
-        const prog = (data.progress ?? {}) as Record<string, unknown>;
-
-        cumUpdated += Number(batch.updated ?? 0);
-        cumFailed += Number(batch.failed ?? 0);
-        cumWould += Number(batch.wouldUpdate ?? 0);
-        cumExamined += Number(batch.examined ?? 0);
-        cumSkipNo += Number(batch.skippedNoTreezOrBrand ?? 0);
-        cumSkipAl += Number(batch.skippedAlready ?? 0);
-
-        const errs = batch.errors as string[] | undefined;
-        if (errs?.length) {
-          for (const e of errs) {
-            if (allErrors.length < 35) allErrors.push(e);
-          }
-        }
-
-        const totalRows = Number(prog.totalRows ?? 0);
-        const processedRows = Number(prog.processedRows ?? 0);
-        const batchRowsInRange = Number(batch.rowsInBatch ?? 0);
-        const batchRowFrom = Number(batch.offsetStart ?? 0);
-        const batchRowTo = Number(batch.offsetEnd ?? 0);
-        const bEx = Number(batch.examined ?? 0);
-        const bUp = Number(batch.updated ?? 0);
-        const bWu = Number(batch.wouldUpdate ?? 0);
-        const bFa = Number(batch.failed ?? 0);
-        const bSn = Number(batch.skippedNoTreezOrBrand ?? 0);
-        const bSa = Number(batch.skippedAlready ?? 0);
-
-        flushSync(() => {
-          setBrandSyncProgress({
-            totalRows,
-            processedRows,
-            batchIndex: batchNum,
-            cumulativeUpdated: cumUpdated,
-            cumulativeFailed: cumFailed,
-            cumulativeWouldUpdate: cumWould,
-            cumulativeExamined: cumExamined,
-            cumulativeSkippedNoTreez: cumSkipNo,
-            cumulativeSkippedAlready: cumSkipAl,
-            dryRun,
-            batchRowsInRange,
-            batchExamined: bEx,
-            batchUpdated: bUp,
-            batchWouldUpdate: bWu,
-            batchFailed: bFa,
-            batchSkippedNoTreez: bSn,
-            batchSkippedAlready: bSa,
-            batchRowFrom,
-            batchRowTo,
-          });
-        });
-
-        const hasMore = Boolean(data.hasMore);
-        if (!hasMore) {
-          setBrandSyncResult({
-            success: true,
-            dryRun,
-            batches: batchNum,
-            treezProductCount: data.treezProductCount,
-            treezBarcodesWithBrand: data.treezBarcodesWithBrand,
-            opticonRowCount: data.opticonRowCount,
-            totals: {
-              examined: cumExamined,
-              updated: cumUpdated,
-              wouldUpdate: dryRun ? cumWould : undefined,
-              failed: cumFailed,
-              skippedNoTreezOrBrand: cumSkipNo,
-              skippedAlready: cumSkipAl,
-            },
-            errors: allErrors.length ? allErrors : undefined,
-            lastBatch: batch,
-          });
-          if (!dryRun) setTimeout(() => void checkSyncStatus(), 800);
-          break;
-        }
-
-        offset = Number(data.nextOffset ?? processedRows);
-      }
-    } catch (e) {
-      setBrandSyncProgress(null);
-      setBrandSyncResult({
-        success: false,
-        error: e instanceof Error ? e.message : String(e),
-        lastOk: lastPayload,
-      });
-    } finally {
-      setBrandSyncLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -570,19 +296,6 @@ export default function MiddlewarePage() {
       checkSyncStatus();
     }
   }, [products]);
-
-  useEffect(() => {
-    loadEngineStatus();
-    const t = setInterval(() => {
-      loadEngineStatus();
-    }, 8000);
-    return () => {
-      clearInterval(t);
-    };
-  }, []);
-
-  const fmt = (iso: string | null) =>
-    iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "short", timeStyle: "medium" }) : "—";
 
   const filteredProducts = products.filter((product) => {
     if (!searchQuery) return true;
@@ -705,329 +418,6 @@ export default function MiddlewarePage() {
           Supabase snapshot load failed — Opticon/Supabase card totals may be wrong: {syncMeta.supabaseError}
         </p>
       ) : null}
-
-      {/* Catalog (5m) + webhook — change-monitor UI removed */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
-              <RefreshCw className="h-5 w-5 text-emerald-700" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-zinc-900">Catalog add / remove (cron)</h2>
-              <p className="text-xs text-zinc-500">
-                FRONT OF HOUSE vs Supabase · new rows + DB cleanup. Background crons stay off until{" "}
-                <code className="rounded bg-zinc-100 px-1">ENABLE_BACKGROUND_SYNC=true</code> and a server restart.
-              </p>
-            </div>
-          </div>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
-              <Clock className="h-3.5 w-3.5" />
-              Interval: {engine?.catalogSync.intervalMinutes ?? 5} min
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
-              <Sparkles className="h-3.5 w-3.5" />
-              New items: {engine?.catalogSync.lastNewProducts ?? 0}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-800">
-              <Trash2 className="h-3.5 w-3.5" />
-              Removed (Supabase): {engine?.catalogSync.lastRemovedFromSupabase ?? 0}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-800">
-              <Upload className="h-3.5 w-3.5" />
-              Opticon uploads: {engine?.catalogSync.lastOpticonUploads ?? 0}
-            </span>
-          </div>
-          <p className="text-xs text-zinc-500">
-            Products that disappear from this Treez location slice are deleted from <code className="rounded bg-zinc-100 px-1">product_snapshots</code> and related{" "}
-            <code className="rounded bg-zinc-100 px-1">product_changes</code>. Opticon rows are not auto-deleted yet (no delete API).
-          </p>
-          <dl className="mt-3 space-y-1 text-xs text-zinc-600">
-            <div className="flex justify-between gap-2">
-              <dt>Last tick</dt>
-              <dd className="font-mono text-zinc-800">{fmt(engine?.catalogSync.lastTickAt ?? null)}</dd>
-            </div>
-            <div className="flex justify-between gap-2">
-              <dt>Last success</dt>
-              <dd className="font-mono text-zinc-800">{fmt(engine?.catalogSync.lastCompleteAt ?? null)}</dd>
-            </div>
-            {engine?.catalogSync.lastError ? (
-              <div className="rounded border border-red-200 bg-red-50 p-2 text-red-800">{engine.catalogSync.lastError}</div>
-            ) : null}
-          </dl>
-        </div>
-
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100">
-              <Webhook className="h-5 w-5 text-violet-700" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-zinc-900">Treez product webhook</h2>
-              <p className="text-xs text-zinc-500">PRODUCT create / update / activate / deactivate / image</p>
-            </div>
-          </div>
-          <div className="mb-3 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-3">
-            <p className="mb-1 text-xs font-medium text-zinc-500">POST URL (expose publicly for Treez)</p>
-            <code className="break-all text-xs text-zinc-800">{webhookUrl}</code>
-          </div>
-          <p className="mb-2 text-xs text-zinc-600">
-            Optional auth: set <code className="rounded bg-zinc-100 px-1">TREEZ_WEBHOOK_SECRET</code> in env and send{" "}
-            <code className="rounded bg-zinc-100 px-1">Authorization: Bearer …</code> or{" "}
-            <code className="rounded bg-zinc-100 px-1">X-Treez-Webhook-Secret</code>.
-          </p>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
-              Received (total): {engine?.webhook.totalReceived ?? 0}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Last OK: {fmt(engine?.webhook.lastSuccessAt ?? null)}
-            </span>
-          </div>
-          <dl className="space-y-1 text-xs text-zinc-600">
-            <div className="flex justify-between gap-2">
-              <dt>Last product</dt>
-              <dd className="max-w-[60%] truncate font-mono text-zinc-800">{engine?.webhook.lastProductId ?? "—"}</dd>
-            </div>
-            <div className="flex justify-between gap-2">
-              <dt>Last received</dt>
-              <dd className="font-mono text-zinc-800">{fmt(engine?.webhook.lastReceivedAt ?? null)}</dd>
-            </div>
-            {engine?.webhook.lastError ? (
-              <div className="rounded border border-red-200 bg-red-50 p-2 text-red-800">{engine.webhook.lastError}</div>
-            ) : null}
-          </dl>
-        </div>
-      </div>
-
-      {/* Upload Progress */}
-      {uploadingAll && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-blue-900">Uploading Products...</p>
-            <p className="text-sm font-medium text-blue-700">
-              {uploadProgress.current} / {uploadProgress.total}
-            </p>
-          </div>
-          <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-blue-600 h-full transition-all duration-300"
-              style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons - SINGLE SMART BUTTON */}
-      <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-emerald-50 rounded-2xl border-2 border-blue-300 p-8 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-2xl font-bold text-zinc-900 mb-2">Smart Sync Control</h3>
-            <p className="text-zinc-600">Intelligent sync to both Opticon + Supabase simultaneously</p>
-          </div>
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <Zap className="w-8 h-8 text-white" />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={uploadAllProducts}
-            disabled={uploadingAll || (stats.new + stats.partial) === 0}
-            className="group relative overflow-hidden rounded-xl px-10 py-8 text-lg font-bold text-white transition-all disabled:opacity-50 hover:scale-105 hover:shadow-2xl"
-            style={{ backgroundColor: "#10b981" }}
-          >
-            <div className="relative z-10">
-              <Upload className="w-12 h-12 mx-auto mb-3" />
-              <div className="mb-2">Smart Upload All</div>
-              <div className="text-sm font-normal opacity-90">
-                {stats.new + stats.partial} products need syncing
-              </div>
-              <div className="text-xs font-normal opacity-80 mt-1">
-                Auto-detects missing from Supabase or Opticon
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-
-          <button
-            onClick={fetchProducts}
-            disabled={loading || uploadingAll}
-            className="group relative overflow-hidden rounded-xl px-10 py-8 text-lg font-bold text-zinc-700 bg-white border-2 border-zinc-300 transition-all disabled:opacity-50 hover:scale-105 hover:shadow-xl hover:border-zinc-400"
-          >
-            <div className="relative z-10">
-              <RefreshCw className="w-12 h-12 mx-auto mb-3" />
-              <div className="mb-2">Refresh from Treez</div>
-              <div className="text-sm font-normal opacity-70">
-                Get latest product data
-              </div>
-            </div>
-          </button>
-        </div>
-
-        <div className="mt-6 bg-white/80 backdrop-blur rounded-lg p-4 border border-blue-200">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 text-sm text-zinc-700">
-              <p className="font-semibold mb-2">How Smart Upload Works:</p>
-              <ul className="space-y-1 text-xs">
-                <li className="flex items-start gap-2">
-                  <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
-                  <span><strong>Auto-detects</strong> products missing from Supabase OR Opticon</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Upload className="w-3 h-3 flex-shrink-0 mt-0.5 text-blue-600" />
-                  <span>Uploads to <strong>both systems simultaneously</strong></span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Database className="w-3 h-3 flex-shrink-0 mt-0.5 text-purple-600" />
-                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong>; brand in <strong>Brandname</strong></span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
-                  <span>Already synced products are <strong>automatically skipped</strong></span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Backfill Opticon Brandname with Treez brand (existing rows) */}
-      <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50/90 to-white p-5 shadow-sm">
-        <div className="mb-2 flex items-center gap-2">
-          <Smartphone className="h-4 w-4 text-violet-700" />
-          <h3 className="text-sm font-semibold text-violet-950">Opticon: brand → Brandname</h3>
-        </div>
-        <p className="mb-3 text-xs leading-relaxed text-violet-900/90">
-          Loads Treez <strong>FRONT OF HOUSE</strong> products and Opticon rows, matches on{" "}
-          <code className="rounded bg-violet-100 px-1">Barcode</code> (Treez UUID), then re-sends each Opticon product with{" "}
-          <code className="rounded bg-violet-100 px-1">Brandname</code> set to the Treez brand (length capped per{" "}
-          <code className="rounded bg-violet-100 px-1">OPTICON_BRAND_MAX_LEN</code>, default 255). Skips
-          rows that already match. The <strong>first batch</strong> waits for the full Treez catalog and a full{" "}
-          <code className="rounded bg-violet-100 px-1">GET /api/Products</code> download from the hub (large stores can take several minutes); later batches reuse the in-memory product list. Runs in <strong>batches</strong> with a live progress bar. Use <strong>Dry run</strong> first. If this app runs on
-          Vercel with a short request limit, run the same sync from your <strong>local / store server</strong> or
-          increase <code className="rounded bg-violet-100 px-1">maxDuration</code> where supported.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => void runBrandSyncToNotUsed(true)}
-            disabled={brandSyncLoading || loading}
-            className="rounded-lg border border-violet-300 bg-white px-4 py-2 text-xs font-semibold text-violet-900 shadow-sm transition hover:bg-violet-50 disabled:opacity-50"
-          >
-            {brandSyncLoading ? "Working…" : "Dry run (counts only)"}
-          </button>
-          <button
-            type="button"
-            onClick={() => void runBrandSyncToNotUsed(false)}
-            disabled={brandSyncLoading || loading}
-            className="rounded-lg px-4 py-2 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50 hover:opacity-90"
-            style={{ backgroundColor: "#6d28d9" }}
-          >
-            {brandSyncLoading ? "Working…" : "Run sync to Opticon"}
-          </button>
-        </div>
-
-        {brandSyncProgress && (brandSyncLoading || brandSyncProgress.totalRows > 0 || brandSyncProgress.batchIndex > 0) ? (
-          <div className="mt-4 rounded-lg border border-violet-200 bg-white/90 p-3">
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-violet-950">
-              <span className="font-semibold">
-                {brandSyncProgress.totalRows === 0 && brandSyncLoading ? (
-                  <>Preparing first batch…</>
-                ) : (
-                  <>
-                    Batch {brandSyncProgress.batchIndex}
-                    {brandSyncLoading ? <Loader2 className="ml-1 inline h-3.5 w-3.5 animate-spin text-violet-600" /> : null}
-                  </>
-                )}
-              </span>
-              {brandSyncProgress.totalRows > 0 ? (
-                <span className="font-mono text-violet-800">
-                  Rows {brandSyncProgress.processedRows.toLocaleString()} / {brandSyncProgress.totalRows.toLocaleString()} (
-                  {Math.min(
-                    100,
-                    Math.round((brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 1000) / 10
-                  )}
-                  %)
-                </span>
-              ) : (
-                <span className="text-violet-700/80">Fetching full Treez catalog + Opticon product table…</span>
-              )}
-            </div>
-
-            {brandSyncProgress.totalRows > 0 ? (
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
-                <div
-                  className="h-full rounded-full bg-violet-600 transition-[width] duration-300 ease-out"
-                  style={{
-                    width: `${Math.min(100, (brandSyncProgress.processedRows / brandSyncProgress.totalRows) * 100)}%`,
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-200">
-                <div className="h-full w-1/3 animate-pulse rounded-full bg-violet-500" />
-              </div>
-            )}
-
-            {brandSyncProgress.batchIndex > 0 && brandSyncProgress.totalRows > 0 ? (
-              <div className="mt-3 rounded-md border border-violet-100 bg-violet-50/80 px-2.5 py-2 text-[11px] leading-snug text-violet-950">
-                <p className="font-semibold text-violet-900">This batch (rows {brandSyncProgress.batchRowFrom.toLocaleString()}–{(brandSyncProgress.batchRowTo - 1).toLocaleString()})</p>
-                <p className="mt-1 font-mono text-violet-800">
-                  Barcodes examined: <strong>{brandSyncProgress.batchExamined.toLocaleString()}</strong>
-                  {" · "}
-                  {brandSyncProgress.dryRun ? (
-                    <>
-                      Would set brand (Brandname): <strong className="text-emerald-800">{brandSyncProgress.batchWouldUpdate.toLocaleString()}</strong>
-                    </>
-                  ) : (
-                    <>
-                      Brands written to Opticon: <strong className="text-emerald-800">{brandSyncProgress.batchUpdated.toLocaleString()}</strong>
-                    </>
-                  )}
-                  {" · "}
-                  Failed: <strong className="text-red-700">{brandSyncProgress.batchFailed.toLocaleString()}</strong>
-                  {" · "}
-                  Skip: <strong>{(brandSyncProgress.batchSkippedNoTreez + brandSyncProgress.batchSkippedAlready).toLocaleString()}</strong>
-                </p>
-              </div>
-            ) : null}
-
-            <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">Running totals (all batches)</p>
-            <dl className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-zinc-700 sm:grid-cols-4">
-              <div>
-                <dt className="text-zinc-500">Barcodes examined</dt>
-                <dd className="font-semibold text-zinc-900">{brandSyncProgress.cumulativeExamined.toLocaleString()}</dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">{brandSyncProgress.dryRun ? "Would set brand" : "Brands written"}</dt>
-                <dd className="font-semibold text-emerald-700">
-                  {(brandSyncProgress.dryRun ? brandSyncProgress.cumulativeWouldUpdate : brandSyncProgress.cumulativeUpdated).toLocaleString()}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">Failed</dt>
-                <dd className="font-semibold text-red-700">{brandSyncProgress.cumulativeFailed.toLocaleString()}</dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">Skip (no brand / already)</dt>
-                <dd className="font-semibold text-zinc-800">
-                  {(brandSyncProgress.cumulativeSkippedNoTreez + brandSyncProgress.cumulativeSkippedAlready).toLocaleString()}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        ) : null}
-
-        {brandSyncResult ? (
-          <pre className="mt-3 max-h-48 overflow-auto rounded-lg border border-violet-200 bg-white p-3 font-mono text-[11px] leading-relaxed text-zinc-800">
-            {JSON.stringify(brandSyncResult, null, 2)}
-          </pre>
-        ) : null}
-      </div>
 
       {/* Product table — hidden by default; sync still runs in the background */}
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
@@ -1189,7 +579,6 @@ export default function MiddlewarePage() {
                         ) : status.status !== "synced" ? (
                           <button
                             onClick={() => uploadProduct(product, index)}
-                            disabled={uploadingAll}
                             className="rounded-lg px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition disabled:opacity-50"
                           >
                             Upload
