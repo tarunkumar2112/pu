@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type TreezProduct, treezBrandForOpticonNotUsed } from "@/lib/treez";
+import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 import { extractProductSnapshot, saveProductSnapshot } from "@/lib/change-detector";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { recordWebhookProduct } from "@/lib/sync-engine-status";
@@ -108,7 +109,8 @@ export async function POST(request: NextRequest) {
 
     const price = snapshot.price ?? 0;
     const opt = {
-      NotUsed: treezBrandForOpticonNotUsed(treezProduct),
+      NotUsed: "",
+      ...opticonBrandPayload(treezBrandForOpticonNotUsed(treezProduct)),
       ProductId: "",
       Barcode: snapshot.treez_product_id,
       Description: snapshot.product_name || "",

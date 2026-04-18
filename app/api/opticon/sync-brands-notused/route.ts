@@ -5,6 +5,11 @@ import {
   normalizeTreezProductId,
   treezBrandForOpticonNotUsed,
 } from "@/lib/treez";
+import {
+  getOpticonBrandField,
+  readProductRowBrandField,
+  writeProductRowBrandField,
+} from "@/lib/opticon-brand-field";
 import { fetchEbs50Products, pushProductToEbs50, ebs50ProductRowToPayload } from "@/lib/opticon";
 
 /** Long-running: self-hosted / tunnel recommended; Vercel may time out on full catalogs. */
@@ -62,7 +67,7 @@ async function getBrandByBarcodeMap(location: string): Promise<{
 
 /**
  * POST /api/opticon/sync-brands-notused
- * For each EBS50 product row, match Barcode (Treez UUID) to Treez catalog and set NotUsed = brand.
+ * For each EBS50 product row, match Barcode (Treez UUID) to Treez catalog and set brand column (default `Brandname`).
  *
  * **Batched mode:** send `offset` (0-based) and optional `batchSize` (default 120). Response includes
  * `nextOffset`, `hasMore`, and batch counters so the client can show progress.
@@ -102,6 +107,7 @@ export async function POST(request: NextRequest) {
 
     const rows = opt.products;
     const totalOpticonRows = rows.length;
+    const brandField = getOpticonBrandField();
 
     let rangeStart: number;
     let rangeEnd: number;
@@ -144,8 +150,8 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      const curNot = String(r.NotUsed ?? r.notUsed ?? "").trim();
-      if (curNot === brand) {
+      const curBrand = readProductRowBrandField(r, brandField).trim();
+      if (curBrand === brand) {
         skippedAlready++;
         continue;
       }
@@ -155,12 +161,11 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      const payload = ebs50ProductRowToPayload(r, { NotUsed: brand });
+      const payload = ebs50ProductRowToPayload(r, { [brandField]: brand });
       const res = await pushProductToEbs50(payload);
       if (res.success) {
         updated++;
-        r.NotUsed = brand;
-        r.notUsed = brand;
+        writeProductRowBrandField(r, brand, brandField);
       } else {
         failed++;
         if (errors.length < 20) {

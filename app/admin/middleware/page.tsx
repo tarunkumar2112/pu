@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { flushSync } from "react-dom";
 import {
-  TreezProduct,
+  type TreezProduct,
   getProductDisplay,
   getTreezProductListId,
   normalizeTreezProductId,
   treezBrandForOpticonNotUsed,
 } from "@/lib/treez";
+import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 import {
   Package,
   CheckCircle2,
@@ -309,9 +310,10 @@ export default function MiddlewarePage() {
       else if (pricing?.tier_pricing_detail?.[0]?.price_per_value) price = Number(pricing.tier_pricing_detail[0].price_per_value);
       else if (product.price) price = Number(product.price);
 
-      // 1. Upload to Opticon (using UUID as Barcode; brand in NotUsed for ESL templates)
+      // 1. Upload to Opticon (UUID as Barcode; brand in Brandname — see lib/opticon-brand-field.ts)
       const opticonProduct = {
-        NotUsed: treezBrandForOpticonNotUsed(product),
+        NotUsed: "",
+        ...opticonBrandPayload(treezBrandForOpticonNotUsed(product)),
         ProductId: String(index + 1),
         Barcode: treezUuid,
         Description: String(cfg?.name || product.name || ""),
@@ -423,12 +425,12 @@ export default function MiddlewarePage() {
 
   const BRAND_SYNC_BATCH = 120;
 
-  /** Backfill Opticon `NotUsed` from Treez brand (Barcode = Treez UUID). Batched for progress + timeouts. */
+  /** Backfill Opticon `Brandname` from Treez brand (Barcode = Treez UUID). Batched for progress + timeouts. */
   const runBrandSyncToNotUsed = async (dryRun: boolean) => {
     if (
       !dryRun &&
       !window.confirm(
-        "Update Opticon products: set NotUsed = Treez brand wherever Barcode matches the FOH catalog? This runs in batches and may take several minutes."
+        "Update Opticon products: set Brandname = Treez brand wherever Barcode matches the FOH catalog? This runs in batches and may take several minutes."
       )
     ) {
       return;
@@ -1019,7 +1021,7 @@ export default function MiddlewarePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Database className="w-3 h-3 flex-shrink-0 mt-0.5 text-purple-600" />
-                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong>; brand in <strong>NotUsed</strong></span>
+                  <span>Treez UUID stored as <strong>Barcode in Opticon</strong>; brand in <strong>Brandname</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-3 h-3 flex-shrink-0 mt-0.5 text-emerald-600" />
@@ -1031,16 +1033,17 @@ export default function MiddlewarePage() {
         </div>
       </div>
 
-      {/* Backfill Opticon NotUsed with Treez brand (existing rows) */}
+      {/* Backfill Opticon Brandname with Treez brand (existing rows) */}
       <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50/90 to-white p-5 shadow-sm">
         <div className="mb-2 flex items-center gap-2">
           <Smartphone className="h-4 w-4 text-violet-700" />
-          <h3 className="text-sm font-semibold text-violet-950">Opticon: brand → NotUsed</h3>
+          <h3 className="text-sm font-semibold text-violet-950">Opticon: brand → Brandname</h3>
         </div>
         <p className="mb-3 text-xs leading-relaxed text-violet-900/90">
           Loads Treez <strong>FRONT OF HOUSE</strong> products and Opticon rows, matches on{" "}
           <code className="rounded bg-violet-100 px-1">Barcode</code> (Treez UUID), then re-sends each Opticon product with{" "}
-          <code className="rounded bg-violet-100 px-1">NotUsed</code> set to the Treez brand (truncated to 100 chars). Skips
+          <code className="rounded bg-violet-100 px-1">Brandname</code> set to the Treez brand (length capped per{" "}
+          <code className="rounded bg-violet-100 px-1">OPTICON_BRAND_MAX_LEN</code>, default 255). Skips
           rows that already match. The <strong>first batch</strong> waits for the full Treez catalog and a full{" "}
           <code className="rounded bg-violet-100 px-1">GET /api/Products</code> download from the hub (large stores can take several minutes); later batches reuse the in-memory product list. Runs in <strong>batches</strong> with a live progress bar. Use <strong>Dry run</strong> first. If this app runs on
           Vercel with a short request limit, run the same sync from your <strong>local / store server</strong> or
@@ -1116,7 +1119,7 @@ export default function MiddlewarePage() {
                   {" · "}
                   {brandSyncProgress.dryRun ? (
                     <>
-                      Would set brand (NotUsed): <strong className="text-emerald-800">{brandSyncProgress.batchWouldUpdate.toLocaleString()}</strong>
+                      Would set brand (Brandname): <strong className="text-emerald-800">{brandSyncProgress.batchWouldUpdate.toLocaleString()}</strong>
                     </>
                   ) : (
                     <>

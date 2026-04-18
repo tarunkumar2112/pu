@@ -1,4 +1,5 @@
 import { fetchTreezProducts, treezBrandForOpticonNotUsed } from "@/lib/treez";
+import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 import { getAllSnapshots, saveProductSnapshot } from "@/lib/change-detector";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { supabase } from "@/lib/supabase";
@@ -116,7 +117,8 @@ export async function runAutoSyncCatalog(): Promise<CatalogSyncResult> {
         newProducts++;
 
         const opt = {
-          NotUsed: treezBrandForOpticonNotUsed(product),
+          NotUsed: "",
+          ...opticonBrandPayload(treezBrandForOpticonNotUsed(product)),
           ProductId: String(seq),
           Barcode: productId,
           Description: String(snapshot.product_name),

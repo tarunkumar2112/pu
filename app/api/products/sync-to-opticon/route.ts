@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import { type TreezProduct, treezBrandForOpticonNotUsed } from "@/lib/treez";
+import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 
 /**
  * Sync a specific change to Opticon ESL
@@ -74,14 +75,15 @@ export async function POST(request: NextRequest) {
     });
 
     const rawTreez = product.raw_data as TreezProduct | undefined;
-    const notUsedBrand = rawTreez ? treezBrandForOpticonNotUsed(rawTreez) : "";
+    const brandStr = rawTreez ? treezBrandForOpticonNotUsed(rawTreez) : "";
 
     // Build Opticon product payload
     // IMPORTANT: Find product in Opticon by BARCODE (Treez UUID), not ProductId
     // We need to UPDATE existing product, not create new one
     // Opticon uses Barcode field to identify which product to update
     const opticonProduct = {
-      NotUsed: notUsedBrand,
+      NotUsed: "",
+      ...opticonBrandPayload(brandStr),
       ProductId: "", // Empty - Opticon will find by Barcode
       Barcode: product.opticon_barcode, // Treez UUID - THIS is how Opticon identifies product
       Description: product.product_name || "",

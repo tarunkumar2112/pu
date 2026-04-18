@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readWatchList, writeWatchList } from "@/lib/watch-list";
-import { fetchTreezProductById, getNestedValue } from "@/lib/treez";
+import { fetchTreezProductById, getNestedValue, treezBrandForOpticonNotUsed } from "@/lib/treez";
+import { opticonBrandPayload } from "@/lib/opticon-brand-field";
 import { pushProductToEbs50 } from "@/lib/opticon";
 import type { WatchListItem } from "@/lib/watch-list";
 import type { TreezProduct } from "@/lib/treez";
@@ -17,7 +18,10 @@ const DEFAULT_MAPPINGS = [
 ];
 
 function productToOpticon(product: TreezProduct): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
+  const result: Record<string, unknown> = {
+    NotUsed: "",
+    ...opticonBrandPayload(treezBrandForOpticonNotUsed(product)),
+  };
   for (const { treez: treezPath, opticon: opticonKey } of DEFAULT_MAPPINGS) {
     const val = getNestedValue(product, treezPath);
     if (val !== undefined && val !== null) {

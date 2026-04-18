@@ -1,4 +1,5 @@
 import { fetchTreezProductById, treezBrandForOpticonNotUsed, type TreezProduct } from './treez';
+import { opticonBrandPayload } from './opticon-brand-field';
 import {
   extractProductSnapshot,
   detectProductChanges,
@@ -246,11 +247,12 @@ async function autoSyncToOpticon(changes: any[], snapshots: any[]): Promise<{ sy
       console.log(`[Opticon Auto-Sync] Syncing ${product.product_name}...`);
 
       const rawTreez = product.raw_data as TreezProduct | undefined;
-      const notUsedBrand = rawTreez ? treezBrandForOpticonNotUsed(rawTreez) : "";
+      const brandStr = rawTreez ? treezBrandForOpticonNotUsed(rawTreez) : "";
 
       // Build Opticon payload
       const opticonProduct = {
-        NotUsed: notUsedBrand,
+        NotUsed: "",
+        ...opticonBrandPayload(brandStr),
         ProductId: "",
         Barcode: product.opticon_barcode, // Treez UUID
         Description: product.product_name || "",

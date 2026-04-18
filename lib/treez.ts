@@ -135,11 +135,20 @@ export function getProductDisplay(p: TreezProduct): ProductDisplay {
   };
 }
 
-/** Brand string for Opticon `NotUsed` (EBS50 field length limits — keep short). */
-export function treezBrandForOpticonNotUsed(p: TreezProduct, maxLen = 100): string {
+/**
+ * Brand string for Opticon product row (default column `Brandname`; see OPTICON_BRAND_FIELD).
+ * Length cap from `maxLen`, else OPTICON_BRAND_MAX_LEN env, else 255.
+ */
+export function treezBrandForOpticonNotUsed(p: TreezProduct, maxLen?: number): string {
   const raw = getProductDisplay(p).brand.trim();
   if (!raw || raw === "-") return "";
-  return raw.length > maxLen ? raw.slice(0, maxLen) : raw;
+  const cap =
+    maxLen ??
+    (() => {
+      const n = Number(process.env.OPTICON_BRAND_MAX_LEN);
+      return Number.isFinite(n) && n > 0 ? Math.min(Math.floor(n), 2000) : 255;
+    })();
+  return raw.length > cap ? raw.slice(0, cap) : raw;
 }
 
 /**

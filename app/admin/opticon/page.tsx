@@ -25,6 +25,7 @@ export default function OpticonAdminPage() {
   const [linkResult, setLinkResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [testProduct, setTestProduct] = useState(`{
   "NotUsed": "",
+  "Brandname": "",
   "ProductId": "001",
   "Barcode": "3083680012256",
   "Description": "BONDUELLE CARROTS ",

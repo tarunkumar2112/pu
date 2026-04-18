@@ -38,6 +38,7 @@ const OPTICON_FIELDS = [
   { value: "Content", label: "Content" },
   { value: "Unit", label: "Unit" },
   { value: "NotUsed", label: "NotUsed" },
+  { value: "Brandname", label: "Brandname" },
 ];
 
 const DEFAULT_MAPPINGS: { treez: string; opticon: string }[] = [

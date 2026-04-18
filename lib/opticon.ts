@@ -7,6 +7,7 @@
  */
 
 import https from "node:https";
+import { getOpticonBrandField, pascalToCamelFieldKey } from "@/lib/opticon-brand-field";
 
 function getEbs50BaseUrl(): string {
   const base = process.env.EBS50_BASE_URL ?? "";
@@ -335,8 +336,10 @@ export function ebs50ProductRowToPayload(
     if (v === undefined || v === null) return def;
     return String(v);
   };
+  const brandField = getOpticonBrandField();
   const payload: Record<string, unknown> = {
     NotUsed: pick("NotUsed", "notUsed"),
+    [brandField]: pick(brandField, pascalToCamelFieldKey(brandField), ""),
     ProductId: pick("ProductId", "productId"),
     Barcode: pick("Barcode", "barcode"),
     Description: pick("Description", "description"),
