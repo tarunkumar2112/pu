@@ -41,12 +41,38 @@ function toPrice(product: Record<string, unknown>): string {
   return Number.isFinite(n) ? n.toFixed(2) : "";
 }
 
+function toDiscount(product: Record<string, unknown>): string {
+  const discount = product.discount as {
+    discount_type?: string;
+    discount_value?: number;
+  } | undefined;
+
+  if (!discount || discount.discount_value === undefined) return "";
+
+  const value = Number(discount.discount_value);
+  if (!Number.isFinite(value) || value <= 0) return "";
+
+  switch (discount.discount_type) {
+    case "PERCENT":
+      return value.toFixed(2);
+    case "DOLLAR":
+      return value.toFixed(2);
+    case "BOGO":
+      return "BOGO";
+    case "COST":
+      return value.toFixed(2);
+    default:
+      return value.toFixed(2);
+  }
+}
+
 function toCsv(products: Record<string, unknown>[]): string {
   const lines: string[] = [CSV_HEADERS.join(",")];
   products.forEach((product, index) => {
     const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
     const treezUuid = getTreezProductListId(product as any);
     const price = toPrice(product);
+    const discount = toDiscount(product);
     const row = [
       String(index + 1).padStart(3, "0"),
       treezUuid,
@@ -56,7 +82,7 @@ function toCsv(products: Record<string, unknown>[]): string {
       String(product.category_type ?? product.category ?? product.categoryName ?? ""),
       price,
       price,
-      "",
+      discount,
       String(cfg?.size ?? ""),
       String(cfg?.size_unit ?? "EA"),
       "",
@@ -80,6 +106,7 @@ export async function GET(request: NextRequest) {
       active: "ALL",
       above_threshold: true,
       sellable_quantity_in_location: location,
+      include_discounts: true,
       page_size: 5000, // Get all products
     });
 
@@ -90,6 +117,7 @@ export async function GET(request: NextRequest) {
       // Log first product to see structure
       if (products.indexOf(product) === 0) {
         console.log('[Location API] Sample product structure:', JSON.stringify(product, null, 2));
+        console.log('[Location API] Sample product discount:', JSON.stringify(product.discount, null, 2));
       }
 
       return product; // Return as-is since fetchTreezProducts already returns proper format
