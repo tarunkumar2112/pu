@@ -11,7 +11,7 @@ const LOGO_URL = "https://cdn.prod.website-files.com/67ee6c6b271e5a2294abc43e/68
 const navItems = [
   { href: "/admin/middleware", label: "Sync Middleware", icon: Zap, group: "main", highlight: true },
   { href: "/admin/treez-location", label: "Treez Table", icon: Package, group: "tables" },
-  { href: "/admin/treez-discounts", label: "Treez Discounts", icon: Percent, group: "tables" },
+  { href: "/admin/treez-discounts", label: "Cart preview", icon: Percent, group: "tables" },
   { href: "/admin/opticon", label: "Opticon Table", icon: Smartphone, group: "tables" },
   { href: "/admin/supabase", label: "Supabase Table", icon: Database, group: "tables" },
 ];

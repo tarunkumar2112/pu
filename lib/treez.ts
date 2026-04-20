@@ -243,6 +243,11 @@ async function getBaseUrl(): Promise<string> {
   return `${baseUrl}/${dispensary}`;
 }
 
+/** Exported base URL helper for Treez route wrappers. */
+export async function getTreezApiBaseUrl(): Promise<string> {
+  return getBaseUrl();
+}
+
 export async function getTreezAccessToken(): Promise<string> {
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60000) {
     return cachedToken.token;
@@ -297,6 +302,199 @@ export async function getTreezAccessToken(): Promise<string> {
     }
     throw error;
   }
+}
+
+export interface CartPreviewItemInput {
+  inventory_id: string;
+  quantity: number;
+}
+
+export interface TreezTicketPreviewRequest {
+  customer_id: string;
+  items: CartPreviewItemInput[];
+}
+
+export interface NormalizedPreviewItem {
+  inventory_id: string;
+  base_price: number;
+  final_price: number;
+  discount_amount: number;
+  discount_percent: number;
+}
+
+export interface NormalizedTicketPreviewResponse {
+  items: NormalizedPreviewItem[];
+  total_discount: number;
+  total_price: number;
+}
+
+type DiscountCandidate = {
+  amount: number;
+  percent: number;
+};
+
+function toSafeNumber(value: unknown): number {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
+/**
+ * Returns the best effective discount for one line item.
+ * Priority: highest absolute discount amount.
+ */
+export function getBestDiscount(discounts: unknown[], basePrice: number): DiscountCandidate {
+  if (!Array.isArray(discounts) || discounts.length === 0) return { amount: 0, percent: 0 };
+
+  let best: DiscountCandidate = { amount: 0, percent: 0 };
+
+  discounts.forEach((row) => {
+    if (!row || typeof row !== "object") return;
+    const d = row as Record<string, unknown>;
+
+    const amountRaw =
+      d.discount_amount ??
+      d.amount ??
+      d.value ??
+      d.savings ??
+      d.discountValue ??
+      d.line_discount_amount;
+    const percentRaw = d.discount_percent ?? d.percent ?? d.percentage ?? d.rate;
+
+    const amount = Math.max(0, toSafeNumber(amountRaw));
+    const percent = Math.max(0, toSafeNumber(percentRaw));
+    const derivedAmount = basePrice > 0 && percent > 0 ? (basePrice * percent) / 100 : 0;
+    const effectiveAmount = Math.max(amount, derivedAmount);
+
+    if (effectiveAmount > best.amount) {
+      best = {
+        amount: effectiveAmount,
+        percent: percent > 0 ? percent : basePrice > 0 ? (effectiveAmount / basePrice) * 100 : 0,
+      };
+    }
+  });
+
+  return best;
+}
+
+function pickInventoryId(item: Record<string, unknown>): string {
+  const v =
+    item.inventory_id ??
+    item.inventoryId ??
+    item.product_id ??
+    item.productId ??
+    item.id ??
+    item.uuid;
+  return v === undefined || v === null ? "" : String(v);
+}
+
+function pickQuantity(item: Record<string, unknown>): number {
+  const q = toSafeNumber(item.quantity ?? item.qty ?? item.count ?? 1);
+  return q > 0 ? q : 1;
+}
+
+function pickBasePrice(item: Record<string, unknown>): number {
+  const v =
+    item.base_price ??
+    item.original_price ??
+    item.list_price ??
+    item.price ??
+    item.unit_price;
+  return Math.max(0, toSafeNumber(v));
+}
+
+function pickFinalPrice(item: Record<string, unknown>): number {
+  const v =
+    item.final_price ??
+    item.net_price ??
+    item.discounted_price ??
+    item.price_after_discount ??
+    item.sale_price;
+  return Math.max(0, toSafeNumber(v));
+}
+
+function pickDiscountArray(item: Record<string, unknown>): unknown[] {
+  const candidates = [
+    item.discounts,
+    item.applied_discounts,
+    item.discount_breakdown,
+    item.promotions,
+    item.promo_discounts,
+  ];
+  for (const c of candidates) {
+    if (Array.isArray(c)) return c;
+  }
+  return [];
+}
+
+/**
+ * Calls Treez ticket preview and returns one effective discount per item.
+ */
+export async function fetchTreezTicketPreview(
+  payload: TreezTicketPreviewRequest
+): Promise<NormalizedTicketPreviewResponse> {
+  const token = await getTreezAccessToken();
+  const baseUrl = await getBaseUrl();
+  const clientId = getClientId();
+
+  const response = await fetch(`${baseUrl}/tickets/preview`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      client_id: clientId,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Treez tickets/preview failed: ${response.status} ${response.statusText} ${text.slice(0, 200)}`);
+  }
+
+  const data = (await response.json()) as Record<string, unknown>;
+  const itemsRaw =
+    (Array.isArray(data.items) && data.items) ||
+    (data.data && typeof data.data === "object" && Array.isArray((data.data as Record<string, unknown>).items)
+      ? ((data.data as Record<string, unknown>).items as unknown[])
+      : []);
+
+  const items: NormalizedPreviewItem[] = [];
+  let totalDiscount = 0;
+  let totalPrice = 0;
+
+  itemsRaw.forEach((row) => {
+    if (!row || typeof row !== "object") return;
+    const item = row as Record<string, unknown>;
+    const quantity = pickQuantity(item);
+    const basePrice = pickBasePrice(item);
+    const finalFromPayload = pickFinalPrice(item);
+    const best = getBestDiscount(pickDiscountArray(item), basePrice);
+    const discountAmount = Math.max(0, best.amount);
+    const finalPrice = finalFromPayload > 0 ? finalFromPayload : Math.max(0, basePrice - discountAmount);
+    const discountPercent = best.percent > 0 ? best.percent : basePrice > 0 ? (discountAmount / basePrice) * 100 : 0;
+
+    items.push({
+      inventory_id: pickInventoryId(item),
+      base_price: Number(basePrice.toFixed(2)),
+      final_price: Number(finalPrice.toFixed(2)),
+      discount_amount: Number(discountAmount.toFixed(2)),
+      discount_percent: Number(discountPercent.toFixed(2)),
+    });
+
+    totalDiscount += discountAmount * quantity;
+    totalPrice += finalPrice * quantity;
+  });
+
+  return {
+    items,
+    total_discount: Number(totalDiscount.toFixed(2)),
+    total_price: Number(totalPrice.toFixed(2)),
+  };
 }
 
 export interface TreezLocation {
