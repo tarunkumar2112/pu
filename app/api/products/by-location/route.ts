@@ -18,17 +18,9 @@ const CSV_HEADERS = [
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ResolvedDiscount {
-  product_id: string;
-  selected_discount: {
-    discount_percent: number;
-    discount_title: string;
-  };
-}
-
-interface CollectionsApiResponse {
-  success: boolean;
-  products_with_discounts: ResolvedDiscount[];
+interface ProductDiscount {
+  discount_method?: string;
+  discount_amount?: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -60,49 +52,24 @@ function toStandardPrice(product: Record<string, unknown>): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-// ─── Fetch discount percent map from /api/collections ────────────────────────
+function getBestPercentDiscount(product: Record<string, unknown>): number {
+  const discounts = product.discounts as ProductDiscount[] | undefined;
+  if (!discounts || discounts.length === 0) return 0;
 
-async function fetchDiscountPercentMap(
-  location: string,
-  baseUrl: string
-): Promise<Map<string, number>> {
-  try {
-    // active_only=false — Treez already controls which discounts are active.
-    // If a discount appears in discounts[], Treez has already determined it applies.
-    const url = `${baseUrl}/api/collections?location=${encodeURIComponent(location)}&active_only=false`;
-    console.log(`[Location API] Fetching discount map from: ${url}`);
-
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.warn(`[Location API] Collections API returned ${res.status}, skipping discounts`);
-      return new Map();
+  let best = 0;
+  for (const d of discounts) {
+    if (d.discount_method !== "PERCENT") continue;
+    const amount = Number(d.discount_amount ?? 0);
+    if (Number.isFinite(amount) && amount > best) {
+      best = amount;
     }
-
-    const data: CollectionsApiResponse = await res.json();
-    if (!data.success || !data.products_with_discounts) return new Map();
-
-    // Build map: product_id → discount_percent (e.g. 40 means 40% off)
-    // sale_price from collections is ignored — we recalculate it here using
-    // the correct standardPrice from the product's own pricing object
-    const map = new Map<string, number>();
-    for (const item of data.products_with_discounts) {
-      map.set(item.product_id, item.selected_discount.discount_percent);
-    }
-
-    console.log(`[Location API] Got discount % for ${map.size} products`);
-    return map;
-  } catch (err) {
-    console.error("[Location API] Failed to fetch collections:", err);
-    return new Map();
   }
+  return best;
 }
 
 // ─── CSV Builder ──────────────────────────────────────────────────────────────
 
-function toCsv(
-  products: Record<string, unknown>[],
-  discountPercentMap: Map<string, number>
-): string {
+function toCsv(products: Record<string, unknown>[]): string {
   const lines: string[] = [CSV_HEADERS.join(",")];
 
   products.forEach((product, index) => {
@@ -116,9 +83,8 @@ function toCsv(
     let sellPrice = standardPrice;
     let discount = "";
 
-    // Priority 1: Collection-based discount percent
-    const discountPercent = discountPercentMap.get(treezUuid);
-    if (discountPercent !== undefined && discountPercent > 0) {
+    const discountPercent = getBestPercentDiscount(product);
+    if (discountPercent > 0) {
       // Calculate sale price locally using the correct standard price
       // Formula: sale_price = price_sell × (1 - discount_percent / 100)
       const salePrice = Math.max(0, standardPriceNum * (1 - discountPercent / 100));
@@ -171,27 +137,24 @@ export async function GET(request: NextRequest) {
   const format = (searchParams.get("format") || "").toLowerCase();
   const wantsCsv = format === "csv" || request.headers.get("accept")?.includes("text/csv");
 
-  const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-
   try {
     console.log(`[Location API] Fetching products for location: ${location}`);
 
-    // Fetch products + discount percent map in parallel
-    const [products, discountPercentMap] = await Promise.all([
-      fetchTreezProducts({
-        active: "ALL",
-        above_threshold: true,
-        sellable_quantity_in_location: location,
-        include_discounts: true,
-        page_size: 5000,
-      }),
-      fetchDiscountPercentMap(location, baseUrl),
-    ]);
+    const products = await fetchTreezProducts({
+      active: "ALL",
+      above_threshold: true,
+      sellable_quantity_in_location: location,
+      include_discounts: true,
+      page_size: 5000,
+    });
+    const discountCount = products.reduce((count, product) => {
+      return count + (getBestPercentDiscount(product as Record<string, unknown>) > 0 ? 1 : 0);
+    }, 0);
 
-    console.log(`[Location API] Fetched ${products.length} products, ${discountPercentMap.size} with discounts`);
+    console.log(`[Location API] Fetched ${products.length} products, ${discountCount} with discounts`);
 
     if (wantsCsv) {
-      const csv = toCsv(products, discountPercentMap);
+      const csv = toCsv(products);
       return new NextResponse(csv, {
         status: 200,
         headers: {
@@ -203,9 +166,8 @@ export async function GET(request: NextRequest) {
 
     // JSON response — attach resolved discount info to each product
     const enrichedProducts = products.map((product: Record<string, unknown>) => {
-      const treezUuid = getTreezProductListId(product as any);
       const standardPriceNum = toStandardPrice(product);
-      const discountPercent = discountPercentMap.get(treezUuid);
+      const discountPercent = getBestPercentDiscount(product);
       const salePrice = discountPercent
         ? Math.max(0, standardPriceNum * (1 - discountPercent / 100))
         : standardPriceNum;
@@ -226,7 +188,7 @@ export async function GET(request: NextRequest) {
       success: true,
       location,
       total: enrichedProducts.length,
-      discounts_applied: discountPercentMap.size,
+      discounts_applied: discountCount,
       products: enrichedProducts,
     });
 
