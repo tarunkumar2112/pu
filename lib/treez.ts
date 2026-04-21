@@ -544,6 +544,113 @@ export async function fetchTreezLocations(): Promise<TreezLocation[]> {
   return data.location_list ?? [];
 }
 
+export interface TreezDirectDiscount {
+  discount_id?: string;
+  discount_title?: string;
+  discount_method?: string;
+  discount_amount?: number;
+  discount_affinity?: string;
+  discount_stackable?: string;
+  discount_product_groups?: string[];
+  discount_product_groups_required?: string[];
+  discount_condition_detail?: Array<{
+    discount_condition_type?: string;
+    discount_condition_value?: string;
+    discount_condition_schedule?: {
+      type?: string;
+      start_date?: string;
+      end_date?: string;
+      repeat?: unknown;
+    };
+  }>;
+  [key: string]: unknown;
+}
+
+function pickDiscountList(data: unknown): TreezDirectDiscount[] {
+  if (!data || typeof data !== "object") return [];
+  const payload = data as Record<string, unknown>;
+
+  const directArrays = [
+    payload.discount_list,
+    payload.discounts,
+    payload.data,
+    payload.result,
+  ];
+  for (const candidate of directArrays) {
+    if (Array.isArray(candidate)) return candidate as TreezDirectDiscount[];
+  }
+
+  if (payload.data && typeof payload.data === "object") {
+    const dataObj = payload.data as Record<string, unknown>;
+    const nestedArrays = [
+      dataObj.discount_list,
+      dataObj.discounts,
+      dataObj.result,
+      dataObj.items,
+    ];
+    for (const candidate of nestedArrays) {
+      if (Array.isArray(candidate)) return candidate as TreezDirectDiscount[];
+    }
+  }
+
+  return [];
+}
+
+/**
+ * Fetch discounts directly from Treez (without product_list include_discounts).
+ * Tries multiple endpoint patterns because Treez deployments can vary.
+ */
+export async function fetchTreezDiscounts(options?: {
+  endpointOverride?: string;
+}): Promise<TreezDirectDiscount[]> {
+  const token = await getTreezAccessToken();
+  const baseUrl = await getBaseUrl();
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "client_id": getClientId(),
+    Accept: "application/json",
+  };
+
+  const endpointOverride = options?.endpointOverride?.trim();
+  const candidatePaths = endpointOverride
+    ? [endpointOverride]
+    : [
+        "/discount/list",
+        "/discount/discount_list",
+        "/pricing/discount/list",
+      ];
+
+  let lastErrorText = "";
+  for (const rawPath of candidatePaths) {
+    const path = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+    const url = `${baseUrl}${path}`;
+
+    const response = await fetch(url, { method: "GET", headers });
+    if (!response.ok) {
+      const text = await response.text();
+      lastErrorText = `${response.status} ${response.statusText} ${text.slice(0, 200)}`;
+      continue;
+    }
+
+    const data = (await response.json()) as Record<string, unknown>;
+    const resultCode = typeof data.resultCode === "string" ? data.resultCode : "";
+    if (resultCode && resultCode !== "SUCCESS") {
+      const reason = typeof data.resultReason === "string" ? data.resultReason : "Unknown resultCode";
+      lastErrorText = `${resultCode}: ${reason}`;
+      continue;
+    }
+
+    const discounts = pickDiscountList(data);
+    if (discounts.length > 0) {
+      return discounts;
+    }
+  }
+
+  throw new Error(
+    `Treez direct discounts endpoint failed or returned no list. Last response: ${lastErrorText || "No successful endpoint response"}`
+  );
+}
+
 export interface FetchProductsOptions {
   /** active=TRUE | FALSE | ALL - default: ALL */
   active?: "TRUE" | "FALSE" | "ALL";
