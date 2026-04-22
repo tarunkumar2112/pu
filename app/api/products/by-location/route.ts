@@ -64,12 +64,12 @@ function isDiscountActiveNow(discount: TreezDiscount): boolean {
     (c) => c.discount_condition_type === "Schedule"
   );
 
-  // No schedule = always active
-  if (!scheduleConditions || scheduleConditions.length === 0) return true;
+  // Business rule: if schedule/start-end is missing, do NOT apply discount.
+  if (!scheduleConditions || scheduleConditions.length === 0) return false;
 
   return scheduleConditions.some((condition) => {
     const schedule = condition.discount_condition_schedule;
-    if (!schedule) return true;
+    if (!schedule?.start_date || !schedule?.end_date) return false;
 
     const start = new Date(schedule.start_date); // e.g. "2025-11-24T00:00"
     const end = new Date(schedule.end_date);     // e.g. "2026-01-01T23:59"
