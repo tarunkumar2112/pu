@@ -233,6 +233,57 @@ export interface TreezProductResponse {
 }
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
+let lastTreezRequestAt = 0;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Global per-process pacing for Treez calls.
+ * Keeps request rate below strict upstream TPS caps.
+ */
+async function waitForTreezRateWindow(): Promise<void> {
+  const minIntervalMs = Number(process.env.TREEZ_MIN_REQUEST_INTERVAL_MS ?? 140);
+  const now = Date.now();
+  const elapsed = now - lastTreezRequestAt;
+  if (elapsed < minIntervalMs) {
+    await sleep(minIntervalMs - elapsed);
+  }
+  lastTreezRequestAt = Date.now();
+}
+
+async function fetchTreezWithRetry(
+  url: string,
+  init: RequestInit,
+  context: string
+): Promise<Response> {
+  const maxAttempts = Number(process.env.TREEZ_MAX_RETRIES ?? 4);
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await waitForTreezRateWindow();
+    const response = await fetch(url, init);
+    if (response.ok) return response;
+
+    // Retry on rate-limit / transient upstream failures.
+    if (response.status === 429 || response.status === 503 || response.status === 502 || response.status === 504) {
+      const retryAfterHeader = response.headers.get("retry-after");
+      const retryAfterSec = retryAfterHeader ? Number(retryAfterHeader) : 0;
+      const retryAfterMs = Number.isFinite(retryAfterSec) && retryAfterSec > 0 ? retryAfterSec * 1000 : 0;
+      const backoffMs = Math.min(8000, 300 * Math.pow(2, attempt - 1));
+      const waitMs = Math.max(retryAfterMs, backoffMs);
+      console.warn(`[Treez] ${context} attempt ${attempt}/${maxAttempts} hit ${response.status}; retrying in ${waitMs}ms`);
+      if (attempt < maxAttempts) {
+        await sleep(waitMs);
+        continue;
+      }
+    }
+
+    return response;
+  }
+
+  throw new Error(`Treez request failed unexpectedly: ${context}`);
+}
 
 async function getBaseUrl(): Promise<string> {
   const baseUrl = (process.env.TREEZ_API_URL ?? "").replace(/\/+$/, "");
@@ -625,7 +676,7 @@ export async function fetchTreezDiscounts(options?: {
     const path = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
     const url = `${baseUrl}${path}`;
 
-    const response = await fetch(url, { method: "GET", headers });
+    const response = await fetchTreezWithRetry(url, { method: "GET", headers }, "direct-discounts");
     if (!response.ok) {
       const text = await response.text();
       lastErrorText = `${response.status} ${response.statusText} ${text.slice(0, 200)}`;
@@ -716,10 +767,10 @@ export async function fetchTreezProducts(
       Accept: "application/json",
     };
 
-    const response = await fetch(url, {
+    const response = await fetchTreezWithRetry(url, {
       method: "GET",
       headers,
-    });
+    }, `product_list page=${page}`);
 
     if (!response.ok) {
       const body = await response.text();
@@ -807,14 +858,14 @@ export async function fetchTreezProductsPage(
   
   console.log(`[Treez API] Calling: ${url.replace(baseUrl, '[BASE_URL]')}`);
 
-  const response = await fetch(url, {
+  const response = await fetchTreezWithRetry(url, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       "client_id": getClientId(),
       Accept: "application/json",
     },
-  });
+  }, `product_list single-page page=${page}`);
 
   if (!response.ok) {
     const body = await response.text();
@@ -864,7 +915,7 @@ export async function fetchTreezProductById(productId: string): Promise<TreezPro
   };
 
   const tryPath = async (url: string) => {
-    const res = await fetch(url, { method: "GET", headers });
+    const res = await fetchTreezWithRetry(url, { method: "GET", headers }, `product_by_id ${productId}`);
     if (!res.ok) return null;
     const data = (await res.json()) as TreezProductResponse & {
       data?: TreezProduct | TreezProduct[] | { product_list?: TreezProduct[] };

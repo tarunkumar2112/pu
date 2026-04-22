@@ -11,6 +11,7 @@ const CSV_HEADERS = [
   "StandardPrice",
   "SellPrice",
   "Discount",
+  "DiscountTitle",
   "Content",
   "Unit",
   "NotUsed",
@@ -188,6 +189,7 @@ function toCsv(products: Record<string, unknown>[]): string {
 
     let sellPrice = standardPrice;
     let discount = "";
+    let discountTitle = "";
 
     // Priority 1: Active PERCENT discount from product.discounts[] (PST schedule aware)
     const bestDiscount = getBestActiveDiscount(product);
@@ -195,6 +197,7 @@ function toCsv(products: Record<string, unknown>[]): string {
       const salePrice = Math.max(0, standardPriceNum * (1 - bestDiscount.percent / 100));
       sellPrice = salePrice.toFixed(2);
       discount = bestDiscount.percent.toFixed(2);
+      discountTitle = bestDiscount.title;
     } else {
       // Priority 2: Product-level discounted_price directly from Treez pricing object
       const pricing = product.pricing as {
@@ -209,6 +212,7 @@ function toCsv(products: Record<string, unknown>[]): string {
           discount = pricing.discount_percent
             ? Number(pricing.discount_percent).toFixed(2)
             : "";
+          discountTitle = "Product-Level Discount";
         }
       }
     }
@@ -223,6 +227,7 @@ function toCsv(products: Record<string, unknown>[]): string {
       standardPrice,
       sellPrice,
       discount,
+      discountTitle,
       String(cfg?.size ?? ""),
       String(cfg?.size_unit ?? "EA"),
       "",
@@ -241,18 +246,29 @@ export async function GET(request: NextRequest) {
   const location = searchParams.get("location") || "FRONT OF HOUSE";
   const format = (searchParams.get("format") || "").toLowerCase();
   const wantsCsv = format === "csv" || request.headers.get("accept")?.includes("text/csv");
+  const rawLimit = searchParams.get("limit");
+  const parsedLimit = rawLimit ? Number(rawLimit) : undefined;
+  const limit =
+    parsedLimit !== undefined && Number.isFinite(parsedLimit) && parsedLimit > 0
+      ? Math.min(Math.floor(parsedLimit), 5000)
+      : undefined;
+  // Treez may reject very small page_size values (e.g. 10) with 400.
+  // Request a safe page size, then trim results locally to the requested limit.
+  const treezPageSize = limit ? Math.max(limit, 100) : 5000;
 
   try {
     console.log(`[Location API] Fetching products for location: ${location}`);
 
     // ✅ Single Treez API call — no more double fetching
-    const products = await fetchTreezProducts({
+    const fetchedProducts = await fetchTreezProducts({
       active: "ALL",
       above_threshold: true,
       sellable_quantity_in_location: location,
       include_discounts: true,
-      page_size: 5000,
+      page_size: treezPageSize,
+      ...(limit ? { page: 1 } : {}),
     });
+    const products = limit ? fetchedProducts.slice(0, limit) : fetchedProducts;
 
     const discountCount = products.filter(
       (p) => getBestActiveDiscount(p as Record<string, unknown>) !== null
@@ -293,6 +309,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       location,
+      limit: limit ?? null,
       total: enrichedProducts.length,
       discounts_applied: discountCount,
       products: enrichedProducts,
