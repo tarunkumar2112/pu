@@ -50,6 +50,26 @@ interface TreezDiscount {
 // ─── PST Schedule Checker ─────────────────────────────────────────────────────
 
 // All Treez schedules are in PST/PDT (America/Los_Angeles)
+function getTimeMinutes(isoLike: string): number {
+  const m = isoLike.match(/T(\d{2}):(\d{2})/);
+  if (m) return Number(m[1]) * 60 + Number(m[2]);
+  const d = new Date(isoLike);
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function inferWeekdayFromText(text: string | undefined): string | null {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  if (t.includes("monday") || /\bmon\b/.test(t)) return "Monday";
+  if (t.includes("tuesday") || /\btue\b/.test(t)) return "Tuesday";
+  if (t.includes("wednesday") || /\bwed\b/.test(t)) return "Wednesday";
+  if (t.includes("thursday") || /\bthu\b/.test(t)) return "Thursday";
+  if (t.includes("friday") || /\bfri\b/.test(t)) return "Friday";
+  if (t.includes("saturday") || /\bsat\b/.test(t)) return "Saturday";
+  if (t.includes("sunday") || /\bsun\b/.test(t)) return "Sunday";
+  return null;
+}
+
 function isDiscountActiveNow(discount: TreezDiscount): boolean {
   // Get current time in PST
   const nowPST = new Date(
@@ -73,9 +93,8 @@ function isDiscountActiveNow(discount: TreezDiscount): boolean {
 
     const start = new Date(schedule.start_date); // e.g. "2025-11-24T00:00"
     const end = new Date(schedule.end_date);     // e.g. "2026-01-01T23:59"
-
-    const startTimeMinutes = start.getHours() * 60 + start.getMinutes();
-    const endTimeMinutes = end.getHours() * 60 + end.getMinutes();
+    const startTimeMinutes = getTimeMinutes(schedule.start_date);
+    const endTimeMinutes = getTimeMinutes(schedule.end_date);
 
     // DO_NOT repeat — one-time discount with a date range
     // e.g. start: 2025-11-24, end: 2026-01-01 → valid if today is within that range
@@ -97,10 +116,21 @@ function isDiscountActiveNow(discount: TreezDiscount): boolean {
         if (nowDate > repeatEnd) return false;
       }
 
-      // Check day of week
-      if (repeat?.days && Array.isArray(repeat.days)) {
-        if (!repeat.days.includes(todayName)) return false;
+      // Check day of week (strict):
+      // 1) repeat.days array, 2) repeat string like "Weekly on Sunday",
+      // 3) discount_condition_value fallback.
+      let scheduledDay: string | null = null;
+      if (repeat?.days && Array.isArray(repeat.days) && repeat.days.length > 0) {
+        scheduledDay = repeat.days[0] ?? null;
+      } else if (typeof schedule.repeat === "string") {
+        scheduledDay = inferWeekdayFromText(schedule.repeat);
       }
+      if (!scheduledDay) {
+        scheduledDay = inferWeekdayFromText(condition.discount_condition_value);
+      }
+      // If we cannot determine weekday for WEEK/CUSTOM, don't apply.
+      if (!scheduledDay) return false;
+      if (scheduledDay !== todayName) return false;
 
       // Check time window
       return nowTimeMinutes >= startTimeMinutes && nowTimeMinutes <= endTimeMinutes;
