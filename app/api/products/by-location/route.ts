@@ -18,9 +18,132 @@ const CSV_HEADERS = [
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ProductDiscount {
-  discount_method?: string;
-  discount_amount?: number;
+interface DiscountSchedule {
+  type: string;           // "DO_NOT" | "WEEK" | "CUSTOM" | "MONTH"
+  start_date: string;     // "2025-11-24T00:00"
+  end_date: string;       // "2026-01-01T23:59"
+  repeat?: string | {
+    interval_type?: string;
+    days?: string[];
+    end?: string | null;
+  };
+}
+
+interface DiscountCondition {
+  discount_condition_type: string;   // "Schedule" | "Fulfillment Type" | "Customer Group" | "Bogo Condition"
+  discount_condition_value: string;
+  discount_condition_schedule?: DiscountSchedule;
+}
+
+interface TreezDiscount {
+  discount_id: string;
+  discount_title: string;
+  discount_method: string;       // "PERCENT" | "DOLLAR" | "BOGO" | "COST"
+  discount_amount: number;       // For PERCENT: 40 means 40%
+  discount_affinity: string;     // "Pre-Cart" | "Cart"
+  discount_stackable: string;
+  discount_product_groups: string[];
+  discount_condition_detail: DiscountCondition[];
+}
+
+// ─── PST Schedule Checker ─────────────────────────────────────────────────────
+
+// All Treez schedules are in PST/PDT (America/Los_Angeles)
+function isDiscountActiveNow(discount: TreezDiscount): boolean {
+  // Get current time in PST
+  const nowPST = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+  );
+  const nowDate = nowPST;
+  const nowTimeMinutes = nowPST.getHours() * 60 + nowPST.getMinutes();
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const todayName = dayNames[nowPST.getDay()];
+
+  const scheduleConditions = discount.discount_condition_detail?.filter(
+    (c) => c.discount_condition_type === "Schedule"
+  );
+
+  // No schedule = always active
+  if (!scheduleConditions || scheduleConditions.length === 0) return true;
+
+  return scheduleConditions.some((condition) => {
+    const schedule = condition.discount_condition_schedule;
+    if (!schedule) return true;
+
+    const start = new Date(schedule.start_date); // e.g. "2025-11-24T00:00"
+    const end = new Date(schedule.end_date);     // e.g. "2026-01-01T23:59"
+
+    const startTimeMinutes = start.getHours() * 60 + start.getMinutes();
+    const endTimeMinutes = end.getHours() * 60 + end.getMinutes();
+
+    // DO_NOT repeat — one-time discount with a date range
+    // e.g. start: 2025-11-24, end: 2026-01-01 → valid if today is within that range
+    if (schedule.type === "DO_NOT") {
+      // Compare dates only (ignore time) for multi-day ranges
+      const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      const nowDateOnly = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+      return nowDateOnly >= startDateOnly && nowDateOnly <= endDateOnly;
+    }
+
+    // WEEK / CUSTOM repeat — check day of week + time window
+    if (schedule.type === "WEEK" || schedule.type === "CUSTOM") {
+      const repeat = schedule.repeat as { days?: string[]; end?: string | null } | undefined;
+
+      // Check if repeat has ended
+      if (repeat?.end) {
+        const repeatEnd = new Date(repeat.end);
+        if (nowDate > repeatEnd) return false;
+      }
+
+      // Check day of week
+      if (repeat?.days && Array.isArray(repeat.days)) {
+        if (!repeat.days.includes(todayName)) return false;
+      }
+
+      // Check time window
+      return nowTimeMinutes >= startTimeMinutes && nowTimeMinutes <= endTimeMinutes;
+    }
+
+    // MONTH repeat — check time window (simplified)
+    if (schedule.type === "MONTH") {
+      return nowTimeMinutes >= startTimeMinutes && nowTimeMinutes <= endTimeMinutes;
+    }
+
+    return true;
+  });
+}
+
+// ─── Discount Resolver ────────────────────────────────────────────────────────
+
+// Get the best (highest %) active PERCENT discount for a product
+// Uses product.discounts[] directly — no extra API call needed
+function getBestActiveDiscount(product: Record<string, unknown>): {
+  percent: number;
+  title: string;
+} | null {
+  const discounts = product.discounts as TreezDiscount[] | undefined;
+  if (!discounts || discounts.length === 0) return null;
+
+  let best: { percent: number; title: string } | null = null;
+
+  for (const d of discounts) {
+    // Phase 1: PERCENT only
+    if (d.discount_method !== "PERCENT") continue;
+
+    const amount = Number(d.discount_amount ?? 0);
+    if (!Number.isFinite(amount) || amount <= 0) continue;
+
+    // Check if this discount is currently active (PST schedule)
+    if (!isDiscountActiveNow(d)) continue;
+
+    // Pick highest % — conflict resolution rule
+    if (!best || amount > best.percent) {
+      best = { percent: amount, title: d.discount_title };
+    }
+  }
+
+  return best;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -52,21 +175,6 @@ function toStandardPrice(product: Record<string, unknown>): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-function getBestPercentDiscount(product: Record<string, unknown>): number {
-  const discounts = product.discounts as ProductDiscount[] | undefined;
-  if (!discounts || discounts.length === 0) return 0;
-
-  let best = 0;
-  for (const d of discounts) {
-    if (d.discount_method !== "PERCENT") continue;
-    const amount = Number(d.discount_amount ?? 0);
-    if (Number.isFinite(amount) && amount > best) {
-      best = amount;
-    }
-  }
-  return best;
-}
-
 // ─── CSV Builder ──────────────────────────────────────────────────────────────
 
 function toCsv(products: Record<string, unknown>[]): string {
@@ -75,23 +183,20 @@ function toCsv(products: Record<string, unknown>[]): string {
   products.forEach((product, index) => {
     const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
     const treezUuid = getTreezProductListId(product as any);
-
-    // Always use the product's own price_sell as standard price — this is always correct
     const standardPriceNum = toStandardPrice(product);
     const standardPrice = standardPriceNum.toFixed(2);
 
     let sellPrice = standardPrice;
     let discount = "";
 
-    const discountPercent = getBestPercentDiscount(product);
-    if (discountPercent > 0) {
-      // Calculate sale price locally using the correct standard price
-      // Formula: sale_price = price_sell × (1 - discount_percent / 100)
-      const salePrice = Math.max(0, standardPriceNum * (1 - discountPercent / 100));
+    // Priority 1: Active PERCENT discount from product.discounts[] (PST schedule aware)
+    const bestDiscount = getBestActiveDiscount(product);
+    if (bestDiscount) {
+      const salePrice = Math.max(0, standardPriceNum * (1 - bestDiscount.percent / 100));
       sellPrice = salePrice.toFixed(2);
-      discount = discountPercent.toFixed(2);
+      discount = bestDiscount.percent.toFixed(2);
     } else {
-      // Priority 2: Product-level discount from Treez pricing object
+      // Priority 2: Product-level discounted_price directly from Treez pricing object
       const pricing = product.pricing as {
         discounted_price?: number;
         discount_percent?: number;
@@ -115,9 +220,9 @@ function toCsv(products: Record<string, unknown>[]): string {
       String(cfg?.name ?? product.name ?? product.productName ?? ""),
       String(cfg?.brand ?? product.brand ?? product.brandName ?? ""),
       String(product.category_type ?? product.category ?? product.categoryName ?? ""),
-      standardPrice,  // StandardPrice — always regular undiscounted price
-      sellPrice,      // SellPrice — correctly calculated from standardPrice × discount
-      discount,       // Discount % — e.g. "40.00" for 40% off
+      standardPrice,
+      sellPrice,
+      discount,
       String(cfg?.size ?? ""),
       String(cfg?.size_unit ?? "EA"),
       "",
@@ -140,6 +245,7 @@ export async function GET(request: NextRequest) {
   try {
     console.log(`[Location API] Fetching products for location: ${location}`);
 
+    // ✅ Single Treez API call — no more double fetching
     const products = await fetchTreezProducts({
       active: "ALL",
       above_threshold: true,
@@ -147,11 +253,12 @@ export async function GET(request: NextRequest) {
       include_discounts: true,
       page_size: 5000,
     });
-    const discountCount = products.reduce((count, product) => {
-      return count + (getBestPercentDiscount(product as Record<string, unknown>) > 0 ? 1 : 0);
-    }, 0);
 
-    console.log(`[Location API] Fetched ${products.length} products, ${discountCount} with discounts`);
+    const discountCount = products.filter(
+      (p) => getBestActiveDiscount(p as Record<string, unknown>) !== null
+    ).length;
+
+    console.log(`[Location API] Fetched ${products.length} products, ${discountCount} with active discounts`);
 
     if (wantsCsv) {
       const csv = toCsv(products);
@@ -164,21 +271,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // JSON response — attach resolved discount info to each product
+    // JSON — attach resolved discount to each product for debugging
     const enrichedProducts = products.map((product: Record<string, unknown>) => {
       const standardPriceNum = toStandardPrice(product);
-      const discountPercent = getBestPercentDiscount(product);
-      const salePrice = discountPercent
-        ? Math.max(0, standardPriceNum * (1 - discountPercent / 100))
-        : standardPriceNum;
-
+      const bestDiscount = getBestActiveDiscount(product);
       return {
         ...product,
-        resolved_discount: discountPercent
+        resolved_discount: bestDiscount
           ? {
-              discount_percent: discountPercent,
+              discount_title: bestDiscount.title,
+              discount_percent: bestDiscount.percent,
               standard_price: standardPriceNum,
-              sale_price: parseFloat(salePrice.toFixed(2)),
+              sale_price: parseFloat(
+                Math.max(0, standardPriceNum * (1 - bestDiscount.percent / 100)).toFixed(2)
+              ),
             }
           : null,
       };
