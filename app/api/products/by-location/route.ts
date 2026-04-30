@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchTreezProducts, getTreezProductListId } from "@/lib/treez";
 
+const ALLOWED_ORIGINS = new Set([
+  "http://ebs50.local",
+  "http://169.254.139.79",
+  "http://169.254.139.79/",
+]);
+
 const CSV_HEADERS = [
   "ProductId",
   "TreezUUID",
@@ -269,7 +275,23 @@ function toCsv(products: Record<string, unknown>[]): string {
   return lines.join("\n");
 }
 
+function applyCors(request: NextRequest, response: NextResponse): NextResponse {
+  const origin = request.headers.get("origin");
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    response.headers.set("Access-Control-Allow-Origin", origin);
+    response.headers.set("Vary", "Origin");
+  }
+  response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+  response.headers.set("Access-Control-Max-Age", "86400");
+  return response;
+}
+
 // ─── Route Handler ────────────────────────────────────────────────────────────
+
+export async function OPTIONS(request: NextRequest) {
+  return applyCors(request, new NextResponse(null, { status: 204 }));
+}
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -308,13 +330,13 @@ export async function GET(request: NextRequest) {
 
     if (wantsCsv) {
       const csv = toCsv(products);
-      return new NextResponse(csv, {
+      return applyCors(request, new NextResponse(csv, {
         status: 200,
         headers: {
           "Content-Type": "text/csv; charset=utf-8",
           "Content-Disposition": `inline; filename="treez-${location.replace(/\s+/g, "-").toLowerCase()}.csv"`,
         },
-      });
+      }));
     }
 
     // JSON — attach resolved discount to each product for debugging
@@ -336,26 +358,26 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
+    return applyCors(request, NextResponse.json({
       success: true,
       location,
       limit: limit ?? null,
       total: enrichedProducts.length,
       discounts_applied: discountCount,
       products: enrichedProducts,
-    });
+    }));
 
   } catch (error: any) {
     console.error("[Location API] Error:", error);
     if (wantsCsv) {
-      return new NextResponse(`${CSV_HEADERS.join(",")}\n`, {
+      return applyCors(request, new NextResponse(`${CSV_HEADERS.join(",")}\n`, {
         status: 200,
         headers: { "Content-Type": "text/csv; charset=utf-8" },
-      });
+      }));
     }
-    return NextResponse.json(
+    return applyCors(request, NextResponse.json(
       { error: error.message || "Failed to fetch products" },
       { status: 500 }
-    );
+    ));
   }
 }
