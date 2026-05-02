@@ -210,8 +210,8 @@ function* generateCsvRows(products: Record<string, unknown>[]): Generator<string
   // Header row
   yield CSV_HEADERS.join(",");
 
-  // Product rows
-  products.forEach((product, index) => {
+  // Product rows (for...of so yield stays in the generator body; forEach callbacks cannot yield)
+  for (const [index, product] of products.entries()) {
     const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
     const treezUuid = getTreezProductListId(product as any);
     const standardPriceNum = toStandardPrice(product);
@@ -262,7 +262,7 @@ function* generateCsvRows(products: Record<string, unknown>[]): Generator<string
     ].map(csvEscape).join(",");
 
     yield row;
-  });
+  }
 }
 
 // ─── CORS Helper ──────────────────────────────────────────────────────────────
