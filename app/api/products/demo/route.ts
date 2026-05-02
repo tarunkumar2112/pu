@@ -349,7 +349,9 @@ export async function GET(request: NextRequest) {
           location,
           limit: limit ?? null,
           total: enrichedProducts.length,
-          discounts_applied: enrichedProducts.filter((p) => p.resolved_discount).length,
+          discounts_applied: enrichedProducts.filter(
+            (p: Record<string, unknown> & { resolved_discount: unknown }) => p.resolved_discount
+          ).length,
           products: enrichedProducts,
         })
       );
