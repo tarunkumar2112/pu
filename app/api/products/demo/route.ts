@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchTreezProducts, getTreezProductListId } from "@/lib/treez";
 
 const ALLOWED_ORIGINS = new Set([
   "http://ebs50.local",
@@ -27,7 +26,7 @@ const CSV_HEADERS = [
 
 const REQUEST_CACHE = new Map<
   string,
-  { timestamp: number; promise: Promise<any> }
+  { timestamp: number; promise: Promise<Record<string, unknown>[]> }
 >();
 const CACHE_TTL = 5000; // 5 seconds — prevents duplicate simultaneous requests
 
@@ -175,7 +174,154 @@ function getBestActiveDiscount(product: Record<string, unknown>): {
   return best;
 }
 
+/** Wide date window so `isDiscountActiveNow` stays true for demo PERCENT rows */
+function demoPercentDiscount(id: string, title: string, percent: number): TreezDiscount {
+  const start = new Date();
+  start.setUTCFullYear(start.getUTCFullYear() - 1);
+  const end = new Date();
+  end.setUTCFullYear(end.getUTCFullYear() + 1);
+  return {
+    discount_id: id,
+    discount_title: title,
+    discount_method: "PERCENT",
+    discount_amount: percent,
+    discount_affinity: "ANY",
+    discount_stackable: "NO",
+    discount_product_groups: [],
+    discount_condition_detail: [
+      {
+        discount_condition_type: "Schedule",
+        discount_condition_value: "",
+        discount_condition_schedule: {
+          type: "DO_NOT",
+          start_date: start.toISOString(),
+          end_date: end.toISOString(),
+        },
+      },
+    ],
+  };
+}
+
+const DEMO_PRODUCTS: Record<string, unknown>[] = [
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440001",
+    name: "Blue Dream 3.5g",
+    brand: "Demo Farms",
+    category_type: "Flower",
+    product_configurable_fields: {
+      name: "Blue Dream 3.5g",
+      brand: "Demo Farms",
+      size: "3.5",
+      size_unit: "G",
+    },
+    pricing: { price_sell: 35 },
+    product_barcodes: [{ barcode: "850012345001" }],
+    discounts: [],
+  },
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440002",
+    name: "OG Kush 7g",
+    brand: "Demo Farms",
+    category_type: "Flower",
+    product_configurable_fields: {
+      name: "OG Kush 7g",
+      brand: "Demo Farms",
+      size: "7",
+      size_unit: "G",
+    },
+    pricing: { price_sell: 70 },
+    product_barcodes: [{ barcode: "850012345002" }],
+    discounts: [demoPercentDiscount("demo-d1", "Loyalty 15%", 15)],
+  },
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440003",
+    name: "House Preroll 1g",
+    brand: "Demo Labs",
+    category_type: "Preroll",
+    product_configurable_fields: {
+      name: "House Preroll 1g",
+      brand: "Demo Labs",
+      size: "1",
+      size_unit: "G",
+    },
+    pricing: { price_sell: 12, discounted_price: 9, discount_percent: 25 },
+    product_barcodes: [{ barcode: "850012345003" }],
+    discounts: [],
+  },
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440004",
+    name: "Sour Gummies 100mg",
+    brand: "Demo Edibles",
+    category_type: "Edible",
+    product_configurable_fields: {
+      name: "Sour Gummies 100mg",
+      brand: "Demo Edibles",
+      size: "100",
+      size_unit: "MG",
+    },
+    pricing: { price_sell: 22 },
+    product_barcodes: [{ barcode: "850012345004" }],
+    discounts: [demoPercentDiscount("demo-d2", "Weekend 10%", 10)],
+  },
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440005",
+    name: "Disposable Vape 0.5g",
+    brand: "Demo Oil Co",
+    category_type: "Vape",
+    product_configurable_fields: {
+      name: "Disposable Vape 0.5g",
+      brand: "Demo Oil Co",
+      size: "0.5",
+      size_unit: "G",
+    },
+    pricing: { price_sell: 28 },
+    product_barcodes: [{ barcode: "850012345005" }],
+    discounts: [],
+  },
+  {
+    product_id: "550e8400-e29b-41d4-a716-446655440006",
+    name: "Sparkling THC Soda",
+    brand: "Demo Beverages",
+    category_type: "Beverage",
+    product_configurable_fields: {
+      name: "Sparkling THC Soda",
+      brand: "Demo Beverages",
+      size: "12",
+      size_unit: "OZ",
+    },
+    pricing: { price_sell: 6 },
+    product_barcodes: [{ barcode: "850012345006" }],
+    discounts: [demoPercentDiscount("demo-d3", "Mix & Match 20%", 20)],
+  },
+];
+
+function getDemoProductSlice(limit?: number): Record<string, unknown>[] {
+  const copy = DEMO_PRODUCTS.map((p) => ({ ...p }));
+  if (limit === undefined) return copy;
+  return copy.slice(0, limit);
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Same field order as Treez `getTreezProductListId` (no network). */
+function getDemoProductListId(product: Record<string, unknown>): string {
+  const candidates: unknown[] = [
+    product.inventory_product_id,
+    product.inventoryProductId,
+    product.product_id,
+    product.productId,
+    product.id,
+    product.product_uuid,
+    product.productUuid,
+  ];
+  for (const c of candidates) {
+    const s = c !== undefined && c !== null ? String(c).trim() : "";
+    if (s) return s;
+  }
+  const barcodes = product.product_barcodes as Array<{ barcode?: string }> | undefined;
+  const bc = barcodes?.[0]?.barcode;
+  return bc !== undefined && bc !== null ? String(bc).trim() : "";
+}
 
 function csvEscape(value: unknown): string {
   const s = value === undefined || value === null ? "" : String(value);
@@ -213,7 +359,7 @@ function* generateCsvRows(products: Record<string, unknown>[]): Generator<string
   // Product rows (for...of so yield stays in the generator body; forEach callbacks cannot yield)
   for (const [index, product] of products.entries()) {
     const cfg = product.product_configurable_fields as Record<string, unknown> | undefined;
-    const treezUuid = getTreezProductListId(product as any);
+    const treezUuid = getDemoProductListId(product);
     const standardPriceNum = toStandardPrice(product);
     const standardPrice = standardPriceNum.toFixed(2);
 
@@ -296,8 +442,6 @@ export async function GET(request: NextRequest) {
     parsedLimit !== undefined && Number.isFinite(parsedLimit) && parsedLimit > 0
       ? Math.min(Math.floor(parsedLimit), 5000)
       : undefined;
-  const treezPageSize = limit ? Math.max(limit, 100) : 5000;
-
   const cacheKey = getCacheKey(location, limit);
 
   try {
@@ -306,7 +450,7 @@ export async function GET(request: NextRequest) {
     const cached = REQUEST_CACHE.get(cacheKey);
 
     if (cached && now - cached.timestamp < CACHE_TTL) {
-      console.log(`[Location API] Using cached promise for: ${cacheKey}`);
+      console.log(`[Demo products API] Using cached promise for: ${cacheKey}`);
       const products = await cached.promise;
 
       // Return CSV or JSON
@@ -318,7 +462,7 @@ export async function GET(request: NextRequest) {
             status: 200,
             headers: {
               "Content-Type": "text/csv; charset=utf-8",
-              "Content-Disposition": `attachment; filename="treez-${location.replace(/\s+/g, "-").toLowerCase()}.csv"`,
+              "Content-Disposition": `attachment; filename="demo-products-${location.replace(/\s+/g, "-").toLowerCase()}.csv"`,
             },
           })
         );
@@ -357,21 +501,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ✅ Create promise and cache it
-    const fetchPromise = (async () => {
-      console.log(`[Location API] Fetching products for location: ${location}`);
-
-      const fetchedProducts = await fetchTreezProducts({
-        active: "ALL",
-        above_threshold: true,
-        sellable_quantity_in_location: location,
-        include_discounts: true,
-        page_size: treezPageSize,
-        ...(limit ? { page: 1 } : {}),
-      });
-
-      return limit ? fetchedProducts.slice(0, limit) : fetchedProducts;
-    })();
+    // ✅ Create promise and cache it (static demo — no Treez API)
+    const fetchPromise = Promise.resolve(getDemoProductSlice(limit)).then((rows) => {
+      console.log(`[Demo products API] Serving ${rows.length} static rows (location=${location})`);
+      return rows;
+    });
 
     REQUEST_CACHE.set(cacheKey, {
       timestamp: now,
@@ -388,10 +522,12 @@ export async function GET(request: NextRequest) {
     const products = await fetchPromise;
 
     const discountCount = products.filter(
-      (p) => getBestActiveDiscount(p as Record<string, unknown>) !== null
+      (p: Record<string, unknown>) => getBestActiveDiscount(p) !== null
     ).length;
 
-    console.log(`[Location API] Fetched ${products.length} products, ${discountCount} with active discounts`);
+    console.log(
+      `[Demo products API] ${products.length} products, ${discountCount} with scheduled % discounts`
+    );
 
     if (wantsCsv) {
       // ✅ Stream CSV as generator to avoid single giant row
@@ -403,7 +539,7 @@ export async function GET(request: NextRequest) {
           status: 200,
           headers: {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": `attachment; filename="treez-${location.replace(/\s+/g, "-").toLowerCase()}.csv"`,
+            "Content-Disposition": `attachment; filename="demo-products-${location.replace(/\s+/g, "-").toLowerCase()}.csv"`,
           },
         })
       );
@@ -441,7 +577,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error: any) {
-    console.error("[Location API] Error:", error);
+    console.error("[Demo products API] Error:", error);
 
     // Clear cache on error
     REQUEST_CACHE.delete(cacheKey);
@@ -459,7 +595,7 @@ export async function GET(request: NextRequest) {
     return applyCors(
       request,
       NextResponse.json(
-        { error: error.message || "Failed to fetch products" },
+        { error: error.message || "Failed to load demo products" },
         { status: 500 }
       )
     );
