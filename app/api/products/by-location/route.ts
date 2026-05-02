@@ -304,14 +304,15 @@ export async function GET(request: NextRequest) {
     parsedLimit !== undefined && Number.isFinite(parsedLimit) && parsedLimit > 0
       ? Math.min(Math.floor(parsedLimit), 5000)
       : undefined;
-  // Treez may reject very small page_size values (e.g. 10) with 400.
-  // Request a safe page size, then trim results locally to the requested limit.
-  const treezPageSize = limit ? Math.max(limit, 100) : 5000;
+  // Treez may reject very small page_size values (e.g. 10) with 400 — use at least 100.
+  // When `limit` is set, one page is enough at max(limit, 100). When unset, batch size comes from
+  // `TREEZ_PRODUCT_LIST_PAGE_SIZE` (e.g. 100) or defaults to 1000 per Treez request (still paginates until done).
+  const treezPageSize = limit !== undefined ? Math.max(limit, 100) : undefined;
 
   try {
     console.log(`[Location API] Fetching products for location: ${location}`);
 
-    // ✅ Single Treez API call — no more double fetching
+    // Treez `fetchTreezProducts` follows pages until done when `page` is omitted.
     const fetchedProducts = await fetchTreezProducts({
       active: "ALL",
       above_threshold: true,

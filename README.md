@@ -16,6 +16,8 @@ Sync products from Treez dispensary POS to Opticon ESL (Electronic Shelf Labels)
 TREEZ_API_KEY=your_api_key
 TREEZ_DISPENSARY=partnersandbox3
 TREEZ_API_URL=https://api.treez.io/v2.0/dispensary
+# Optional: Treez `product_list` page size (100–5000). Default 1000; use 100 for smaller JSON per request (more pages).
+# TREEZ_PRODUCT_LIST_PAGE_SIZE=100
 ```
 
 2. Run the development server:

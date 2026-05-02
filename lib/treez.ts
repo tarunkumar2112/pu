@@ -702,6 +702,25 @@ export async function fetchTreezDiscounts(options?: {
   );
 }
 
+/** Treez `product_list` may return 400 for very small page_size (e.g. 10). */
+const TREEZ_PAGE_SIZE_MIN = 100;
+const TREEZ_PAGE_SIZE_MAX = 5000;
+
+/**
+ * Items per `product_list` request. Explicit `page_size` wins; else `TREEZ_PRODUCT_LIST_PAGE_SIZE` (e.g. 100);
+ * else 1000. Smaller values mean more HTTP round-trips but smaller JSON per call.
+ */
+export function resolveTreezProductListPageSize(explicit?: number): number {
+  if (explicit !== undefined && Number.isFinite(explicit)) {
+    return Math.min(TREEZ_PAGE_SIZE_MAX, Math.max(TREEZ_PAGE_SIZE_MIN, Math.floor(explicit)));
+  }
+  const fromEnv = Number(process.env.TREEZ_PRODUCT_LIST_PAGE_SIZE);
+  if (Number.isFinite(fromEnv) && fromEnv >= TREEZ_PAGE_SIZE_MIN) {
+    return Math.min(TREEZ_PAGE_SIZE_MAX, Math.floor(fromEnv));
+  }
+  return 1000;
+}
+
 export interface FetchProductsOptions {
   /** active=TRUE | FALSE | ALL - default: ALL */
   active?: "TRUE" | "FALSE" | "ALL";
@@ -709,7 +728,7 @@ export interface FetchProductsOptions {
   above_threshold?: boolean;
   /** pagination page number */
   page?: number;
-  /** items per page (default 1000 from Treez when excluded) */
+  /** items per page; omit to use `TREEZ_PRODUCT_LIST_PAGE_SIZE` or 1000 */
   page_size?: number;
   /** filter by category_type */
   category_type?: string;
@@ -750,7 +769,7 @@ export async function fetchTreezProducts(
     defaultParams.sellable_quantity_in_type = options.sellable_quantity_in_type;
   if (options.include_discounts === true) defaultParams.include_discounts = "TRUE";
   if (options.internal_tag) defaultParams.internal_tag = options.internal_tag;
-  if (options.page_size) defaultParams.page_size = String(options.page_size);
+  defaultParams.page_size = String(resolveTreezProductListPageSize(options.page_size));
 
   const allProducts: TreezProduct[] = [];
   let page = 1;
@@ -845,7 +864,7 @@ export async function fetchTreezProductsPage(
     above_threshold: String(options.above_threshold ?? false),
     include_discounts: "FALSE",
   };
-  if (options.page_size) params.page_size = String(options.page_size);
+  params.page_size = String(resolveTreezProductListPageSize(options.page_size));
   if (options.category_type) params.category_type = options.category_type;
   if (options.ID) params.ID = options.ID;
   if (options.sellable_quantity_in_location)

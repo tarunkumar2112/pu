@@ -1,7 +1,40 @@
 # Opticon EBS50 API Reference
 
 **Links:** [Opticon](https://opticon.com/) | [Treez](https://www.treez.io/)  
-**Manual:** [ESL Web Server User Manual (PDF)](https://www.opticon.com/support/Display%20Solutions/ESL%20Web%20Server/ESL%20Web%20Server%20-%20User%20Manual-EN.pdf)
+**Manuals (official PDFs):**
+
+- [ESL Web Server – User Manual (EBS-50, includes API CSV)](https://www.opticon.com/support/Display%20Solutions/ESL%20Web%20Server/ESL%20Web%20Server%20-%20User%20Manual-EN.pdf)
+- [EBS-50 User Manual](https://www.opticon.com/support/Display%20Solutions/EBS-50/EBS-50%20User%20Manual-EN.pdf) (same product line; cross-check chapter numbers)
+- [Opticon ESL Server Manual](https://www.opticon.com/support/Display%20Solutions/ESL%20Server/Opticon%20ESL%20Server%20Manual-EN.pdf) (Windows ESL Server app; CSV field separator UI)
+
+---
+
+## HTTP API CSV — confirmed requirements (vs our app)
+
+Use this when the **ESL Web Server** polls your **HTTPS CSV endpoint** (not `ChangeStrings`). Sources: EBS-50 / ESL Web Server manual §8.4.1.1.x (API CSV), ESL Server manual §7.2.6.7 and appendix on CSV format.
+
+| Topic | Confirmed from Opticon docs | Action for our integration |
+|--------|-----------------------------|----------------------------|
+| **Field delimiter** | **EBS-50 ESL Web Server:** On ingest, the delimiter is **auto-detected** as a single character among **comma, semicolon, tab, pipe, colon, circumflex** (`^`). | **Comma is valid** if the file is consistent. Support’s note about **`;`** matches European CSV and **SQL hybrid** setups where the DB UI uses **“Field separator (for CSV-import)”** — that setting applies to **files dropped in the Input folder**, not necessarily rewriting HTTP bodies. Still: if the server was configured expecting `;`, verify in **Products → database / CSV wizard** what the **parsed** column count is after a test fetch. |
+| **Encoding** | Supported: **UTF-8**, UTF-7, **ANSI**, Unicode (others on request). | Emit **UTF-8** without BOM unless Opticon asks otherwise. Set `Content-Type: text/csv; charset=utf-8`. |
+| **Line endings** | Docs stress **one record per line**, comment lines with **`#`** first character, optional header detection. | Use **`\n`** or **`\r\n`** consistently **one row per product**. **Never** raw newlines inside a field unless the field is fully **quoted** per RFC 4180 (unquoted newlines → **one giant logical line** → matches support’s parser hang). |
+| **Max rows** | “Load full product table in memory” warns for **exceptionally large** tables; no single hard **HTTP CSV row limit** called out in the sections reviewed. | Treat **payload size + parse time** as the limit. For **30s** budgets, cap rows or use **API CSV “modified since”** partial responses (manual §8.4.1.1.3). |
+| **HTTP / API CSV behavior** | Endpoint is **http/https** reachable from the ESL Web Server. Optional **request headers** (e.g. API keys). **`modified since`**: ISO 8601 in header and query; **complete reload interval**: every *n*th sync does a **full** fetch without `modified since`. | Implement **`modified since`** if we want incremental CSV; ensure **full** responses stay under timeout. |
+| **30 second limit** | **Not** stated as a fixed HTTP read timeout in the manual excerpts we used; it is your **observed / business** constraint (and Margaret’s reliability note). | Aim for about **25 seconds or less** end-to-end; ask Opticon for the **exact HTTP client timeout** on your **firmware / ESL Web Server version**. |
+| **Retries / duplicate reloads** | ESL **poll interval** / **poll timeout** in manuals refer to **label ↔ base station** polls (e.g. default **20s** interval), not your CSV URL. | **Five** reloads from one button = treat as **UI retry or timeout resend** until Opticon confirms. Mitigate with **fast responses** and **idempotent** CSV. |
+
+### Support thread (Margaret / engineer) — engineering interpretation
+
+- **“One row, gigantic”:** Almost always **missing physical newlines** (buffering) or **unescaped newlines inside fields** so the server sees **one line**. Fix on our side: strict CSV escaping + reasonable row count.
+- **`;` in this database”:** Aligns with **European CSV** or **configured** separator; **EBS-50 auto-detect** still allows `,` **if** the file is self-consistent. When in doubt, **match the sample** Opticon exports from your store wizard.
+- **Serverless / Vercel:** Margaret’s point is **latency + cold starts**, not CSV grammar. Production CSV for ESL is better on an **always-on** host or **pre-generated file** if polls must never miss **30s**.
+
+### What to ask Opticon in one email (if anything is still ambiguous)
+
+1. Exact **HTTP(S) read timeout** for **API CSV** on our **ESL Web Server + firmware version**.  
+2. Whether **API CSV** responses must use the same **field separator** as the **“Field separator (for CSV-import)”** UI setting when using **SQL hybrid**.  
+3. Recommended **max response size** or **max rows per full sync** for stable parsing on EBS-50.  
+4. Whether **Reload** on the product table can **retry** the same URL and how many times.
 
 ---
 
