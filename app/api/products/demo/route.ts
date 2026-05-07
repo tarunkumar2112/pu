@@ -86,6 +86,27 @@ function inferWeekdayFromText(text: string | undefined): string | null {
   return null;
 }
 
+const CANONICAL_WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+function normalizeToFullWeekday(raw: string | undefined | null): string | null {
+  if (raw === undefined || raw === null) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  const lower = s.toLowerCase();
+  for (const d of CANONICAL_WEEKDAYS) {
+    if (lower === d.toLowerCase()) return d;
+  }
+  return inferWeekdayFromText(s);
+}
+
 function isDiscountActiveNow(discount: TreezDiscount): boolean {
   const nowPST = new Date(
     new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
@@ -124,17 +145,22 @@ function isDiscountActiveNow(discount: TreezDiscount): boolean {
         if (nowDate > repeatEnd) return false;
       }
 
-      let scheduledDay: string | null = null;
+      const allowedDays: string[] = [];
       if (repeat?.days && Array.isArray(repeat.days) && repeat.days.length > 0) {
-        scheduledDay = repeat.days[0] ?? null;
+        for (const d of repeat.days) {
+          const n = normalizeToFullWeekday(d);
+          if (n) allowedDays.push(n);
+        }
       } else if (typeof schedule.repeat === "string") {
-        scheduledDay = inferWeekdayFromText(schedule.repeat);
+        const n = inferWeekdayFromText(schedule.repeat);
+        if (n) allowedDays.push(n);
       }
-      if (!scheduledDay) {
-        scheduledDay = inferWeekdayFromText(condition.discount_condition_value);
+      if (allowedDays.length === 0) {
+        const n = inferWeekdayFromText(condition.discount_condition_value);
+        if (n) allowedDays.push(n);
       }
-      if (!scheduledDay) return false;
-      if (scheduledDay !== todayName) return false;
+      if (allowedDays.length === 0) return false;
+      if (!allowedDays.includes(todayName)) return false;
 
       return nowTimeMinutes >= startTimeMinutes && nowTimeMinutes <= endTimeMinutes;
     }
